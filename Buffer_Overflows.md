@@ -247,3 +247,101 @@ If you type more than 14 bytes, the extra data spills over into the integer vari
 Try It
 Run the program and input more than 14 characters.
 You’ll see that the integer variable’s value changes, demonstrating a buffer overflow.
+
+- Ssh log in first
+- Compile c code first
+- Ends with normal warnings nothing of concern.
+```
+[user1@ip-10-49-129-36 ~]$ ls
+overflow-1  overflow-2  overflow-3  overflow-4
+[user1@ip-10-49-129-36 ~]$ cd overflow-1
+[user1@ip-10-49-129-36 overflow-1]$ ls
+int-overflow  int-overflow.c
+[user1@ip-10-49-129-36 overflow-1]$ gcc int-overflow.c -o int-overflow
+int-overflow.c: In function \u2018main\u2019:
+int-overflow.c:10:3: warning: implicit declaration of function \u2018gets\u2019; did you mean \u2018fgets\u2019? [-Wimplicit-function-declaration]
+   gets(buffer);
+   ^~~~
+   fgets
+/tmp/ccfWv56Q.o: In function `main':
+int-overflow.c:(.text+0x23): warning: the `gets' function is dangerous and should not be used.
+```
+- View code if desired just wanted to see what error was but its just warning.
+```
+[user1@ip-10-49-129-36 overflow-1]$ cat int-overflow.c
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+
+int main(int argc, char **argv)
+{
+  volatile int variable = 0;
+  char buffer[14];
+
+  gets(buffer);
+
+  if(variable != 0) {
+      printf("You have changed the value of the variable\n");
+  } else {
+      printf("Try again?\n");
+  }
+}
+```
+14 bytes → Try again?
+8 bytes  → Try again?
+10 bytes → Try again?
+32 bytes → Overflow + Segfault - this overwrites the the return address by one byte, 31 avoids it
+15 bytes → Overflow (variable changed)
+
+```
+[user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
+AAAAAAAAAAAAAA
+Try again?
+[user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
+AAAAAAAA
+Try again?
+```
+32 and 15 tried
+```
+[user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+You have changed the value of the variable
+Segmentation fault
+[user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
+AAAAAAAAAAAAAAA
+You have changed the value of the variable
+[user1@ip-10-49-129-36 overflow-1]$ 
+```
+
+Task 7 Overwriting Function Pointers
+
+This uses overflow-2 folder, here is part of the C code:
+```
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+
+void special()
+{
+    printf("this is the special function\n");
+    printf("you did this, friend!\n");
+}
+
+void normal()
+{
+    printf("this is the normal function\n");
+}
+
+void other()
+{
+    printf("why is this here?");
+}
+
+int main(int argc, char **argv)
+{
+    volatile int (*new_ptr) () = normal;
+    char buffer[14];
+    gets(buffer);
+    new_ptr();
+}
+```
