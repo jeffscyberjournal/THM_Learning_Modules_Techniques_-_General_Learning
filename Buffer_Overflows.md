@@ -252,12 +252,26 @@ You’ll see that the integer variable’s value changes, demonstrating a buffer
 - Compile c code first
 - Ends with normal warnings nothing of concern.
 ```
-[user1@ip-10-49-129-36 ~]$ ls
+ ~]$ ls
 overflow-1  overflow-2  overflow-3  overflow-4
-[user1@ip-10-49-129-36 ~]$ cd overflow-1
-[user1@ip-10-49-129-36 overflow-1]$ ls
-int-overflow  int-overflow.c
-[user1@ip-10-49-129-36 overflow-1]$ gcc int-overflow.c -o int-overflow
+ ~]$ cd overflow-1
+1]$ ls -la
+total 16
+drwxrwxr-x 2 user1 user1   48 Sep  2  2019 .
+drwx------ 7 user1 user1  169 Nov 27  2019 ..
+-rwxrwxr-x 1 user1 user1 8224 Sep  2  2019 int-overflow
+-rw-rw-r-- 1 user1 user1  291 Sep  2  2019 int-overflow.c
+```
+Its actually compiled closer look at the file shows its listed as not stripped meaning the debugging information and functions are not removed.
+```
+[user1@ip-10-49-147-85 overflow-1]$ file int-overflow
+int-overflow: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 3.2.0, BuildID[sha1]=847268d010c1aa1403e55a8891fc94d05b7ed123, not stripped
+[user1@ip-10-49-147-85 overflow-1]$ 
+
+```
+If not compiled just gun with gcc to compile for c code:
+```
+ overflow-1]$ gcc int-overflow.c -o int-overflow
 int-overflow.c: In function \u2018main\u2019:
 int-overflow.c:10:3: warning: implicit declaration of function \u2018gets\u2019; did you mean \u2018fgets\u2019? [-Wimplicit-function-declaration]
    gets(buffer);
@@ -266,9 +280,53 @@ int-overflow.c:10:3: warning: implicit declaration of function \u2018gets\u2019;
 /tmp/ccfWv56Q.o: In function `main':
 int-overflow.c:(.text+0x23): warning: the `gets' function is dangerous and should not be used.
 ```
+## 
+A closer look at RADARE2 
+
+```
+[user1@ip-10-49-147-85 overflow-1]$ radare2 int-overflow
+ -- The Hard ROP Cafe
+[0x00400450]> 
+```
+The Hard ROP Café” is just a fun radare2 startup banner, not an actual exploit technique.
+
+Next start the analysis is 'aaa'
+```
+[user1@ip-10-49-147-85 overflow-1]$ radare2 int-overflow
+ -- The Hard ROP Cafe
+[0x00400450]> aaa
+[x] Analyze all flags starting with sym. and entry0 (aa)
+[x] Analyze function calls (aac)
+[x] Analyze len bytes of instructions for references (aar)
+[x] Check for objc references
+[x] Check for vtables
+[x] Type matching analysis for all functions (aaft)
+[x] Propagate noreturn information
+[x] Use -AA or aaaa to perform additional experimental analysis.
+[0x00400450]> 
+```
+Next 'afl' to display the functions:
+```
+
+[0x00400450]> afl
+0x00400450    1 42           entry0
+0x00400480    4 42   -> 37   sym.deregister_tm_clones
+0x004004b0    4 58   -> 55   sym.register_tm_clones
+0x004004f0    3 34   -> 29   entry.fini0
+0x00400520    1 7            entry.init0
+0x004005f0    1 2            sym.__libc_csu_fini
+0x004005f4    1 9            sym._fini
+0x00400580    3 101  -> 92   sym.__libc_csu_init
+0x00400400    3 23           sym._init
+0x00400527    4 75           main
+0x00400430    1 6            sym.imp.puts
+0x00400440    1 6            sym.imp.gets
+[0x00400450]> 
+
+```
 - View code if desired just wanted to see what error was but its just warning.
 ```
-[user1@ip-10-49-129-36 overflow-1]$ cat int-overflow.c
+ overflow-1]$ cat int-overflow.c
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -287,9 +345,9 @@ int main(int argc, char **argv)
   }
 }
 ```
+The variable line 'char buffer[14];' pretty much tells me 14 is going to be the maximum it will handle, try a few sizes anyway.
 14 bytes → Try again?
-8 bytes  → Try again?
-10 bytes → Try again?
+8 bytes → Try again?
 32 bytes → Overflow + Segfault - this overwrites the the return address by one byte, 31 avoids it
 15 bytes → Overflow (variable changed)
 
@@ -313,10 +371,12 @@ You have changed the value of the variable
 [user1@ip-10-49-129-36 overflow-1]$ 
 ```
 
+
 Task 7 Overwriting Function Pointers
 
 This uses overflow-2 folder, here is part of the C code:
 ```
+overflow-2]$ cat func-pointer.c
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -345,3 +405,4 @@ int main(int argc, char **argv)
     new_ptr();
 }
 ```
+
