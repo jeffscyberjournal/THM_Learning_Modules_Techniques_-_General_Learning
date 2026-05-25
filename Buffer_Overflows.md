@@ -501,12 +501,9 @@ From the above pdf @ main we get
 
 
 From pdf @ main:
-
-s (your buffer[14]) is at: rbp - 0x16
-
-var_8h (your new_ptr) is at: rbp - 0x8
-
-Distance between them: 0𝑥16 − 0𝑥8 = 0𝑥𝐸 = 14
+- s (your buffer[14]) is at: rbp - 0x16
+- var_8h (your new_ptr) is at: rbp - 0x8
+- Distance between them: 0𝑥16 − 0𝑥8 = 0𝑥𝐸 = 14
 
 So:
 
@@ -554,26 +551,35 @@ int main(int argc, char **argv)
     copy_arg(argv[1]);
 }
 ```
+Note the goal is to read the secret.txt file, the program has suid bit set. When any user runs this program, it executes with the permissions of the file’s owner (user2). So user1 temporarily becomes user2 for the duration of program. Idea is to spawn a shell within program t allow secret.txt file to read.
+
+```
+[user1@ip-10-49-146-85 overflow-3]$ ls -la
+total 20
+drwxrwxr-x 2 user1 user1   72 Sep  2  2019 .
+drwx------ 7 user1 user1  169 Nov 27  2019 ..
+-rwsrwxr-x 1 user2 user2 8264 Sep  2  2019 buffer-overflow
+-rw-rw-r-- 1 user1 user1  285 Sep  2  2019 buffer-overflow.c
+-rw------- 1 user2 user2   22 Sep  2  2019 secret.txt
+[user1@ip-10-49-146-85 overflow-3]$ 
+
+```
+
 Key points:
-
-buffer is 140 bytes.
-
-strcpy(buffer, string) copies without length checking.
+- buffer is 140 bytes.
+- strcpy(buffer, string) copies without length checking.
 
 If argv[1] is longer than 140 bytes, you:
-
-overflow buffer
-
-overwrite saved registers
-
-overwrite the return address
+- overflow buffer
+- overwrite saved registers
+- overwrite the return address
 
 If you overwrite the return address with an address that points into your own buffer, and that buffer contains shellcode, the CPU will execute your shellcode when copy_arg returns.
 
 To make hitting the shellcode easier, you prepend a NOP sled (\x90 bytes) before the shellcode.
 
 Goal:
-Use this to spawn a shell (then read secret.txt via the SUID binary).
+- Use this to spawn a shell (then read secret.txt via the SUID binary).
 
 ## Normal stack frame for copy_arg (before overflow):
 
@@ -663,11 +669,9 @@ It is not printed by the program.
 It is not in the binary.
 
 It is only known at runtime, so you must get it from:
-
-gdb  
+- gdb  
 or
-
-radare2 -d
+- radare2 -d
 
 This is how all classic stack‑based shellcode exploits work.
 
