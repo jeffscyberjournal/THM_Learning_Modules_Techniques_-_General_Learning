@@ -10,7 +10,7 @@
 When a program runs, the computer treats it as a process. Modern computers can run many processes at once, but they don’t truly run at the same time. Instead, the CPU rapidly switches between them. This fast switching is called a context switch.
 
 Each process needs its own information to run—such as the current instruction and register values—so the operating system must store and manage all of this data. A process’s memory is arranged in a specific order:
-
+```
 +--------------------------------------+
 |          Higher memory addresses     |
 +--------------------------------------+
@@ -26,7 +26,7 @@ Each process needs its own information to run—such as the current instruction 
 +--------------------------------------+
 |                  0                   |
 +--------------------------------------+
-
+```
 Process Memory Layout (Simplified)
 - User Stack  
 Stores information the program needs while running, such as the program counter and saved registers. The stack grows downwards, and unused space below it is reserved in case it needs to grow.
@@ -134,7 +134,7 @@ When this happens:
 
 
 Stack Layout During the Call
-Code
+```
 Stack Bottom
 ┌───────────────────────────────┐
 │ Previous stack frame          │
@@ -145,6 +145,8 @@ Stack Bottom
 ├───────────────────────────────┤
 │ Stack frame for add           │
 └───────────────────────────────┘
+```
+
 Stack Top
 When add finishes, it executes retq:
 - Pops the return address off the stack
@@ -229,14 +231,16 @@ int main(int argc, char **argv)
 ## Memory Alignment
 Compilers often align variables to specific boundaries (like 8 or 16 bytes).
 For example, if a 12‑byte array is allocated on a 16‑byte‑aligned stack, the compiler adds 4 bytes of padding to make it fit neatly.
-
+```
 | buffer (12 bytes) | padding (4 bytes) |
-
+```
 ## Stack Frame Example
 In the main function, the stack frame might look like this:
 
+```
 | integer variable |
 | character buffer |
+```
 
 Even though the stack grows downward, data written into the buffer moves from lower to higher addresses.
 If too much data is entered, it can overwrite the integer variable.
