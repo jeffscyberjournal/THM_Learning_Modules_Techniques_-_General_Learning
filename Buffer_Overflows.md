@@ -1,11 +1,11 @@
 # Buffer Overflows
 
-## Task 1 Introduction
+# Task 1 Introduction
 
 - Explore simple stack buffer overflows (without mitigation) on x86-64 linux programs.
 - Use radare2 to examine the memory layout and familiarize with it.
 
-## Task 2 Process Layout
+# Task 2 Process Layout
 
 When a program runs, the computer treats it as a process. Modern computers can run many processes at once, but they don’t truly run at the same time. Instead, the CPU rapidly switches between them. This fast switching is called a context switch.
 
@@ -40,10 +40,10 @@ Used for dynamic memory allocation (e.g., malloc). It grows upwards as needed, a
 - Program Code and Data  
 Contains the program’s executable instructions and its initialised global variables.
 
-### Q1 Where is dynamically allocated memory stored? heap
-### Q2 Where is information about functions(e.g. local arguments) stored? stack
+## Q1 Where is dynamically allocated memory stored? heap
+## Q2 Where is information about functions(e.g. local arguments) stored? stack
 
-## Task 3 x86-64 Procedures
+# Task 3 x86-64 Procedures
 
 A program contains many functions, and the computer needs a way to keep track of which function is running and what data is being passed between them. This is what the stack is used for. The stack is a continuous block of memory that helps manage function calls and data.
 
@@ -106,14 +106,14 @@ calc(4, 5);
 ```
 Calling calc(4, 5) creates a stack frame for calc, which then calls add, creating another stack frame above it.
 
-### Q1: What direction does the stack grow? (lower/higher), use the symbol "|" to represent lower and the symbol "/" to represent higher.
+## Q1: What direction does the stack grow? (lower/higher), use the symbol "|" to represent lower and the symbol "/" to represent higher.
 A: questions wrong answer is l.
-### Q2: What instruction is used to add data onto the stack?
+## Q2: What instruction is used to add data onto the stack?
 Answer: push
 
-## Task 4 Procedures Continued
+# Task 4 Procedures from task 3 continued 
 
-### Function Calls and Stack Frames
+## Function Calls and Stack Frames
 
 When the program runs inside the calc function:
 - calc is the caller
@@ -192,7 +192,7 @@ Runtime Stack Overview
 └───────────────────────────────┘
 ```
 
-### Q1 What register stores the return address? Answer: RAX
+## Q1 What register stores the return address? Answer: RAX
 
 # Task 5: Endianess
 
@@ -206,7 +206,8 @@ Least Significant Byte (LSB) → 78
 
 # Task 6 Overwriting Variables
 
-Understanding Buffer Overflow
+## Understanding Buffer Overflow
+
 In the program, an integer variable and a character buffer are stored next to each other in memory.
 Because memory is contiguous, writing too much data into the buffer can overwrite the integer variable.
 ```
@@ -252,10 +253,8 @@ You’ll see that the integer variable’s value changes, demonstrating a buffer
 - Compile c code first
 - Ends with normal warnings nothing of concern.
 ```
- ~]$ ls
-overflow-1  overflow-2  overflow-3  overflow-4
  ~]$ cd overflow-1
-1]$ ls -la
+overflow-1]$ ls -la
 total 16
 drwxrwxr-x 2 user1 user1   48 Sep  2  2019 .
 drwx------ 7 user1 user1  169 Nov 27  2019 ..
@@ -267,22 +266,18 @@ Its actually compiled closer look at the file shows its listed as not stripped m
 ```
 [user1@ip-10-49-147-85 overflow-1]$ file int-overflow
 int-overflow: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 3.2.0, BuildID[sha1]=847268d010c1aa1403e55a8891fc94d05b7ed123, not stripped
-[user1@ip-10-49-147-85 overflow-1]$ 
-
 ```
+
 If not compiled just run with gcc to compile for c code:
 ```
  overflow-1]$ gcc int-overflow.c -o int-overflow
-int-overflow.c: In function \u2018main\u2019:
-int-overflow.c:10:3: warning: implicit declaration of function \u2018gets\u2019; did you mean \u2018fgets\u2019? [-Wimplicit-function-declaration]
-   gets(buffer);
-   ^~~~
-   fgets
-/tmp/ccfWv56Q.o: In function `main':
-int-overflow.c:(.text+0x23): warning: the `gets' function is dangerous and should not be used.
+... Warnings listed but compiles fine.
 ```
 
 ## A closer look at RADARE2, then run analysis 'aaa'
+
+radare2 is mentioned in the first section but up to this point is not even mentioned in use with the problems at hand
+
 ```
 [user1@ip-10-49-147-85 overflow-1]$ radare2 int-overflow
  -- The Hard ROP Cafe
