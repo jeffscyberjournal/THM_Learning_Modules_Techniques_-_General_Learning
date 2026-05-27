@@ -140,8 +140,8 @@ When the program runs inside the calc function:
      0x562b77135625      8b75ec          movl local_14h, %esi
      0x562b77135628      89d6            movl %edx, %esi
      0x562b7713562a      89c7            movl %eax, %edi
-     ;--rip:
      0x562b7713562c b    e8c9ffffff      callq sym.add           #<--- caller callq
+     ;--rip:
      0x562b77135631      8945fc          movl %eax, local_4h
      0x562b77135634      8b45fc          movl local_4h, %eax
      0x562b77135637      c9              leave
@@ -156,7 +156,31 @@ When this happens:
     - rsp → top of the new stack
     - rbp → base of the new frame
 
-<img width="644" height="328" alt="image" src="https://github.com/user-attachments/assets/caa80e6e-683a-42f5-918b-418899329cb5" />
+```
+(fcn) sym.calc 37
+  sym.calc (int arg1, int arg2);
+     ; var int local_18h @ rbp-0x18
+     ; var int local_14h @ rbp-0x14
+     ; var int local_4h  @ rbp-0x4
+     ; arg int arg1 @ rdi
+     ; arg int arg2 @ rsi
+     ; CALL XREF from sym.main (0x562b77135659)
+     0x562b77135614      55              pushq %rbp
+     0x562b77135615      4889e5          movq %rsp, %rbp        #<--- push rbp
+     0x562b77135618      4883ec18        subq $0x18, %rsp
+     0x562b7713561c      897df8          movl %edi, local_18h ; arg1
+     0x562b7713561f      8975ec          movl %esi, local_14h ; arg2
+     0x562b77135622      8b55f8          movl local_18h, %edx
+     0x562b77135625      8b75ec          movl local_14h, %esi
+     0x562b77135628      89d6            movl %edx, %esi
+     0x562b7713562a      89c7            movl %eax, %edi
+     0x562b7713562c b    e8c9ffffff      callq sym.add          
+     ;--rip:
+     0x562b77135631      8945fc          movl %eax, local_4h
+     0x562b77135634      8b45fc          movl local_4h, %eax
+     0x562b77135637      c9              leave
+     0x562b77135638      c3              retq
+```
 
 
 ## Stack Layout During the Call
@@ -179,7 +203,31 @@ When add finishes, it executes retq:
 - Restores rsp, rbp, and rip to return to calc
 ```
 
-<img width="650" height="358" alt="image" src="https://github.com/user-attachments/assets/f391035a-ad8c-45f7-a877-ac0916ce9dc3" />
+```
+(fcn) sym.calc 37
+  sym.calc (int arg1, int arg2);
+     ; var int local_18h @ rbp-0x18
+     ; var int local_14h @ rbp-0x14
+     ; var int local_4h  @ rbp-0x4
+     ; arg int arg1 @ rdi
+     ; arg int arg2 @ rsi
+     ; CALL XREF from sym.main (0x562b77135659)
+     0x562b77135614      55              pushq %rbp
+     0x562b77135615      4889e5          movq %rsp, %rbp        
+     0x562b77135618      4883ec18        subq $0x18, %rsp
+     0x562b7713561c      897df8          movl %edi, local_18h ; arg1
+     0x562b7713561f      8975ec          movl %esi, local_14h ; arg2
+     0x562b77135622      8b55f8          movl local_18h, %edx
+     0x562b77135625      8b75ec          movl local_14h, %esi
+     0x562b77135628      89d6            movl %edx, %esi
+     0x562b7713562a      89c7            movl %eax, %edi
+     0x562b7713562c b    e8c9ffffff      callq sym.add         
+     ;--rip:
+     0x562b77135631      8945fc          movl %eax, local_4h  #<--- finishes pop return address 
+     0x562b77135634      8b45fc          movl local_4h, %eax
+     0x562b77135637      c9              leave
+     0x562b77135638      c3              retq
+```
 
 
 ## Passing Data Between Functions
