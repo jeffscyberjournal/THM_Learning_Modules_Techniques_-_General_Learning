@@ -1135,7 +1135,34 @@ child stopped with signal 11
 [+] SIGNAL 11 errno=0 addr=0x41414141 code=1 ret=0
 [0x41414141]> dr rip
 0x41414141
+[0x41414141]>
+```
+while here get the stackpointer address: dr rsp
+```
+[0x41414141]> dr
+rax = 0x000000b9
+rbx = 0x00000000
+rcx = 0x00000000
+rdx = 0x00000000
+r8 = 0x000000ac
+r9 = 0x7ffff7b594b0
+r10 = 0x4141414141414141
+r11 = 0x00000246
+r12 = 0x00400450
+r13 = 0x7fffffffe3c0
+r14 = 0x00000000
+r15 = 0x00000000
+rsi = 0x00602260
+rdi = 0x00000000
+rsp = 0x7fffffffe2d0
+rbp = 0x4141414141414141
+rip = 0x41414141
+rflags = 0x00010202
+orax = 0xffffffffffffffff
+[0x41414141]> dr rsp
+0x7fffffffe2d0
 [0x41414141]> 
+```
 ```
 Now in summary what we have:
 offset = 167
