@@ -40,8 +40,8 @@ Used for dynamic memory allocation (e.g., malloc). It grows upwards as needed, a
 - Program Code and Data  
 Contains the program’s executable instructions and its initialised global variables.
 
-## Q1 Task 2: Where is dynamically allocated memory stored? Answer: heap
-## Q2 Task 2: Where is information about functions(e.g. local arguments) stored? Answer: stack
+### Q1 Task 2: Where is dynamically allocated memory stored? Answer: heap
+### Q2 Task 2: Where is information about functions(e.g. local arguments) stored? Answer: stack
 
 # Task 3 x86-64 Procedures
 
