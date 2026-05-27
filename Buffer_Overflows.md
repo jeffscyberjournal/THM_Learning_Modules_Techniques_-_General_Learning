@@ -40,8 +40,11 @@ Used for dynamic memory allocation (e.g., malloc). It grows upwards as needed, a
 - Program Code and Data  
 Contains the program’s executable instructions and its initialised global variables.
 
-### Q1 Task 2: Where is dynamically allocated memory stored? Answer: heap
-### Q2 Task 2: Where is information about functions(e.g. local arguments) stored? Answer: stack
+### Q1 Task 2: Where is dynamically allocated memory stored? 
+Answer: heap
+### Q2 Task 2: Where is information about functions(e.g. local arguments) stored? 
+Answer: stack
+
 
 # Task 3 x86-64 Procedures
 
@@ -106,8 +109,11 @@ calc(4, 5);
 ```
 Calling calc(4, 5) creates a stack frame for calc, which then calls add, creating another stack frame above it.
 
-## Q1 Task 3: What direction does the stack grow? (lower/higher), use the symbol "|" to represent lower and the symbol "/" to represent higher: A: questions wrong answer is l.
-## Q2 Task 3: What instruction is used to add data onto the stack? Answer: push
+## Q1 Task 3: What direction does the stack grow? (lower/higher), use the symbol "|" to represent lower and the symbol "/" to represent higher: 
+Answer: questions wrong answer is l.
+## Q2 Task 3: What instruction is used to add data onto the stack? 
+Answer: push
+
 
 # Task 4 Procedures from task 3 continued 
 
@@ -116,9 +122,31 @@ Calling calc(4, 5) creates a stack frame for calc, which then calls add, creatin
 When the program runs inside the calc function:
 - calc is the caller
 - add is the callee
-
-<img width="685" height="388" alt="image" src="https://github.com/user-attachments/assets/14fe4803-a5ae-40d0-962f-756f76f59e56" />
-
+```
+(fcn) sym.calc 37
+  sym.calc (int arg1, int arg2);
+     ; var int local_18h @ rbp-0x18
+     ; var int local_14h @ rbp-0x14
+     ; var int local_4h  @ rbp-0x4
+     ; arg int arg1 @ rdi
+     ; arg int arg2 @ rsi
+     ; CALL XREF from sym.main (0x562b77135659)
+     0x562b77135614      55              pushq %rbp
+     0x562b77135615      4889e5          movq %rsp, %rbp
+     0x562b77135618      4883ec18        subq $0x18, %rsp
+     0x562b7713561c      897df8          movl %edi, local_18h ; arg1
+     0x562b7713561f      8975ec          movl %esi, local_14h ; arg2
+     0x562b77135622      8b55f8          movl local_18h, %edx
+     0x562b77135625      8b75ec          movl local_14h, %esi
+     0x562b77135628      89d6            movl %edx, %esi
+     0x562b7713562a      89c7            movl %eax, %edi
+     ;--rip:
+     0x562b7713562c b    e8c9ffffff      callq sym.add           #<--- caller callq
+     0x562b77135631      8945fc          movl %eax, local_4h
+     0x562b77135634      8b45fc          movl local_4h, %eax
+     0x562b77135637      c9              leave
+     0x562b77135638      c3              retq
+```
 The instruction callq sym.add calls the add function.
 When this happens:
 - The CPU pushes the return address (the next instruction in calc) onto the stack.
