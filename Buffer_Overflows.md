@@ -5,6 +5,8 @@
 - Explore simple stack buffer overflows (without mitigation) on x86-64 linux programs.
 - Use radare2 to examine the memory layout and familiarize with it.
 
+### Q1 Task 1: Access target, No Answer required
+
 # Task 2 Process Layout
 
 When a program runs, the computer treats it as a process. Modern computers can run many processes at once, but they don’t truly run at the same time. Instead, the CPU rapidly switches between them. This fast switching is called a context switch.
@@ -27,16 +29,14 @@ Each process needs its own information to run—such as the current instruction 
 |                  0                   |
 +--------------------------------------+
 ```
-Process Memory Layout (Simplified)
+
+### Process Memory Layout (Simplified)
 - User Stack  
 Stores information the program needs while running, such as the program counter and saved registers. The stack grows downwards, and unused space below it is reserved in case it needs to grow.
-
 - Shared Library Region  
 Holds code for libraries the program uses, whether they are statically or dynamically linked.
-
 - Heap  
 Used for dynamic memory allocation (e.g., malloc). It grows upwards as needed, and unused space above it is reserved for future growth.
-
 - Program Code and Data  
 Contains the program’s executable instructions and its initialised global variables.
 
@@ -61,6 +61,7 @@ When you push a value:
 - Take the value of var
 - Decrease the stack pointer (rsp) by 8 bytes
 - Write the value to the new rsp location (the new top of the stack)
+
 ```
 Before push:
 rsp → 0x8
@@ -107,6 +108,7 @@ int calc(int a, int b){
 
 calc(4, 5);
 ```
+
 Calling calc(4, 5) creates a stack frame for calc, which then calls add, creating another stack frame above it.
 
 ## Q1 Task 3: What direction does the stack grow? (lower/higher), use the symbol "|" to represent lower and the symbol "/" to represent higher: 
@@ -122,6 +124,7 @@ Answer: push
 When the program runs inside the calc function:
 - calc is the caller
 - add is the callee
+
 ```
 (fcn) sym.calc 37
   sym.calc (int arg1, int arg2);
@@ -147,6 +150,7 @@ When the program runs inside the calc function:
      0x562b77135637      c9              leave
      0x562b77135638      c3              retq
 ```
+
 The instruction callq sym.add calls the add function.
 When this happens:
 - The CPU pushes the return address (the next instruction in calc) onto the stack.
@@ -195,13 +199,13 @@ Stack Bottom
 ├───────────────────────────────┤
 │ Stack frame for add           │
 └───────────────────────────────┘
+```
 
 Stack Top
 When add finishes, it executes retq:
 - Pops the return address off the stack
 - Removes its stack frame
 - Restores rsp, rbp, and rip to return to calc
-```
 
 ```
 (fcn) sym.calc 37
@@ -252,7 +256,7 @@ To prevent overwriting values:
 Type	              Registers	                      Saved By
 Caller-saved	      rax, r10, r11	                  Caller
 Callee-saved	      rbx, r12, r13, r14, rbp, rsp	  Callee
-Argument registers	rdi, rsi, rdx, rcx, r8, r9	    Caller
+Argument registers	  rdi, rsi, rdx, rcx, r8, r9	  Caller
 
 
 ## Runtime Stack Overview
@@ -278,10 +282,10 @@ Computers store multi-byte values differently depending on their architecture.
 Let’s take the hexadecimal number 0x12345678 as an example:
 
 Most Significant Byte (MSB) → 12
-
 Least Significant Byte (LSB) → 78
 
 ### Q1 Task 5: No answers required.
+
 
 # Task 6 Overwriting Variables
 
