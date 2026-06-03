@@ -84,6 +84,8 @@ Common issue:
 - If stuck, always ask: “Is my DNS working?”
 
 #either manually include thmdc ip with nameserver line or run the 'systemctl restart dnsmasq' command 
+
+```
 root@ip-10-48-119-205:~# sudo nano /etc/resolv.conf
 
 root@ip-10-48-119-205:~# nslookup thmdc
