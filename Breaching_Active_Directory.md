@@ -38,7 +38,8 @@ Address:	10.200.70.101#53
 Name:	za.tryhackme.com
 Address: 10.200.70.101
 
-#likely should include 1.1.1.1 or 8.8.8.8 for external tryhackme.com
+#likely should include nameserver 1.1.1.1 or nameserver 8.8.8.8 in /etc/resolv.conf
+#for external tryhackme.com
 root@ip-10-48-119-205:~# nslookup tryhackme.com
 ;; communications error to 10.200.70.101#53: timed out
 ;; communications error to 10.200.70.101#53: timed out
