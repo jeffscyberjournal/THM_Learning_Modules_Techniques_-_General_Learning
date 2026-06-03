@@ -57,6 +57,7 @@ sudo openvpn breachingad.ovpn
 - After “Initialization Sequence Completed,” configure DNS manually (same as above).
 
 Kali users
+
 Use Network Manager GUI to set DNS:
 - Primary: THMDC IP
 - Secondary: 1.1.1.1 (or similar)
