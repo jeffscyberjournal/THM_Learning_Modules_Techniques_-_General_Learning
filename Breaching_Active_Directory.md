@@ -164,37 +164,33 @@ Downloadable files one the python script below and usernames as well (first.last
 - NTLM is a suite of Microsoft authentication protocols used in Active Directory.
 - NetNTLM is the challenge‑response mechanism used by NTLM. It allows applications (like OWA, VPN portals, RDP gateways, web apps) to forward authentication challenges to a Domain Controller instead of validating credentials themselves.
 - This means the application acts as a middle‑man, never storing AD credentials locally.
+```
++--------------------+        +--------------------+        +------------------------+
+|  Application User  |        |       Server       |        |    Domain Controller   |
++--------------------+        +--------------------+        +------------------------+
+          |                             |                              |
+          | (1) Access request          |                              |
+          +---------------------------->|                              |
+          |                             |                              |
+          |                             | (2) Send challenge           |
+          |<----------------------------+                              |
+          |                             |                              |
+          | (3) Send response (NetNTLM) |                              |
+          +---------------------------->|                              |
+          |                             |                              |
+          |                             | (4) Forward challenge        |
+          |                             |     + response               |
+          |                             +----------------------------->|
+          |                             |                              |
+          |                             |        (5) Auth result       |
+          |                             |<-----------------------------+
+          |                             |                              |
+          | (6) Grant / deny access     |                              |
+          |<----------------------------+                              |
+          |                             |                              |
++--------------------+        +--------------------+        +------------------------+
 
-                +---------------------------+
-                |     Domain Controller     |
-                |---------------------------|
-                | (5) Compares challenge    |
-                |     and response for      |
-                |     authentication        |
-                +---------------------------+
-                          ^ 
-                          | (4) Server sends challenge
-                          |     and response to DC
-                          |
-+----------------+         |
-|     Server     |---------+
-|----------------|
-| (2) Sends challenge      |
-| (3) Receives response    |
-| (6) Sends DC's response  |
-+----------------+
-        ^
-        |
-        | (1) User requests access
-        |
-+----------------+
-| Application    |
-|     User       |
-|----------------|
-| Requests access|
-| Sends response |
-+----------------+
-
+```
 
 ### Why NetNTLM Matters for Attackers
 
