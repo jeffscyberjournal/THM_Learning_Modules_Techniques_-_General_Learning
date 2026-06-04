@@ -128,3 +128,25 @@ root@ip-10-48-119-205:~#
 
 ```
 
+## Task 2 OSINT and PHISHING
+
+OSINT (Open Source Intelligence)
+
+OSINT involves gathering publicly available information to uncover leaked or exposed credentials. Common sources of accidental credential exposure include:
+
+- Users posting questions on public forums (e.g., Stack Overflow) and unintentionally revealing credentials.
+- Developers uploading scripts to GitHub with hardcoded passwords.
+- Employees reusing work emails on external sites that later suffer data breaches.
+
+Platforms like HaveIBeenPwned and DeHashed help identify whether corporate emails appear in known breaches.
+
+Even if credentials are found, they may be outdated — so attackers still need a way to validate them. Later tasks (e.g., NTLM-authenticated services) provide methods to test whether discovered credentials still work.
+
+Phishing
+
+Phishing remains one of the most effective ways to obtain AD credentials. Two common outcomes:
+
+- Victims enter their credentials into a fake login page.
+- Victims run a malicious file that installs a Remote Access Trojan (RAT).
+
+A RAT runs under the user’s security context, giving the attacker immediate access to that user’s AD account. This is why phishing is a major focus for both offensive and defensive teams.
