@@ -422,18 +422,105 @@ Example captured credentials (from your document):
 za.tryhackme.com\svcLDAP
 password11
 ```
-Your actual answer was:
 
 tryhackmeldappass1@
 
-✔ THM Questions & Answers (from your document)
-Question	Answer
 ### Q1 What type of attack can be performed against LDAP Authentication systems not commonly found against Windows Authentication systems? 
+
 Answer: Pass‑back Attack
 
 ### Q2 What two authentication mechanisms do we allow?	
+
 Answer: LOGIN, PLAIN
 
 ### Q3 What is the password associated with the svcLDAP account? 
+
 Anwswer: tryhackmeldappass1@
+
+## Task 4 Authentication Relays
+
+NetNTLM Attacks via SMB, LLMNR/NBT‑NS Poisoning & Responder
+
+1. SMB & NetNTLM Authentication
+
+SMB (Server Message Block) is a core Windows protocol used for:
+
+- File sharing
+- Printer communication
+- Remote administration
+- Inter‑service communication
+
+Older SMB versions have weak authentication protections.
+SMB uses NetNTLM challenge‑response authentication, which can be:
+
+- Captured → cracked offline
+- Relayed → used to authenticate to another host without knowing the password
+
+2. LLMNR, NBT‑NS, and WPAD Poisoning
+Windows networks use fallback name‑resolution protocols:
+
+- LLMNR (Link‑Local Multicast Name Resolution)
+- NBT‑NS (NetBIOS Name Service)
+- WPAD (Web Proxy Auto‑Discovery Protocol)
+
+These protocols broadcast queries like:
+
+- “Who is FILESERVER?"
+- “Who is PRINTER?”
+- “Where is the proxy?”
+
+A rogue device can answer these broadcasts and claim:
+
+- “I am FILESERVER — connect to me.”
+
+This forces victims to authenticate to the attacker.
+
+3. Responder
+Responder is the tool used to poison these protocols and capture authentication attempts.
+
+It:
+- Listens for LLMNR/NBT‑NS/WPAD broadcasts
+- Sends poisoned replies
+- Hosts fake SMB/HTTP/SQL services
+- Forces the victim to authenticate
+- Captures NetNTLMv2 hashes
+
+On THM, you run:
+
+```
+sudo responder -I breachad
+```
+Because you’re on a VPN, poisoning is limited — THM simulates an authentication attempt every ~30 minutes.
+
+When a victim authenticates, you get output like:
+
+```
+[SMBv2] NTLMv2-SSP Username : ZA\<service account>
+[SMBv2] NTLMv2-SSP Hash     : <hash>
+```
+
+4. Cracking the Captured Hash
+
+Once you have the NTLMv2‑SSP hash, you can crack it offline using Hashcat:
+```
+hashcat -m 5600 <hashfile> <wordlist> --force
+```
+If the password is weak, you recover valid AD credentials.
+
+5. Relaying the Challenge
+Instead of cracking the hash, you can relay it to another SMB server.
+
+Requirements:
+
+- SMB signing must be disabled or not enforced
+- The captured account must have permissions on the target
+- The relay target must accept SMB authentication
+- This gives you an active authenticated session without knowing the password.
+- This is the basis of SMB relay attacks.
+
+✔ THM Questions (Answers)
+Question	Answer
+What tool is used to poison and capture authentication requests?	Responder
+What is the username associated with the captured challenge?	(You will find this in your Responder output — format: ZA\\username)
+What is the cracked password?	(You will get this after running Hashcat on your captured hash)
 
