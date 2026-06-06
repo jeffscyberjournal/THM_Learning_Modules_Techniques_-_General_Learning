@@ -344,3 +344,96 @@ Hello World
 [-] Failed login with Username: louise.talbot
 ...
 ```
+## Task 3 LDAP Bind Credentials
+
+LDAP Authentication & LDAP Pass‑Back Attacks
+
+### 1. LDAP Authentication Basics
+
+LDAP (Lightweight Directory Access Protocol) is another method applications use to authenticate against Active Directory.
+Unlike NTLM/NetNTLM:
+
+- LDAP authentication is direct — the application itself validates the user’s credentials.
+- The application uses its own stored AD service account to query LDAP.
+- These credentials are often stored in plaintext inside configuration files (GitLab, Jenkins, printers, VPNs, custom apps).
+
+If such applications are exposed to the internet, attackers can:
+
+- Brute‑force LDAP logins
+- Steal stored LDAP service credentials
+- Abuse misconfigurations
+
+### 2. LDAP Pass‑Back Attack
+
+This attack is unique to LDAP systems and not possible with Windows Authentication (NTLM).
+
+It works when:
+
+- You gain access to a device’s LDAP configuration (e.g., a printer’s admin panel).
+- You change the LDAP server IP to your own machine.
+- When the device performs a “Test Settings” check, it sends LDAP credentials to your rogue LDAP server.
+
+This allows you to capture the LDAP service account username and password.
+
+Printers are especially vulnerable because:
+
+- Admin interfaces often use default credentials (admin:admin).
+- LDAP passwords are hidden in the UI but still used internally.
+- Devices automatically authenticate when “Test Settings” is clicked.
+
+### 3. Why Netcat Alone Doesn’t Work
+
+When the printer connects back, it first tries to negotiate LDAP authentication mechanisms.
+
+If the server supports secure SASL mechanisms, the credentials:
+
+- Are not sent in plaintext
+- Or are not sent at all
+
+Netcat cannot emulate LDAP negotiation, so the printer refuses to send credentials.
+
+### 4. Hosting a Rogue LDAP Server
+
+To capture plaintext credentials, you must:
+
+- Run OpenLDAP as a rogue server.
+- Downgrade its supported authentication mechanisms to only: PLAIN and LOGIN
+
+This is done using an LDIF patch:
+
+```
+dn: cn=config
+replace: olcSaslSecProps
+olcSaslSecProps: noanonymous,minssf=0,passcred
+```
+This forces the printer to authenticate using insecure methods.
+
+### 5. Capturing the Credentials
+
+Once the rogue LDAP server is running:
+
+- Click Test Settings on the printer page.
+- The printer sends the LDAP bind request to your server.
+- Use tcpdump to capture the plaintext credentials.
+
+Example captured credentials (from your document):
+
+```
+za.tryhackme.com\svcLDAP
+password11
+```
+Your actual answer was:
+
+tryhackmeldappass1@
+
+✔ THM Questions & Answers (from your document)
+Question	Answer
+### Q1 What type of attack can be performed against LDAP Authentication systems not commonly found against Windows Authentication systems? 
+Answer: Pass‑back Attack
+
+### Q2 What two authentication mechanisms do we allow?	
+Answer: LOGIN, PLAIN
+
+### Q3 What is the password associated with the svcLDAP account? 
+Anwswer: tryhackmeldappass1@
+
