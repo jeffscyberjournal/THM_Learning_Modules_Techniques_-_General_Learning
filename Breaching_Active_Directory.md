@@ -770,7 +770,7 @@ Answer Q3 Task 5: FPassword1!
 
 ## Task 6 Microsoft Deployment Toolkit
 
-1. Microsoft Deployment Toolkit (MDT)
+### 1. Microsoft Deployment Toolkit (MDT)
 
 Used by large organizations to automate OS deployment.
 It integrates with SCCM for patch management and centralized updates.
@@ -781,7 +781,7 @@ Purpose:
 - Configure default software and updates automatically.
 - Simplify mass installations without physical media.
 
-2. PXE Boot Overview
+### 2. PXE Boot Overview
 
 PXE (Preboot Execution Environment) allows a machine to boot from a network server instead of local storage.
 
@@ -802,7 +802,7 @@ Simplified ASCII diagram of PXE boot flow:
 (8) TFTP Transfer  -> Server delivers PXE boot image
 ```
 
-3. PXE Boot Image Retrieval
+### 3. PXE Boot Image Retrieval
 
 Attackers can exploit misconfigured MDT servers to extract credentials.
 
@@ -830,7 +830,7 @@ Extract credentials from the image:
 Get-FindCredentials -WimFile pxeboot.wim
 ```
 
-4. Recovered Credentials Example
+### 4. Recovered Credentials Example
 
 PowerPXE reveals credentials stored in bootstrap.ini:
 ```
@@ -839,8 +839,8 @@ UserID     = svcMDT
 UserDomain = ZA
 UserPassword = MDT@TryHackMe1
 ```
-🧠 Key Answers
-Question	                                          Answer
+
+### Question	                                          Answer
 Tool used to create and host PXE Boot images	      Microsoft Deployment Toolkit
 Protocol used for file recovery from MDT server	   TFTP
 Username stored in PXE Boot image	               svcMDT
