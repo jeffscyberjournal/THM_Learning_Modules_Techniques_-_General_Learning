@@ -787,7 +787,7 @@ PXE (Preboot Execution Environment) allows a machine to boot from a network serv
 
 Simplified ASCII diagram of PXE boot flow:
 
-Code
+```
 +----------------+       +-----------+       +----------------+
 |   MDT Server   | <-->  |   User    | <-->  |  DHCP Server   |
 +----------------+       +-----------+       +----------------+
@@ -800,6 +800,7 @@ Code
 (6) PXE Info       -> Server sends boot details
 (7) TFTP Request   -> Client requests PXE boot image
 (8) TFTP Transfer  -> Server delivers PXE boot image
+```
 
 3. PXE Boot Image Retrieval
 
