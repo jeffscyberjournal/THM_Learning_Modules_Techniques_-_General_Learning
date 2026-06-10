@@ -956,4 +956,28 @@ Protocol used for file recovery from MDT server	   TFTP
 Username stored in PXE Boot image	               svcMDT
 Password stored in PXE Boot image	               MDT@TryHackMe1
 
+Q5 Breaching AD Cleanup Question
+1. The cleanup script mentioned in the room is ONLY for the Linux AttackBox
+The script is:
+/opt/cleanup.sh
+
+It cleans:
+- rogue LDAP files
+- slapd configs
+- responder artifacts
+- directories created during the Linux-side tasks
+- It does NOT clean anything on the Windows machine.
+
+2. The Windows-side files you created (PowerPXE folder etc.)
+Located in:
+
+```
+C:\Users\THM\Documents\<username>\
+```
+cannot be deleted manually because:
+- You don’t have permission
+- The VM is snapshot-protected
+- THM resets the Windows machine automatically after the room ends
+
+So you are not expected to clean those files.
 
