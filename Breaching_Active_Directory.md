@@ -910,8 +910,7 @@ thm@THMJMP1 C:\Users\thm\Documents\UserName>tftp -i 10.200.70.202
 Transfer successful: 12288 bytes in 1 second(s), 12288 bytes/s   
 
 
-thm@THMJMP1 C:\Users\thm\Documents\UserName>powershell -execution
-policy bypass
+thm@THMJMP1 C:\Users\thm\Documents\UserName>powershell -executionpolicy bypass
 Windows PowerShell
 Copyright (C) Microsoft Corporation. All rights reserved.        
 
