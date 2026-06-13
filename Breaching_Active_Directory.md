@@ -305,9 +305,13 @@ Answer: netNTML
 
 Answer: Gorden.stevens
 
-### Q3 Task 3: How many valid credentials pairs were found by the password spraying script? Answer 4
+### Q3 Task 3: How many valid credentials pairs were found by the password spraying script? 
 
-### Q4 Task 3: What is the message displayed by the web application when authenticating with a valid credential pair? Answer 'Hello World'
+Answer 4
+
+### Q4 Task 3: What is the message displayed by the web application when authenticating with a valid credential pair? 
+
+Answer 'Hello World'
 
 How to Modify the Script to Print the Success Message
 Inside this block:
