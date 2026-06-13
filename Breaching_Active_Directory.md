@@ -948,17 +948,33 @@ UserDomain = ZA
 UserPassword = MDT@TryHackMe1
 ```
 
-### Question	                                                Answer
-Q1 Task 6: Tool used to create and host PXE Boot images	      Microsoft Deployment Toolkit
-Q2 Task 6: Protocol used for file recovery from MDT server	   TFTP
-Q3 Task 6: Username stored in PXE Boot image	                  svcMDT
-Q4 Task 6: Password stored in PXE Boot image	                  MDT@TryHackMe1
+### Question Task 6
+
+
+### Q1: Tool used to create and host PXE Boot images
+
+Answer: Microsoft Deployment Toolkit
+
+### Q2: Protocol used for file recovery from MDT server     
+
+Answer: TFTP
+
+### Q3: Username stored in PXE Boot image
+
+Answer: svcMDT
+
+### Q4: Password stored in PXE Boot image
+
+Answer: MDT@TryHackMe1
 
 ### Q5 Breaching AD Cleanup Question
 
 1. The cleanup script mentioned in the room is ONLY for the Linux AttackBox
+
 The script is:
+```
 /opt/cleanup.sh
+```
 
 It cleans:
 - rogue LDAP files
@@ -1098,16 +1114,21 @@ Decrypted password : MyStrongPassword!
 This gives you a valid AD service account.
 
 ### Q1 Task 7. What type of files often contain stored credentials on hosts?
+
 Answer: configuration files
 
 ### Q2 Task 7. What is the name of the McAfee database that stores configuration including credentials used to connect to the orchestrator?
+
 Answer: ma.db
 
 ### Q3 Task 7. What table in this database stores the credentials of the orchestrator?
+
 Answer: AGENT_REPOSITORIES
 
 ### Q4. What is the username of the AD account associated with the McAfee service?
+
 Answer: From the room or from sqlitebrowser results: svcAV
 
 ### Q5. What is the password of the AD account associated with the McAfee service?
+
 Answer: From sqlitebrowswer: MyStrongPassword!
