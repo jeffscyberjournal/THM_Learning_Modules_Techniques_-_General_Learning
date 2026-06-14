@@ -1136,3 +1136,26 @@ Answer: From the room or from sqlitebrowser results: svcAV
 ### Q5. What is the password of the AD account associated with the McAfee service?
 
 Answer: From sqlitebrowswer: MyStrongPassword!
+
+
+
+
+## Task 8 Summary
+
+Breaching Active Directory can be done through many different attack paths, and new methods continue to appear because AD has such a large attack surface. To reliably obtain initial credentials, attackers rely on strong enumeration techniques that must be updated regularly.
+
+Mitigations organisations can use:
+User awareness & training: Since users are often the weakest link, educating them to avoid sharing credentials or trusting suspicious emails reduces risk.
+
+Limit AD service exposure online: Services using NTLM or LDAP shouldn’t be internet‑facing. They should be placed behind a VPN with MFA.
+
+Network Access Control (NAC): Prevents unauthorised or rogue devices from joining the network, though it requires allowlisting legitimate devices.
+
+Enforce SMB signing: This stops SMB relay attacks.
+
+Least privilege: Minimising privileges—especially for service accounts—reduces the impact if credentials are compromised.
+
+The next step after breaching AD is to enumerate the domain to understand its structure and find misconfigurations. (And remember to reset DNS settings.)
+
+### Q1 Task 8: Acknowledgement of understanding how configuration changes can help prevent AD breaches.
+Answer: None required
