@@ -1149,6 +1149,7 @@ Mitigations organisations can use:
 - Limit AD service exposure online: Services using NTLM or LDAP shouldn’t be internet‑facing. They should be placed behind a VPN with MFA.
 - Network Access Control (NAC): Prevents unauthorised or rogue devices from joining the network, though it requires allowlisting legitimate devices.
 - Enforce SMB signing: This stops SMB relay attacks.
+- SMB signing is a security feature that adds a cryptographic signature to every SMB message. That signature proves: the message really came from the legitimate client, the message wasn’t modified in transit and the server can trust the request. This prevents attackers from intercepting and relaying SMB authentication packets. It wont prevent attacker with a leaked password or brute force attempt.
 - Least privilege: Minimising privileges—especially for service accounts—reduces the impact if credentials are compromised.
 
 The next step after breaching AD is to enumerate the domain to understand its structure and find misconfigurations. (And remember to reset DNS settings.)
