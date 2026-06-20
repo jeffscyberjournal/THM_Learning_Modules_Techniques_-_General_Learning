@@ -108,11 +108,10 @@ Should look like this in format
 Your credentials have been generated: Username: iain.williams Password: Annotation1990
 ```
 
-Then try xfreerdp failed so did remmina, nmap showed 3389 was open.
+Then try xfreerdp should work with remmina as well.
 ```
-xfreerdp /v:THMJMP1.za.tryhackme.com /u:za.tryhackme.com\conor.martin /p:Hell2020 /cert:ignore /dynamic-resolution
-or
-remmina -c "rdp://za.tryhackme.com\\iain.williams@thmjmp1.za.tryhackme.com"
+xfreerdp /v:THMJMP1.za.tryhackme.com /u:'za.tryhackme.com\damian.morris' /p:Beerbeer1972 /cert:ignore /dynamic-resolution +clipboard
+
 ```
 
 later tried SSH which did work
