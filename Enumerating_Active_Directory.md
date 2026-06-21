@@ -319,3 +319,236 @@ NTLM fallback path:
 - Access denied
 
 This is why the IP version fails.
+
+
+## Task 3 Enumeration through Microsoft Management Console
+
+1. Launch MMC using injected AD credentials
+Because THMJMP1 is not domain‑joined, you must start MMC using runas /netonly so all MMC network calls use your AD creds.
+
+
+Steps From RDP Windows Desktop (high probability this wont work, RSAT was not in the vm, just run mmc.exe from run command box instead):
+- Press Start 
+- Search for "Apps & Features" and press enter
+- Click Manage Optional Features
+- Click Add a feature
+- Search for "RSAT"
+- Select "RSAT: Active Directory Domain Services and Lightweight Directory Tools" and click Install
+
+
+OR try running (if RSAT present else skip and just run mmc.exe from run box):
+
+runas /netonly /user:za.tryhackme.com\<your-username> mmc
+Enter your AD password.
+
+MMC now uses your AD credentials for all domain queries.
+
+2. Add the AD RSAT Snap‑ins
+Inside MMC:
+
+File → Add/Remove Snap‑in
+
+Add all three active directory components listed at top:
+
+- Active Directory Users and Computers
+- Active Directory Domains and Trusts
+- Active Directory Sites and Services
+- Click OK
+
+3. Point each snap‑in at the target domain
+You must manually tell MMC which domain to connect to.
+
+For Domains and Trusts:
+Right‑click → Change Forest 
+
+Enter: za.tryhackme.com (enter this as root domain)
+
+For Sites and Services:
+Right‑click → Change Forest
+
+Enter: za.tryhackme.com (enter this as root domain) 
+
+For Users and Computers:
+Right‑click → Change Domain
+
+Enter: za.tryhackme.com (enter this as domain)
+
+Enable advanced view:
+Right‑click Active Directory Users and Computers
+
+View → Advanced Features
+
+MMC is now fully connected to the AD domain.
+
+4. Enumerate AD Objects
+Users & Groups
+Expand Active Directory Users and Computers → za.tryhackme.com
+
+Browse OUs such as:
+
+- People
+- IT
+- HR
+- etc.
+
+Click a user → view:
+
+Attributes
+
+Group membership
+
+Description fields (flags often stored here)
+
+Computers
+Expand:
+
+Servers OU → count server objects
+
+Workstations OU → count workstation objects
+
+Organisational Units
+Count department OUs under the People container.
+
+Admin Tiers
+Look for OUs named:
+
+- Tier0
+- Tier1
+- Tier2
+
+5. Extract the flag
+Find user:
+
+Code
+t0_tinus.green
+Open Properties → Description  
+Flag:
+
+Code
+THM{Enumerating.Via.MMC}
+⭐ Answers Recap
+Question	Answer
+Q1 Task 3: Servers OU — number of computers	2
+Found under Users and computers section in Servers
+Q2 Task 3: Workstations OU — number of computers	1
+Found under Users and computers section under Computers
+Q3 Task 3: Number of department OUs	7
+Found under Users and computers section under People, clearly lists OU on right side.
+Q4 Task 3: Number of admin tiers	3
+Flag in t0_tinus.green description	THM{Enumerating.Via.MMC}
+Found under Users and computers section under Admins in description 
+
+
+
+## Task 4 Enumeration through Command Prompt
+
+#### 1. Why use CMD for AD enumeration
+
+CMD is useful when:
+- You don’t have RDP
+- PowerShell is monitored
+- You’re operating through a RAT
+- You need quick, low‑noise AD lookups
+
+The key tool is: 
+```
+net
+```
+This command works only on a domain‑joined machine, which is why THMJMP1 must be used.
+
+#### 2. Enumerating AD Users
+
+List all domain users
+```
+net user /domain
+```
+Shows every AD account in the domain.
+
+Get details about a specific user
+```
+net user <username> /domain
+```
+Example:
+
+```
+net user zoe.marshall /domain
+```
+Reveals:
+
+- Full name
+- Password last set
+- Password expiry
+- Group memberships (up to 10)
+- Last logon
+- Whether account is active
+
+#### 3. Enumerating AD Groups
+
+List all domain groups
+```
+net group /domain
+```
+Useful for finding:
+
+- Domain Admins
+
+Tier 0 / Tier 1 / Tier 2 Admins
+
+- Server Admins
+- Schema Admins
+
+List members of a specific group
+```
+net group "<group name>" /domain
+```
+Example:
+
+```
+net group "Tier 1 Admins" /domain
+```
+Shows all accounts in that admin tier.
+
+#### 4. Enumerating Password Policy
+
+View domain password policy
+```
+net accounts /domain
+```
+Reveals:
+
+- Minimum password length
+- Maximum password age
+- Lockout threshold
+- Lockout duration
+- Password history length
+
+This helps plan password spraying or brute‑force strategies.
+
+#### 5. Benefits of CMD Enumeration
+
+- No extra tools needed
+- Low detection footprint
+- Works through phishing payloads
+- Works through RAT shells
+- Fast and simple
+
+#### 6. Drawbacks
+
+- Must run on a domain‑joined machine
+- Group membership output is limited (fails after ~10 groups)
+- Not suitable for deep or wide enumeration
+
+#### Answers to the Questions
+Q1 Task 4: Apart from Domain Users, what other group is aaron.harris a member of?
+From the room:
+From net user aaron.harris /domain 
+Internet Access
+Q2 Task 4: Is the Guest account active? (Yay, Nay)
+using net users Guest /domain | findstr "active"
+Nay
+Q3 Task 4: How many accounts are members of the Tier 1 Admins group?
+net group "Tier 1 Admins" /domain
+7
+Q4 Task 4: What is the account lockout duration (minutes)?
+From net accounts /domain:
+30
