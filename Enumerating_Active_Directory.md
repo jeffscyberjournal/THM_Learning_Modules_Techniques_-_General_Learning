@@ -552,3 +552,150 @@ net group "Tier 1 Admins" /domain
 Q4 Task 4: What is the account lockout duration (minutes)?
 From net accounts /domain:
 30
+
+
+
+## Task 5 PowerShell AD Enumeration 
+
+PowerShell provides far deeper AD enumeration than CMD because RSAT installs 50+ AD cmdlets.
+On THMJMP1, RSAT is already installed.
+
+To enter PowerShell from SSH:
+```
+powershell
+```
+
+Because THMJMP1 is not domain‑joined, every AD cmdlet must include:
+```
+-Server za.tryhackme.com
+```
+
+####  1. Enumerating Users
+
+Get a specific user
+```
+Get-ADUser -Identity <username> -Server za.tryhackme.com -Properties *
+```
+Shows all attributes, including:
+
+- Department
+- Title
+- Description
+- DistinguishedName
+- PasswordLastSet
+- badPwdCount
+- whenChanged
+
+Search for users
+```
+Get-ADUser -Filter 'Name -like "*stevens"' -Server za.tryhackme.com |
+    Format-Table Name,SamAccountName -Auto
+```
+
+#### 2. Enumerating Groups
+
+Get group details
+```
+Get-ADGroup -Identity "<group>" -Server za.tryhackme.com
+```
+Get group members
+```
+Get-ADGroupMember -Identity "<group>" -Server za.tryhackme.com
+```
+
+Example:
+
+```
+Get-ADGroupMember -Identity "Administrators" -Server za.tryhackme.com
+```
+
+#### 3. Enumerating AD Objects (generic search)
+
+Find objects changed after a date
+```
+$ChangeDate = New-Object DateTime(2022,02,28,12,00,00)
+Get-ADObject -Filter 'whenChanged -gt $ChangeDate' -Server za.tryhackme.com
+```
+Find accounts with failed password attempts
+```
+Get-ADObject -Filter 'badPwdCount -gt 0' -Server za.tryhackme.com
+```
+Useful for safe password spraying.
+
+#### 4. Enumerating Domain Information
+```
+Get-ADDomain -Server za.tryhackme.com
+```
+Reveals:
+
+- Domain containers
+- UsersContainer
+- ComputersContainer
+- DeletedObjectsContainer
+- DNSRoot
+- Domain SID
+
+#### 5. Modifying AD Objects (example)
+
+PowerShell RSAT can modify AD objects (not required in this room):
+
+```
+Set-ADAccountPassword -Identity <user> -Server za.tryhackme.com `
+  -OldPassword (ConvertTo-SecureString "old" -AsPlainText -Force) `
+  -NewPassword (ConvertTo-SecureString "new" -AsPlainText -Force)
+```
+#### Benefits
+
+- Deepest enumeration method
+- Can query any AD object
+- Can specify domain controller
+- Supports automation and scripting
+- Can modify AD objects (if permitted)
+
+#### Drawbacks
+- PowerShell is monitored by defenders
+- Requires RSAT
+- More detectable than CMD
+
+#### Answers to the Questions
+1. What is the value of the Title attribute of Beth Nolan (beth.nolan)?
+Use:
+
+Code
+Get-ADUser -Identity beth.nolan -Server za.tryhackme.com -Properties Title
+Answer:  
+Consultant  
+(THM room value)
+
+2. DistinguishedName of Annette Manning (annette.manning)
+Use:
+
+Code
+Get-ADUser -Identity annette.manning -Server za.tryhackme.com -Properties DistinguishedName
+Answer:  
+CN=annette.manning,OU=Finance,OU=People,DC=za,DC=tryhackme,DC=com
+
+3. When was the Tier 2 Admins group created?
+Use:
+
+Code
+Get-ADGroup -Identity "Tier 2 Admins" -Server za.tryhackme.com -Properties whenCreated
+Answer:  
+02/24/2022 21:57:36 PM  
+(Format: mm/dd/yyyy hh:mm:ss AM/PM)
+
+4. SID of the Enterprise Admins group
+Use:
+
+Code
+Get-ADGroup -Identity "Enterprise Admins" -Server za.tryhackme.com -Properties SID
+Answer:  
+S-1-5-21-3330634377-1326264276-632209373-519
+
+5. Which container stores deleted AD objects?
+From Get-ADDomain:
+
+Code
+DeletedObjectsContainer : CN=Deleted Objects,DC=za,DC=tryhackme,DC=com
+Answer:  
+CN=Deleted Objects,DC=za,DC=tryhackme,DC=com
