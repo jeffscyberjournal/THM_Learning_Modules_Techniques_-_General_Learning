@@ -658,20 +658,22 @@ Set-ADAccountPassword -Identity <user> -Server za.tryhackme.com `
 - More detectable than CMD
 
 #### Answers to the Questions
-1. What is the value of the Title attribute of Beth Nolan (beth.nolan)?
+Q1 Task 5. What is the value of the Title attribute of Beth Nolan (beth.nolan)?
+
 Use:
 
-Code
+```
 Get-ADUser -Identity beth.nolan -Server za.tryhackme.com -Properties Title
-Answer:  
-Consultant  
-(THM room value)
+```
+Answer: Senior  
 
-2. DistinguishedName of Annette Manning (annette.manning)
+Q2 Task5. DistinguishedName of Annette Manning (annette.manning)
+
 Use:
 
-Code
+```
 Get-ADUser -Identity annette.manning -Server za.tryhackme.com -Properties DistinguishedName
+```
 Answer:  
 CN=annette.manning,OU=Finance,OU=People,DC=za,DC=tryhackme,DC=com
 
