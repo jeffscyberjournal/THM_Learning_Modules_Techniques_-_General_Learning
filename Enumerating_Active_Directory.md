@@ -616,7 +616,7 @@ Find objects changed after a date
 $ChangeDate = New-Object DateTime(2022,02,28,12,00,00)
 Get-ADObject -Filter 'whenChanged -gt $ChangeDate' -Server za.tryhackme.com
 ```
-Find accounts with failed password attempts
+Find accounts with failed password attempts (0 no failed attempts, 1 or more avoid as failed attempts present in that time frame before zeroed)
 ```
 Get-ADObject -Filter 'badPwdCount -gt 0' -Server za.tryhackme.com
 ```
@@ -658,7 +658,7 @@ Set-ADAccountPassword -Identity <user> -Server za.tryhackme.com `
 - More detectable than CMD
 
 #### Answers to the Questions
-Q1 Task 5. What is the value of the Title attribute of Beth Nolan (beth.nolan)?
+#### Q1 Task 5. What is the value of the Title attribute of Beth Nolan (beth.nolan)?
 
 Use:
 
@@ -667,37 +667,39 @@ Get-ADUser -Identity beth.nolan -Server za.tryhackme.com -Properties Title
 ```
 Answer: Senior  
 
-Q2 Task5. DistinguishedName of Annette Manning (annette.manning)
+#### Q2 Task5. DistinguishedName of Annette Manning (annette.manning)
 
 Use:
-
 ```
 Get-ADUser -Identity annette.manning -Server za.tryhackme.com -Properties DistinguishedName
 ```
 Answer:  
-CN=annette.manning,OU=Finance,OU=People,DC=za,DC=tryhackme,DC=com
+CN=annette.manning,OU=Marketing,OU=People,DC=za,DC=tryhackme,DC=com
 
-3. When was the Tier 2 Admins group created?
+#### Q3 Task5: When was the Tier 2 Admins group created?
+
 Use:
-
-Code
+```
 Get-ADGroup -Identity "Tier 2 Admins" -Server za.tryhackme.com -Properties whenCreated
+```
 Answer:  
-02/24/2022 21:57:36 PM  
+2/24/2022 10:04:41 PM 
 (Format: mm/dd/yyyy hh:mm:ss AM/PM)
 
-4. SID of the Enterprise Admins group
-Use:
+#### Q4 Task5: SID of the Enterprise Admins group
 
-Code
+Use:
+```
 Get-ADGroup -Identity "Enterprise Admins" -Server za.tryhackme.com -Properties SID
+```
 Answer:  
 S-1-5-21-3330634377-1326264276-632209373-519
 
-5. Which container stores deleted AD objects?
-From Get-ADDomain:
+### Q5 Task5: Which container stores deleted AD objects?
 
-Code
-DeletedObjectsContainer : CN=Deleted Objects,DC=za,DC=tryhackme,DC=com
-Answer:  
+User: 
+```
+get-addomain -server za.tryhackme.com
+```
+Answer:  from DeletedObjectsContainer : CN=Deleted Objects,DC=za,DC=tryhackme,DC=com
 CN=Deleted Objects,DC=za,DC=tryhackme,DC=com
