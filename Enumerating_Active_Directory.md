@@ -842,6 +842,39 @@ SharpHound.exe --CollectionMethods Session --Domain za.tryhackme.com --ExcludeDC
 Use BloodHound query:
 Analysis → Find Kerberoastable Users
 
+Using sharphound:
+```
+
+PS C:\Users\jason.knowles> copy C:\Tools\Sharphound.exe ~\Documents\ 
+PS C:\Users\jason.knowles> cd ~\Documents 
+
+PS C:\Users\jason.knowles\Documents> dir
+
+    Directory: C:\Users\jason.knowles\Documents
+
+
+Mode                LastWriteTime         Length Name
+-a----        3/16/2022   5:19 PM         906752 Sharphound.exe
+
+# Despite the .exe .\ required to start the file
+
+PS C:\Users\jason.knowles\Documents> .\Sharphound.exe --CollectionMethods All --Domain za.tryhackme
+...
+2026-06-24T19:45:37.1324939+01:00|INFORMATION|SharpHound Enumeration Completed at 7:45 PM on 6/24/2
+026! Happy Graphing!
+PS C:\Users\jason.knowles\Documents> dir
+    Directory: C:\Users\jason.knowles\Documents
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----        6/24/2026   7:45 PM         121753 20260624194534_BloodHound.zip
+-a----        3/16/2022   5:19 PM         906752 Sharphound.exe
+-a----        6/24/2026   7:45 PM         359470 YzE4MDdkYjAtYjc2MC00OTYyLTk1YTEtYjI0NjhiZmRiOWY1. 
+                                                 bin
+PS C:\Users\jason.knowles\Documents>
+
+```
+
 From the room’s dataset:
 3
 
