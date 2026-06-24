@@ -703,3 +703,158 @@ get-addomain -server za.tryhackme.com
 ```
 Answer:  from DeletedObjectsContainer : CN=Deleted Objects,DC=za,DC=tryhackme,DC=com
 CN=Deleted Objects,DC=za,DC=tryhackme,DC=com
+
+
+## Task 6 BloodHound & SharpHound Enumeration
+
+### What BloodHound Is
+BloodHound is a graph‑based Active Directory attack‑path visualisation tool.
+It changed AD enumeration because:
+
+- Defenders think in lists
+- Attackers think in graphs
+
+BloodHound shows how to reach Domain Admin, not just who is Domain Admin.
+
+2. SharpHound vs BloodHound
+
+- SharpHound = the collector (enumerates AD data)
+- BloodHound = the GUI (visualises attack paths)
+
+SharpHound has three collectors:
+
+- SharpHound.ps1 – PowerShell version (no longer updated)
+- SharpHound.exe – Windows executable (used in THM)
+- AzureHound.ps1 – For Azure AD
+
+Important: SharpHound version must match BloodHound version.
+This room uses BloodHound v4.1.0.
+
+### 3. Running SharpHound on THMJMP1
+Copy SharpHound
+```
+copy C:\Tools\Sharphound.exe ~\Documents\
+cd ~\Documents\
+```
+Run SharpHound (full collection)
+```
+SharpHound.exe --CollectionMethods All --Domain za.tryhackme.com --ExcludeDCs
+```
+- All = full enumeration
+- ExcludeDCs = avoids touching domain controllers (less noisy)
+- Output is a timestamped ZIP file in the same folder
+
+Example output file:
+
+```
+20220316191229_BloodHound.zip
+```
+
+### 4. Importing Data into BloodHound
+
+- Start neo4j
+- Start BloodHound
+- Login with default creds:
+
+```
+neo4j / neo4j
+```
+
+- SCP the ZIP from THMJMP1 to your attack box:
+
+```
+scp <user>@THMJMP1.za.tryhackme.com:C:/Users/<user>/Documents/<zip> .
+```
+
+- Drag‑and‑drop ZIP into BloodHound
+
+BloodHound ingests JSON files and builds the graph.
+
+5. Using BloodHound
+
+Node Info
+
+Click a user/group/computer → see:
+- Overview
+- Node Properties
+- Extra Properties
+- Group Membership
+- Local Admin Rights
+- Execution Rights
+- Outbound / Inbound Control Rights
+
+Analysis Queries
+
+Examples:
+
+- Find all Domain Admins
+- Find Shortest Path to Domain Admin
+- Find Kerberoastable Users
+- Find Local Admin Rights
+
+Attack Path Example
+
+BloodHound showed:
+
+- A Tier 1 Admin logged into THMJMP1
+- Domain Users can RDP into THMJMP1
+- Therefore, compromise THMJMP1 → harvest creds → escalate
+
+### 6. Session‑Only Collection
+
+AD structure rarely changes, but sessions do.
+
+Recommended workflow:
+
+- Run All once at the start
+- Run Session twice daily:
+    - Around 10:00 (morning login wave)
+    - Around 14:00 (after lunch)
+
+Clear old session data in BloodHound before importing new session runs.
+
+7. Benefits & Drawbacks
+
+Benefits
+
+- Visual attack paths
+- Deep AD insight
+- Fast privilege escalation planning
+- Shows relationships invisible to manual enumeration
+
+Drawbacks
+
+- SharpHound is noisy
+- Often detected by AV/EDR
+- Requires Windows execution
+
+### Answers to the Questions
+1. Command to run SharpHound for Session‑only collection
+From the document:
+
+“We will run Sharphound using the All and Session collection methods”
+
+To collect Session only, the correct command is:
+
+Code
+SharpHound.exe --CollectionMethods Session --Domain za.tryhackme.com --ExcludeDCs
+2. Apart from krbtgt, how many other accounts are kerberoastable?
+Use BloodHound query:
+Analysis → Find Kerberoastable Users
+
+From the room’s dataset:
+3
+
+3. How many machines do Tier 1 Admins have admin rights on?
+Use BloodHound query:
+Analysis → Local Admin Rights → Tier 1 Admins
+
+From the room’s dataset:
+5
+
+4. How many users are members of the Tier 2 Admins group?
+Use BloodHound query:
+Analysis → Group Membership → Tier 2 Admins
+
+From the room’s dataset:
+4
