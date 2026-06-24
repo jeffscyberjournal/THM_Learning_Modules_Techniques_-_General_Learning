@@ -829,15 +829,18 @@ Drawbacks
 - Requires Windows execution
 
 ### Answers to the Questions
-1. Command to run SharpHound for Session‑only collection
+
+Q1. Command to run SharpHound for Session‑only collection
 From the document:
 
 “We will run Sharphound using the All and Session collection methods”
 
 To collect Session only, the correct command is:
 
-Code
+```
 SharpHound.exe --CollectionMethods Session --Domain za.tryhackme.com --ExcludeDCs
+```
+
 2. Apart from krbtgt, how many other accounts are kerberoastable?
 Use BloodHound query:
 Analysis → Find Kerberoastable Users
