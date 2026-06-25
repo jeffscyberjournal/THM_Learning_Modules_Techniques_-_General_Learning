@@ -736,6 +736,11 @@ Copy SharpHound
 copy C:\Tools\Sharphound.exe ~\Documents\
 cd ~\Documents\
 ```
+Can be obtained using 
+```
+git clone https://github.com/BloodHoundAD/BloodHound.git
+```
+
 Run SharpHound (full collection)
 ```
 SharpHound.exe --CollectionMethods All --Domain za.tryhackme.com --ExcludeDCs
