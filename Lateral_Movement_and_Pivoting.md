@@ -178,3 +178,38 @@ Key difference: User Account Control (UAC) restricts local admins (except the bu
 - Domain admins with local admin rights get full privileges remotely.
 
 If a lateral movement technique fails, UAC restrictions on a non‑default local admin may be the reason. 
+
+### Summary of UAC and Remote Restrictions in Windows Vista
+
+#### Purpose of UAC
+
+User Account Control (UAC) in Windows Vista ensures users—even those in the local Administrators group—run most tasks with least‑privilege rights. When an administrative action is required, Vista prompts for approval.
+
+### How Remote Restrictions Work
+
+UAC applies special rules to remote connections to prevent:
+
+- Loopback attacks
+- Local malware gaining remote administrative rights
+
+Local Accounts (SAM)
+
+- A local Administrator connecting remotely (e.g., via net use \\computer\share$) does NOT receive full admin rights.
+- Their token is filtered, meaning no elevation and no ability to perform admin tasks.
+- To administer remotely using a local account, they must log in interactively (Remote Desktop / Remote Assistance).
+
+### Domain Accounts
+
+- Domain users who are Administrators do receive full admin tokens when connecting remotely.
+- UAC remote restrictions do not apply to domain accounts.
+- This behavior matches Windows XP.
+
+### Disabling UAC Remote Restrictions
+
+Controlled via the registry value:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\LocalAccountTokenFilterPolicy
+```
+- 0 (default): Local admins get a filtered token (no elevation).
+- 1: Local admins get an elevated token (full admin rights remotely).
+- Setting the value to 1 disables UAC remote restrictions.
