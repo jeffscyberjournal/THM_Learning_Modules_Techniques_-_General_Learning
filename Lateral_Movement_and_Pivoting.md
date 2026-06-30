@@ -71,6 +71,35 @@ Lateral movement refers to the techniques attackers use to move between systems 
 Rather than a single step in a kill chain, lateral movement is a repeating cycle:
 Gain access → extract credentials → move to a new host → escalate → extract more credentials → repeat.
 
+```
++---------------------------------------------------------------+
+|                                                               |
+|   [ Initial Recon ] → [ Initial Compromise ] → [ Foothold ]   |
+|                                                               |
+|                 ↓                 ↓                 ↓          |
+|             [ Escalate Privileges ] → [ Internal Recon ]       |
+|                                      ↘                        |
+|                                       [ Move Laterally ]      |
+|                                        ↘                      |
+|                                         [ Maintain Presence ] |
+|                                          ↘                    |
+|                                           [ Complete Mission ]|
+|                                                               |
++---------------------------------------------------------------+
+
+Cycle Summary:
+---------------------------------------------------------------
+1. Initial Recon        → Gather information about the target.
+2. Initial Compromise   → Gain first access (e.g., phishing).
+3. Establish Foothold   → Deploy persistence or malware.
+4. Escalate Privileges  → Gain higher-level access.
+5. Internal Recon       → Map internal network and assets.
+6. Move Laterally       → Spread to other systems.
+7. Maintain Presence    → Ensure continued access.
+8. Complete Mission     → Achieve attacker’s goal.
+---------------------------------------------------------------
+```
+
 Attackers often need several cycles before reaching high‑value systems.
 
 
@@ -83,6 +112,46 @@ A phishing compromise lands the attacker on a Marketing workstation, which is he
 3. Identifies another host: DEV‑001‑PC
 4. Uses the reused local admin hash to access DEV‑001‑PC
 5. From the developer’s machine, reaches the code repository
+
+Path 1 (successful, stealthy):  
+Marketing-PC → DEV-001-PC (using local admin hash) → Code Repo
+
+Path 2 (blocked by firewall):  
+Marketing-PC → Firewall → Code Repo / admin services (denied)
+
+Path 3 (conceptual, “too noisy”):  
+Marketing-PC → Code Repo directly (would be suspicious in logs even if allowed)
+```
+                  [ Attacker ]
+                      |
+                      v
+                +----------------+
+                |  Marketing-PC  |
+                +----------------+
+                  /      |      \
+                 /       |       \
+                v        |        v
+      (1) Local Admin    |  (3) Direct to
+          Hash reuse     |      Code Repo
+                         |
+        +----------------+----------------+
+        |     Firewall (Marketing rules)  |
+        +----------------+----------------+
+                         |
+          (2) Blocked to Code Repo / Admin
+                         v
+                   +-----------+
+                   | Code Repo |
+                   +-----------+
+
+
+(1) Marketing-PC --------------> DEV-001-PC (via reused local admin hash)
+                                  |
+                                  v
+                             +-----------+
+                             | Code Repo |
+                             +-----------+
+```
 
 Even if Marketing had direct access, using the developer’s machine is less suspicious in audit logs.
 
