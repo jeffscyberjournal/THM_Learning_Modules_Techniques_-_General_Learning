@@ -55,3 +55,57 @@ This jump host simulates your initial foothold in the environment.
 
 ### Reverse Shell Note
 Always use the IP of the lateralmovement interface as your attacker IP for any reverse connections.
+
+
+## Task 2 Summary: Moving Through the Network
+
+### What Lateral Movement Is
+
+Lateral movement refers to the techniques attackers use to move between systems inside a network after gaining an initial foothold. Attackers do this to:
+
+- Reach their ultimate objectives
+- Bypass network segmentation and restrictions
+- Create additional access points
+- Confuse defenders and reduce detection
+
+Rather than a single step in a kill chain, lateral movement is a repeating cycle:
+Gain access → extract credentials → move to a new host → escalate → extract more credentials → repeat.
+
+Attackers often need several cycles before reaching high‑value systems.
+
+
+### Example Scenario
+
+A phishing compromise lands the attacker on a Marketing workstation, which is heavily restricted. To reach an internal code repository, the attacker:
+
+1. Elevates privileges on the Marketing PC
+2. Extracts local admin hashes
+3. Identifies another host: DEV‑001‑PC
+4. Uses the reused local admin hash to access DEV‑001‑PC
+5. From the developer’s machine, reaches the code repository
+
+Even if Marketing had direct access, using the developer’s machine is less suspicious in audit logs.
+
+
+### Attacker Techniques
+
+Attackers can move laterally using:
+
+- Standard administrative protocols: WinRM, RDP, VNC, SSH
+- More stealthy techniques covered later in the room
+
+They try to mimic realistic user behaviour to avoid detection (e.g., IT staff accessing servers is normal; Marketing PC accessing DEV‑001‑PC is suspicious).
+
+
+### Administrators & UAC
+Two types of admin accounts matter:
+
+- Local admin accounts (on the machine)
+- Domain accounts with local admin rights
+
+Key difference: User Account Control (UAC) restricts local admins (except the built‑in Administrator).
+
+- Local admins connecting remotely via RPC/SMB/WinRM receive a filtered medium‑integrity token, blocking privileged actions.
+- Domain admins with local admin rights get full privileges remotely.
+
+If a lateral movement technique fails, UAC restrictions on a non‑default local admin may be the reason. 
