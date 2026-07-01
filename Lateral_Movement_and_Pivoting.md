@@ -241,7 +241,7 @@ PsExec uploads a temporary service executable, starts it, and communicates throu
       |<-- Named Pipe: \\.\pipe\psexesvc --|
       |     stdin / stdout / stderr       |
 ```
-Command example:
+Command example: (MACHINE_IP is PC laterally connecting to)
 ```
 psexec64.exe \\MACHINE_IP -u Administrator -p Mypass123 -i cmd.exe
 ```
