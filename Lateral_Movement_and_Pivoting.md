@@ -931,6 +931,46 @@ The use one of the RDP options to use the has such as:
 ```
 xfreerdp /v:VICTIM_IP /u:DOMAIN\\MyUser /pth:NTLM_HASH
 ```
+#Did not seem to work, asks for accepting something like
+```
+xfreerdp /v:THMJMP2.za.tryhackme.com /u:ZA\Administrator /pth:0b2571be7e75e3dbd169ca5352a2dad7
+```
+
+All seem to fail same way.
+```
+Do you trust the above certificate? (Y/T/N) [03:10:03:742] [539592:00083bca] [ERROR][com.winpr.sspi.Kerberos] - [kerberos_AcquireCredentialsHandleA]: krb5_parse_name (Configuration file does not specify default realm [-1765328160])
+[03:10:03:743] [539592:00083bca] [ERROR][com.winpr.sspi.Kerberos] - [kerberos_AcquireCredentialsHandleA]: krb5_parse_name (Configuration file does not specify default realm [-1765328160])
+[03:10:05:896] [539592:00083bca] [ERROR][com.freerdp.core] - [nla_recv_pdu]: ERRCONNECT_LOGON_FAILURE [0x00020014]
+[03:10:05:896] [539592:00083bca] [ERROR][com.freerdp.core.rdp] - [rdp_recv_callback_int][0x5596eb3daf70]: CONNECTION_STATE_NLA - nla_recv_pdu() fail
+[03:10:05:896] [539592:00083bca] [ERROR][com.freerdp.core.rdp] - [rdp_recv_callback_int][0x5596eb3daf70]: CONNECTION_STATE_NLA status STATE_RUN_FAILED [-1]
+[03:10:05:896] [539592:00083bca] [ERROR][com.freerdp.core.transport] - [transport_check_fds]: transport_check_fds: transport->ReceiveCallback() - STATE_RUN_FAILED [-1]
+[03:10:05:903] [539592:00083bc8] [WARN][com.winpr.negotiate] - [negotiate_FreeCredentialsHandle]: FreeCredentialsHandle returned SEC_E_INVALID_HANDLE
+[03:10:05:903] [539592:00083bc8] [WARN][com.winpr.negotiate] - [negotiate_FreeCredentialsHandle]: FreeCredentialsHandle returned SEC_E_INVALID_HANDLE
+```
+Retry but this clarified issue is rdp on thmjmp2 is not working:
+
+The new error:
+
+```
+BIO_read returned a system error 104: Connection reset by peer
+ERRCONNECT_CONNECT_TRANSPORT_FAILED [0x0002000D]
+```
+means something very different:
+
+#### The RDP service on THMJMP2 is rejecting the connection before authentication.
+This is not a Pass‑the‑Hash problem anymore.
+This is network‑layer refusal.
+
+Let’s break down exactly why this happens in TryHackMe AD rooms and how to confirm it.
+
+#### Why THMJMP2 rejects RDP connections
+TryHackMe’s Lateral Movement & Pivoting room has this behaviour:
+
+✔ THMJMP2 does NOT allow RDP logins
+✔ Only WinRM (WinRS) and SMB are enabled
+✔ RDP is intentionally disabled to force you to use Kerberos or WinRS
+✔ The room’s instructions never mention RDP access to THMJMP2
+✔ The room’s intended RDP target is THMIIS, not THMJMP2
 
 #### Next Kerberos tickets → Pass‑the‑Ticket
 
