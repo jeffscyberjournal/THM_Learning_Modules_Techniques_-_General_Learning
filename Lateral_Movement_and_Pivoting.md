@@ -1399,7 +1399,9 @@ proxychains curl http://pxeboot.za.tryhackme.com
 ### Q1: Pivot to THMIIS using socat
 
 THMJMP2 forwards THMIIS:3389 → THMJMP2:13389:
+use creds from http://distributor.za.tryhackme.com/creds to connect into THMJMP2 first.
 
+Once in set up socat shell
 ```
 socat TCP4-LISTEN:13389,fork TCP4:THMIIS.za.tryhackme.com:3389
 ```
@@ -1409,6 +1411,8 @@ Then attacker connects:
 ```
 xfreerdp /v:THMJMP2.za.tryhackme.com:13389 /u:t1_thomas.moore /p:MyPazzw3rd2020
 ```
+
+#Then on desktop should see flag.exe file with the following content.
 Flag: THM{SIGHT_BEYOND_SIGHT}
 
 ### Tunnelling the Rejetto HFS Exploit
