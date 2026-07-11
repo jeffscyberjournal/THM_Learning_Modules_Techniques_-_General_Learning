@@ -53,7 +53,8 @@ This counts VPN login events per user; Sarah has the most (86 events).
   - Scheduling window
 - Splunk Free does not support scheduling.
 
-Lab answers
+### Lab answers
+
 **Q1 Task2: Head to the Splunk Reports tab and open the Web Connections by Source IP report.
 Which Source_IP field value recorded the highest number of events?**
 Highest Source_IP: 10.0.0.1
