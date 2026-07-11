@@ -177,12 +177,21 @@ index = web_logs URI = /payments.html status_code="404"
 ### Lab Questions
 
 **Q1 Task3: How many Source_IP addresses outside of the expected range accessed /restricted.html?**
-using the query 'index = web_logs URI = /restricted.html NOT Source_IP IN (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)' search for source_ip below on left. 
+using the query: 
+```index = web_logs URI = /restricted.html NOT Source_IP IN (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
+```
+search for source_ip below on left. 
 shows only **2** results 
 
 **Q2 Task 3: How many total 404 status_code were recorded at /payments.html?**
-
-
-Total 404s at /payments.html: You fill this in
-
-Highest 404 count in any hour: You fill this in
+The previous query just using the first line only 
+```
+index = web_logs URI = /payments.html status_code="404"'
+```
+**Q3 Task 3: Total 404s at /payments.html:**
+189, found by just using the first line from above:
+```
+index = web_logs URI = /payments.html status_code = 404
+```
+**Q4 Task3: Highest 404 count in any hour:**
+16 is answer, the example above gives a complete answer and gives concise example.
