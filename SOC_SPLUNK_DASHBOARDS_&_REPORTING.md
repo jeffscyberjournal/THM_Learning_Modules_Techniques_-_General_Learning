@@ -19,6 +19,10 @@ Splunk collects huge volumes of security logs, and this module teaches you how t
 **Splunk as a SIEM**  
 - Aggregates logs, correlates events, generates alerts, and provides visual monitoring across an enterprise environment.
 
+
+
+
+---
 ## Task 2: Creating Reports for Recurring Searches — concise summary
 
 Splunk’s Search & Reporting app lets analysts run queries across large datasets, but raw event logs (10k+ events in this lab) are too noisy to review manually. Reports solve this by saving useful searches and running them automatically.
@@ -63,4 +67,107 @@ Highest Source_IP: 10.0.0.1
 What is the flag value hidden within the search query?**
 Hidden flag in query: THM{splunk_report_wizard!}
 
-## Task3: 
+
+
+
+---
+## Task3: Detecting With Alerts and Rules
+
+Splunk alerts allow analysts to detect suspicious activity automatically instead of manually reviewing large log volumes. Although alerts can’t be executed in the free Splunk instance, the room demonstrates how they are built and configured.
+
+**Note:** 
+- Due to the limitations of the free Splunk license, we cannot practice setting up alerts on the attached instance. However, you can follow along with the queries and screenshots to get some practice and learn how they're set up.
+
+**Alerts**
+- Alerts notify analysts when specific conditions occur (e.g., external IP accessing restricted pages, repeated failed logins).
+- Example query to detect external access to /restricted.html:
+```
+index = web_logs URI = /restricted.html NOT Source_IP IN (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
+```
+- web_logs on its on its own with "all of time" set. shows 10000 entries.
+- Under URI at this point there are only 7 listed, looking further at /restricted.html holds almost same number as the other URI, likely as the file was generated for this purpose, containing 1474, almost same as the other 6. Above shows adding 'URI = /restricted.html' and filtering internal IP ranges out with it, is how the above filter command is why its written that way.
+- This filter shows there were no class A,B or C IP in that log linked with the URI.
+- if the function is useful can be saved using **save as**, the community edition does not allow storing alerts it only contains in **save as** menu Report, Existing Dashboard, New Dashboard, Event type, the alert option is missing. It should provide options for title and description similar to saving a report.
+- Alert configuration demonstrated options also available when saving alert along side title and description:
+  - Real-time alert - runs continuous.
+  - Per-result trigger - everytime a single event matches the search criteria
+  - Send email action - An email will be sent to soc@tryhackme.com when triggered.
+
+```
++---------------------------------------------------------------+
+|                     SAVE AS ALERT (Splunk)                    |
++---------------------------------------------------------------+
+| Title: Restricted URI Accessed by Outside IP                  |
+| Description: Triggers when Source_IP outside expected range    |
+|              accesses /restricted.html                        |
+|                                                               |
+| Permissions: [Private] [Shared in App]                        |
+| Alert type:  [Scheduled] -> [Real-time]   (1️⃣)               |
+| Expires:     [24 hour(s)]                                     |
+|                                                               |
+| Trigger Conditions:                                           |
+|   Trigger alert when: [Per-Result]        (2️⃣)               |
+|   Throttle: [ ]                                              |
+|                                                               |
+| Trigger Actions:                                              |
+|   + Add Actions                                               |
+|   When triggered: [Send email] -> soc@tryhackme.com  (3️⃣)    |
+|                                                               |
+| Buttons: [Cancel] [Save]                                     |
++---------------------------------------------------------------+
+
+Right panel (Email Action Details)
+---------------------------------------------------------------
+| Send email to: soc@tryhackme.com                              |
+| Priority: Normal                                              |
+| Subject: Splunk Alert: Restricted URI Access                  |
+| Message: A Source_IP outside of expected range attempted      |
+|          to access /restricted.html                           |
+| Include: [Link to Alert] [Link to Results]                    |
+| Buttons: [Cancel] [Save]                                      |
+---------------------------------------------------------------
+```
+
+**Baseline & Threshold Rules**
+- Used to detect abnormal spikes in activity (e.g., excessive 404 errors).
+- Baseline query for /payments.html 404 responses:
+- Baseline found: ~7.6 404s per hour
+```
++---------------------------------------------------------------------+
+| SPLUNK SEARCH & REPORTING APP                                       |
++------------------------------------------------------------------------+
+| Query:                                                                 |
+| index = web_logs uri="/payments.html" status_code=404                  |
+| | bin _time span=1h                                                    |
+| | stats count AS hits BY _time                                         |
+| | eventstats avg(hits) AS avg_hits                                     |
+| | eval avg_hits = round(avg_hits, 1)                                   |
++------------------------------------------------------------------------+
+| Results Table                                                          |
+|------------------------------------------------------------------------|
+|_time (One Hour Intervals)| hits (404 Responses)| avg_hits (Average/hr) |
+|------------------------------------------------------------------------|
+|   2023-01-28 04:00       |       7                |          7.4       |
+|   2023-01-28 05:00       |       8                |          7.4       |
+|   2023-01-28 06:00       |       9                |          7.4       |
+|   2023-01-28 07:00       |       5                |          7.4       |
++------------------------------------------------------------------------+
+| Notes:                                                                 |
+| - Data grouped by 1-hour intervals                                     |
+| - Counts 404 responses per hour                                        |
+| - Calculates average (≈7.6/hr) for baseline                            |
++------------------------------------------------------------------------+
+```
+- Threshold rule example (>11 hits in 1 hour):
+```
+| where hits > 11
+| eval alert = "HIGH 404s: ".hits." in 1h (normal: ~7.6/hr)"
+```
+
+### Lab Questions
+
+External IPs accessing /restricted.html: You fill this in after running the query
+
+Total 404s at /payments.html: You fill this in
+
+Highest 404 count in any hour: You fill this in
