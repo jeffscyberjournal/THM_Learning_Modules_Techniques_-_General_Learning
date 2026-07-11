@@ -78,8 +78,8 @@ Gain access → extract credentials → move to a new host → escalate → extr
 |                                                               |
 |   [ Initial Recon ] → [ Initial Compromise ] → [ Foothold ]   |
 |                                                               |
-|                 ↓                 ↓                 ↓          |
-|             [ Escalate Privileges ] → [ Internal Recon ]       |
+|                 ↓                 ↓                 ↓         |
+|             [ Escalate Privileges ] → [ Internal Recon ]      |
 |                                      ↘                        |
 |                                       [ Move Laterally ]      |
 |                                        ↘                      |
@@ -231,17 +231,17 @@ PsExec uploads a temporary service executable, starts it, and communicates throu
 #### ASCII Diagram — PsExec Flow
 ```
 [ Attacker ]                          [ Target ]
-      |                                   |
-      |-- SMB (445) --------------------->|
-      |                                   |
-      |  Upload psexesvc.exe to Admin$    |
-      |---------------------------------->|
-      |                                   |
-      |  Create & start PSEXESVC service  |
-      |---------------------------------->|
-      |                                   |
+      |                                    |
+      |-- SMB (445) ---------------------->|
+      |                                    |
+      |  Upload psexesvc.exe to Admin$     |
+      |----------------------------------->|
+      |                                    |
+      |  Create & start PSEXESVC service   |
+      |----------------------------------->|
+      |                                    |
       |<-- Named Pipe: \\.\pipe\psexesvc --|
-      |     stdin / stdout / stderr       |
+      |     stdin / stdout / stderr        |
 ```
 Command example: (MACHINE_IP is PC laterally connecting to)
 ```
@@ -287,22 +287,21 @@ Windows services can run arbitrary commands when started. sc.exe connects to the
 #### ASCII Diagram — RPC → SVCCTL
 ```
 [ Attacker ] -- RPC 135 --> [ Endpoint Mapper ]
-      |                         |
-      |   "Where is SVCCTL?"    |
-      |------------------------>|
-      |                         |
-      |<-- "SVCCTL at port 50xxx" 
-      |
+      |                            |
+      |   "Where is SVCCTL?"       |
+      |--------------------------->|
+      |                            |
+      |<-- "SVCCTL at port 50xxx"  |
 [ Attacker ] -- RPC 50xxx --> [ SVCCTL ]
-      |                         |
-      |  Create / Start Service |
-      |------------------------>|
+      |                            |
+      |  Create / Start Service    |
+      |--------------------------->|
 ```
 
 #### ASCII Diagram — SMB Named Pipe Fallback
 ```
 [ Attacker ] -- SMB (445/139) --> [ Target ]
-      |                                 |
+      |                                  |
       | Bind to \\pipe\svcctl            |
       |--------------------------------->|
       | Create / Start Service           |
@@ -557,19 +556,19 @@ NTLM is a challenge‑response protocol:
 +-----------+                 +-----------+                 +-------------------+
 |   Client  |                 |   Server  |                 | Domain Controller |
 +-----------+                 +-----------+                 +-------------------+
-     |                              |                                |
+     |                               |                                |
      |----(1) Authentication Req --->|                                |
-     |                              |                                |
+     |                               |                                |
      |<---(2) NTLM Challenge --------|                                |
-     |                              |                                |
+     |                               |                                |
      |----(3) NTLM Response -------->|                                |
-     |                              |                                |
-     |                              |----(4) Send Challenge & Resp -->|
-     |                              |                                |
-     |                              |<---(5) Allow / Deny Auth -------|
-     |<---(6) Allow / Deny Auth ----|                                |
-     |                              |                                |
-     +---------------------------------------------------------------+
+     |                               |                                |
+     |                               |---(4) Send Challenge & Resp -->|
+     |                               |                                |
+     |                               |<---(5) Allow / Deny Auth ------|
+     |<---(6) Allow / Deny Auth -----|                                |
+     |                               |                                |
+     +----------------------------------------------------------------+
 ```
 
 - 1. Client requests authentication.
@@ -706,7 +705,7 @@ ASCII Diagram — Kerberos Get TGT
 |   Client  |                     |  KDC (Domain Ctrlr)   |
 +-----------+                     +-----------------------+
 | User Hash |                     | krbtgt Hash | User Hash |
-     |                                      |
+     |                                       |
      |----(1) Request TGT------------------->|
      |   [Username + Timestamp (enc)]        |
      |<---(2) Response-----------------------|
@@ -734,14 +733,14 @@ ASCII Diagram — Kerberos Get TGS
 |   Client  |                     |  KDC (Domain Ctrlr)   |
 +-----------+                     +-----------------------+
 | Session Key | TGT |             | krbtgt Hash | Svc Owner Hash |
-     |                                      |
-     |----(3) Request TGS------------------->|
-     |   [Username + Timestamp (enc w/ SessKey)] |
-     |   [TGT] [SPN = MSSQL/SRV]             |
-     |<---(4) Response-----------------------|
-     |   [TGS (enc w/ Svc Owner Hash)]       |
-     |   [Svc Session Key]                   |
-     +---------------------------------------+
+     |                                         |
+     |------(3) Request TGS------------------->|
+     | [Username + Timestamp (enc w/ SessKey)] |
+     |     [TGT] [SPN = MSSQL/SRV]             |
+     |<---(4) Response-------------------------|
+     |     [TGS (enc w/ Svc Owner Hash)]       |
+     |     [Svc Session Key]                   |
+     +-----------------------------------------+
 ```
 
 #### 3. Authenticating to the Service
@@ -757,11 +756,11 @@ ASCII Diagram — Kerberos Authenticate
 |   Client  |                     |     Service Server    |
 +-----------+                     +-----------------------+
 | TGS | Svc Session Key |         | Service Owner Hash    |
-     |                                      |
-     |----(5) Send TGS--------------------->|
+     |                                       |
+     |----(5) Send TGS---------------------->|
      |   [Authenticate using Svc Session Key]|
-     |<---(6) Access Granted----------------|
-     +--------------------------------------+
+     |<---(6) Access Granted-----------------|
+     +---------------------------------------+
 ```
 
 ### Key Takeaways
@@ -851,10 +850,20 @@ Notes:
 - Commands executed from the injected shell use the impersonated Kerberos credentials.
 
 ### Summary Table
-Technique	         Protocol	      Required Privilege	    Extracted Material	  Purpose
-Pass‑the‑Ticket	   Kerberos	      SYSTEM (for LSASS dump)	TGT/TGS + Session Key	Reuse valid Kerberos tickets
-Pass‑the‑Key	     Kerberos	      SYSTEM (for LSASS dump)	AES/RC4 key	          Request new TGT without password
-Overpass‑the‑Hash	 Kerberos (RC4)	SYSTEM	                NTLM hash	            Use NTLM hash as Kerberos key
+
++----------------------+-----------+-----------------------+---------------------------+----------------------------------------------+
+| Technique            | Protocol  | Required Privilege    | Extracted Material        | Purpose                                      |
++----------------------+-----------+-----------------------+---------------------------+----------------------------------------------+
+| Pass-the-Ticket      | Kerberos  | SYSTEM (LSASS dump)   | TGT/TGS + Session Key     | Reuse valid Kerberos tickets to impersonate  |
+|                      |           |                       |                           | users without needing password or hash       |
++----------------------+-----------+-----------------------+---------------------------+----------------------------------------------+
+| Pass-the-Key         | Kerberos  | SYSTEM (LSASS dump)   | AES/RC4 Kerberos key      | Request new TGT using the Kerberos key       |
+|                      |           |                       |                           | instead of password (no NTLM involved)       |
++----------------------+-----------+-----------------------+---------------------------+----------------------------------------------+
+| Overpass-the-Hash    | Kerberos  | SYSTEM                | NTLM hash                 | Convert NTLM hash → Kerberos RC4 key to      |
+|                      | (RC4)     |                       |                           | request a TGT (NTLM → Kerberos bridge)       |
++----------------------+-----------+-----------------------+---------------------------+----------------------------------------------+
+
 
 
 ### Final Task – Lateral Movement to THMIIS
