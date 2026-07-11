@@ -47,10 +47,10 @@ This counts VPN login events per user; Sarah has the most (86 events).
 
 - Splunk Enterprise allows scheduled execution (e.g., daily at midnight, every 8 hours).
 - You can define:
-  -- Schedule frequency
-  -- Time range
-  -- Priority
-  -- Scheduling window
+  - Schedule frequency
+  - Time range
+  - Priority
+  - Scheduling window
 - Splunk Free does not support scheduling.
 
 Lab answers
