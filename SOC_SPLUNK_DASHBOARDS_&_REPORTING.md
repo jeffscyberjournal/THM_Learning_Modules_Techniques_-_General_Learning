@@ -176,7 +176,12 @@ index = web_logs URI = /payments.html status_code="404"
 
 ### Lab Questions
 
-External IPs accessing /restricted.html: You fill this in after running the query
+**Q1 Task3: How many Source_IP addresses outside of the expected range accessed /restricted.html?**
+using the query 'index = web_logs URI = /restricted.html NOT Source_IP IN (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)' search for source_ip below on left. 
+shows only **2** results 
+
+**Q2 Task 3: How many total 404 status_code were recorded at /payments.html?**
+
 
 Total 404s at /payments.html: You fill this in
 
