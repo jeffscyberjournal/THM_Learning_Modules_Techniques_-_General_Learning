@@ -163,6 +163,16 @@ Right panel (Email Action Details)
 | where hits > 11
 | eval alert = "HIGH 404s: ".hits." in 1h (normal: ~7.6/hr)"
 ```
+Or in full query:
+```
+index = web_logs URI = /payments.html status_code="404" 
+|  bin _time span=1h 
+|  stats count AS hits BY _time
+| where hits > 11
+| eval alert = "HIGH 404s: ".hits." in 1h (normal: ~7.6/hr)" 
+```
+
+
 
 ### Lab Questions
 
