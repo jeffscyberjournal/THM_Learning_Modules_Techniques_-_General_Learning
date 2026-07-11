@@ -850,7 +850,7 @@ Notes:
 - Commands executed from the injected shell use the impersonated Kerberos credentials.
 
 ### Summary Table
-
+```
 +----------------------+-----------+-----------------------+---------------------------+----------------------------------------------+
 | Technique            | Protocol  | Required Privilege    | Extracted Material        | Purpose                                      |
 +----------------------+-----------+-----------------------+---------------------------+----------------------------------------------+
@@ -863,7 +863,7 @@ Notes:
 | Overpass-the-Hash    | Kerberos  | SYSTEM                | NTLM hash                 | Convert NTLM hash → Kerberos RC4 key to      |
 |                      | (RC4)     |                       |                           | request a TGT (NTLM → Kerberos bridge)       |
 +----------------------+-----------+-----------------------+---------------------------+----------------------------------------------+
-
+```
 
 
 ### Final Task – Lateral Movement to THMIIS
