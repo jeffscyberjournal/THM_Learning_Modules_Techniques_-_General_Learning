@@ -200,19 +200,77 @@ index = web_logs URI = /payments.html status_code = 404
 --- 
 ## Task 4 Creating Dashboards for Summarizing Results
 
-Within Splunk, dashboards provide users with quick access to information about the data present in Splunk. Dashboards are often created to give a summarized overview of selected important fields and statistics of event data. You may want to make a dashboard that displays the number of incidents within a specified time frame, such as identifying spikes or dips in specific events. Similar to reports, if you navigate to the Dashboards tab in Splunk, you will see a list of default dashboards provided, as well as the one we will be using in this task: Web Logs Overview.
-
-The Splunk Dashboards tab with the Dashboards tab, default dashboards highlighted
-
+Splunk dashboards provide fast, visual summaries of important event data. They allow analysts to spot trends, spikes, dips, and anomalies without manually running searches.
+```
++--------------------------------------------------------------------------------+
+| SEARCH | ANALYTICS | DATASETS | REPORTS | ALERTS | [DASHBOARDS] |              |
+|--------------------------------------------------------------------------------|
+| Dashboards                                                                     |
+| Dashboards include interactive visualizations and input controls for data.     |
+|--------------------------------------------------------------------------------|
+| [Create New Dashboard]                                                         |
+|--------------------------------------------------------------------------------|
+| Latest Resources:                                                              |
+| - Explore Dashboard Studio                                                     |
+| - Intro to Dashboard Studio                                                    |
+| - Intro to Classic Dashboards                                                  |
+|--------------------------------------------------------------------------------|
+| Available Dashboards                                                           |
+|--------------------------------------------------------------------------------|
+| Title                                         | Actions | Owner  | App   | Type|
+|--------------------------------------------------------------------------------|
+| Integrity Check of Installed PKGs             | Edit  | nobody | search|Classic|
+| Java Details Dashboard                        | Edit  | nobody | search|Classic|
+| Query Details                                 | Edit  | nobody | search|Classic|
+| Organized Scheduled Searches, Reports, Alerts | Edit  | nobody | search|Classic|
+| Web Logs Overview                             | Edit  | admin  | search|Classic|
++--------------------------------------------------------------------------------+
+| [Search & Reporting] button (top right)                                        |
++--------------------------------------------------------------------------------+
+```
 Aside from choosing an existing dashboard, you have the option to create a new one in which you must assign a title, provide an optional description, adjust the permissions, and decide whether to use Classic Dashboards or Dashboard Studio.
 
 Dashboard Studio is Splunk's newer dashboard builder, designed to provide users with greater customization options in exchange for a complex learning curve. Classic Dashboards, on the other hand, remain the most commonly encountered format and fully support all standard visualizations. In this room, we will cover Classic Dashboards.
 
-The Splunk Create New Dashboard window with the Dashboard Title, Description, Permissions, and Classic Dashboards option highlighted.
+```
++---------------------------------------------------------------+
+|                   CREATE NEW DASHBOARD                        |
++---------------------------------------------------------------+
+| Dashboard Title: [Sample Dashboard Title]                     |
+| Edit ID: sample_dashboard_title                               |
+|---------------------------------------------------------------|
+| Description: [A Dashboard to Visualize Event Data]            |
+|---------------------------------------------------------------|
+| Permissions: [Private]                                        |
+|---------------------------------------------------------------|
+| How do you want to build your dashboard?                      |
+|                                                               |
+| [Classic Dashboards]  - The traditional Splunk dashboard builder
+| [Dashboard Studio]    - A new builder for customizable dashboards
+|---------------------------------------------------------------|
+| Buttons: [Cancel] [Create]                                    |
++---------------------------------------------------------------+
+```
 
 Back in the dashboards tab, go ahead and select the Web Logs Overview dashboard. Currently, our dashboard has a single panel that visualizes the count of events over time from the web_logs index. This dashboard is helpful, but we can further enhance it by adding more visualizations to better understand the data from our web server. Go ahead and click Edit, then + Add Panel as highlighted in the screenshot below, so we can expand our current dashboard.
 
-The Web Logs Overview dashboard with the + Add Panel button highlighted.
++---------------------------------------------------------------+
+|                    EDIT DASHBOARD - SPLUNK                    |
++---------------------------------------------------------------+
+| [UI] [Source] [Add Panel] [Add Input] [Dark Theme]            |
+|---------------------------------------------------------------|
+| Web Logs Overview                                             |
+| This dashboard provides an overview of data from the web_logs. |
+|---------------------------------------------------------------|
+| No title                                                      |
+|---------------------------------------------------------------|
+| Time Chart By Hour                                            |
+|---------------------------------------------------------------|
+| >>> Time chart is here by time <<<                            |
+|---------------------------------------------------------------|
+| Buttons: [Cancel] [Save as...] [Save]                         |
++---------------------------------------------------------------+
+
 
 Perhaps, we want to build a pie chart that shows the event count for the URI field in the web_logs index, helping us visualize how many times each URI was accessed within our available events. In the Add Panel pop-out, choose:
 
@@ -222,7 +280,36 @@ Enter a Content Title
 Enter the search string
 index = web_logs | stats count by URI | sort - count
 Click Add to Dashboard
-The Splunk dashboard Add Panel window with the New, Pie Chart, Time Range, Content Title, Search String, and Add to Dashboard options highlighted as well as the created pie chart. 
+```
++--------------------------------------------------------------------------------+
+|                               ADD PANEL                                        |
++--------------------------------------------------------------------------------+
+| New (15)                                                                       |
+|   - Events                                                                     |
+|   - Statistics Table                                                           |
+|   - Line Chart                                                                 |
+|   - Area Chart                                                                 |
+|   - Column Chart                                                               |
+|   - Bar Chart                                                                  |
+|   - Pie Chart   (1️⃣ Selected)                                                 |
+|   - Scatter Chart                                                              |
++--------------------------------------------------------------------------------+
+|                               NEW PIE CHART                                    |
++--------------------------------------------------------------------------------+
+| Time Range: [All time] (2️⃣)                                                   |
+| Content Title: [URI Event Distribution] (3️⃣)                                  |
+| Search String: (4️⃣)                                                           |
+|   index = web_logs | stats count by URI | sort - count                         |
+|--------------------------------------------------------------------------------|
+| [Add to Dashboard] (5️⃣)                                                       |
++--------------------------------------------------------------------------------+
+| Pie Chart Visualization:                                                       |
+|--------------------------------------------------------------------------------|
+| >>> Pie chart showing URI event distribution <<<                               |
+| URIs represented: /pictures.html, /payments.html, /restricted.html,            |
+|                   /index.html, /about.html, /trainings.html, /contact.html     |
++--------------------------------------------------------------------------------+
+```
 
 Great job! You've officially built an informative and visually appealing dashboard in Splunk, but why stop there? We can add more panels to display any information we like. In the previous task, we looked at the /restricted.html URI field. Let's create a stats table for our dashboard that shows:
 
@@ -237,18 +324,52 @@ index = web_logs URI = /restricted.html
 | eventstats sum(count) as total
 | eval percent = round(count * 100.0 / total, 2) 
 | sort - count
+```
++--------------------------------------------------------------------------------+
+|                                 ADD PANEL                                      |
++--------------------------------------------------------------------------------+
+| New (15)                                                                       |
+|   - Events                                                                     |
+|   - Statistics Table   (Selected)                                              |
+|   - Line Chart                                                                 |
+|   - Area Chart                                                                 |
+|   - Column Chart                                                               |
+|   - Bar Chart                                                                  |
+|   - Pie Chart                                                                  |
+|   - Scatter Chart                                                              |
+|   - Bubble Chart                                                               |
++--------------------------------------------------------------------------------+
+|                             NEW STATISTICS TABLE                               |
++--------------------------------------------------------------------------------+
+| Time Range: [All time]                                                         |
+| Content Title: [status to /restricted.html]                                    |
+| Search String:                                                                |
+|   index = web_logs URI = /restricted.html                                      |
+|   | stats count by status_code                                                 |
+|   | eventstats sum(count) as total                                             |
+|   | eval percent = round(count * 100.0 / total, 2)                             |
+|   | sort - count                                                               |
+|--------------------------------------------------------------------------------|
+| [Add to Dashboard]                                                            |
+|--------------------------------------------------------------------------------|
+| Panel Options: Displaying New Stats Table                                      |
+|--------------------------------------------------------------------------------|
+| status_code | count | percent | total                                          |
+|--------------|--------|----------|--------                                      |
+| 204          | 196    | 13.30    | 1474                                        |
+| 201          | 189    | 12.82    | 1474                                        |
+| 301          | 189    | 12.82    | 1474                                        |
+| 500         
+```
 
-The Splunk dashboard, Add Panel window, and the created statistics table.
-
-Answer the questions below
-Inspect the URI pie chart you built in the dashboard above.
-Which URI field value has the least amount of events present?
+**Q1 Task4: Inspect the URI pie chart you built in the dashboard above.
+Which URI field value has the least amount of events present?**
 
 /________.____
 
 Check
-Add another statistics table to your dashboard to view the Source_IP, URI, and status_code fields.
-How many times did 172.16.0.1 receive the status_code 200 from /payments.html?
+**Q2 Task4: Add another statistics table to your dashboard to view the Source_IP, URI, and status_code fields.
+How many times did 172.16.0.1 receive the status_code 200 from /payments.html?**
 
 __
 
