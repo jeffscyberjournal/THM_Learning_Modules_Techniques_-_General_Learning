@@ -195,3 +195,60 @@ index = web_logs URI = /payments.html status_code = 404
 ```
 **Q4 Task3: Highest 404 count in any hour:**
 16 is answer, the example above gives a complete answer and gives concise example.
+
+
+--- 
+## Task 4 Creating Dashboards for Summarizing Results
+
+Within Splunk, dashboards provide users with quick access to information about the data present in Splunk. Dashboards are often created to give a summarized overview of selected important fields and statistics of event data. You may want to make a dashboard that displays the number of incidents within a specified time frame, such as identifying spikes or dips in specific events. Similar to reports, if you navigate to the Dashboards tab in Splunk, you will see a list of default dashboards provided, as well as the one we will be using in this task: Web Logs Overview.
+
+The Splunk Dashboards tab with the Dashboards tab, default dashboards highlighted
+
+Aside from choosing an existing dashboard, you have the option to create a new one in which you must assign a title, provide an optional description, adjust the permissions, and decide whether to use Classic Dashboards or Dashboard Studio.
+
+Dashboard Studio is Splunk's newer dashboard builder, designed to provide users with greater customization options in exchange for a complex learning curve. Classic Dashboards, on the other hand, remain the most commonly encountered format and fully support all standard visualizations. In this room, we will cover Classic Dashboards.
+
+The Splunk Create New Dashboard window with the Dashboard Title, Description, Permissions, and Classic Dashboards option highlighted.
+
+Back in the dashboards tab, go ahead and select the Web Logs Overview dashboard. Currently, our dashboard has a single panel that visualizes the count of events over time from the web_logs index. This dashboard is helpful, but we can further enhance it by adding more visualizations to better understand the data from our web server. Go ahead and click Edit, then + Add Panel as highlighted in the screenshot below, so we can expand our current dashboard.
+
+The Web Logs Overview dashboard with the + Add Panel button highlighted.
+
+Perhaps, we want to build a pie chart that shows the event count for the URI field in the web_logs index, helping us visualize how many times each URI was accessed within our available events. In the Add Panel pop-out, choose:
+
+New → Pie Chart
+Set the time to All time
+Enter a Content Title
+Enter the search string
+index = web_logs | stats count by URI | sort - count
+Click Add to Dashboard
+The Splunk dashboard Add Panel window with the New, Pie Chart, Time Range, Content Title, Search String, and Add to Dashboard options highlighted as well as the created pie chart. 
+
+Great job! You've officially built an informative and visually appealing dashboard in Splunk, but why stop there? We can add more panels to display any information we like. In the previous task, we looked at the /restricted.html URI field. Let's create a stats table for our dashboard that shows:
+
+status_code field
+count of events
+percent of events
+total amount of events overall
+Go ahead and click + Add Panel button as you did previously, but this time, choose New → Statistics Table. Next, set your Time Range to All time and enter the following query as the Search String:
+
+index = web_logs URI = /restricted.html
+| stats count by status_code
+| eventstats sum(count) as total
+| eval percent = round(count * 100.0 / total, 2) 
+| sort - count
+
+The Splunk dashboard, Add Panel window, and the created statistics table.
+
+Answer the questions below
+Inspect the URI pie chart you built in the dashboard above.
+Which URI field value has the least amount of events present?
+
+/________.____
+
+Check
+Add another statistics table to your dashboard to view the Source_IP, URI, and status_code fields.
+How many times did 172.16.0.1 receive the status_code 200 from /payments.html?
+
+__
+
