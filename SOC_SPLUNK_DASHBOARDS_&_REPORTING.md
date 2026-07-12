@@ -89,31 +89,31 @@ index = web_logs URI = /restricted.html NOT Source_IP IN (10.0.0.0/8, 172.16.0.0
 - This filter shows there were no class A,B or C IP in that log linked with the URI.
 - if the function is useful can be saved using **save as**, the community edition does not allow storing alerts it only contains in **save as** menu Report, Existing Dashboard, New Dashboard, Event type, the alert option is missing. It should provide options for title and description similar to saving a report.
 - Alert configuration demonstrated options also available when saving alert along side title and description:
-  - Real-time alert - runs continuous.
-  - Per-result trigger - everytime a single event matches the search criteria
-  - Send email action - An email will be sent to soc@tryhackme.com when triggered.
+  - (1) Real-time alert - runs continuous.
+  - (2) Per-result trigger - everytime a single event matches the search criteria
+  - (3) Send email action - An email will be sent to soc@tryhackme.com when triggered.
 
 ```
 +---------------------------------------------------------------+
 |                     SAVE AS ALERT (Splunk)                    |
 +---------------------------------------------------------------+
 | Title: Restricted URI Accessed by Outside IP                  |
-| Description: Triggers when Source_IP outside expected range    |
+| Description: Triggers when Source_IP outside expected range   |
 |              accesses /restricted.html                        |
 |                                                               |
 | Permissions: [Private] [Shared in App]                        |
-| Alert type:  [Scheduled] -> [Real-time]   (1️⃣)               |
+| Alert type:  [Scheduled] -> [Real-time]   (1)               |
 | Expires:     [24 hour(s)]                                     |
 |                                                               |
 | Trigger Conditions:                                           |
-|   Trigger alert when: [Per-Result]        (2️⃣)               |
-|   Throttle: [ ]                                              |
+|   Trigger alert when: [Per-Result]        (2)               |
+|   Throttle: [ ]                                               |
 |                                                               |
 | Trigger Actions:                                              |
 |   + Add Actions                                               |
-|   When triggered: [Send email] -> soc@tryhackme.com  (3️⃣)    |
+|   When triggered: [Send email] -> soc@tryhackme.com  (3)    |
 |                                                               |
-| Buttons: [Cancel] [Save]                                     |
+| Buttons: [Cancel] [Save]                                      |
 +---------------------------------------------------------------+
 
 Right panel (Email Action Details)
@@ -381,5 +381,15 @@ index="web_logs" URI=/restricted.html
 | sort - count
 ```
 Really only needs the first 2 and last line to sort it, giving us 41 times 172.16.0.1 received a status 200.
-__
 
+
+---
+## Task4: Extending Splunk's Functionality
+
+Splunk’s core platform ingests and indexes log data, but modern SOCs extend it with advanced security tools. Splunk Enterprise Security (ES) adds a full security operations framework on top of Splunk Enterprise/Cloud, providing correlation searches, notable events, MITRE ATT&CK mapping, risk scoring, investigation workflows, and the SOC Operations dashboard for visibility into analyst workload and efficiency.
+
+Splunk UEBA enhances ES by detecting insider threats and compromised accounts through behavioral analytics. It evaluates user and entity activity over time, aggregates anomalies, assigns risk scores, and maps suspicious behavior to MITRE ATT&CK techniques.
+
+Splunk SOAR (formerly Phantom) introduces automated response (note paid component of splunk not accessible in community addition). Using playbooks, SOAR can perform actions such as isolating hosts, disabling accounts, or checking IP reputation automatically, reducing manual workload and improving response consistency. Playbooks can include conditions, filters, and branching logic to adapt to different alert types and severity levels.
+
+Together, ES + UEBA + SOAR transform Splunk from a visibility tool into a full detection, investigation, and automated response ecosystem.
