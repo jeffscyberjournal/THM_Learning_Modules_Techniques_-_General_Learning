@@ -280,34 +280,34 @@ Enter a Content Title (3. something like URI Distribution)
 Enter the search string (4.)(index = web_logs | stats count by URI | sort - count)
 Click Add to Dashboard
 ```
-+--------------------------------------------------------------------------------+
-|                               ADD PANEL                                        |
-+--------------------------------------------------------------------------------+
-| New (15)                                                                       |
-|   - Events                                                                     |
-|   - Statistics Table                                                           |
-|   - Line Chart                                                                 |
-|   - Area Chart                                                                 |
-|   - Column Chart                                                               |
-|   - Bar Chart                                                                  |
-|   - Pie Chart   (1. Selected)                                                  |
-|   - Scatter Chart                                                              |
-+--------------------------------------------------------------------------------+
-|                               NEW PIE CHART                                    |
-+--------------------------------------------------------------------------------+
-| Time Range: [All time] (2)                                                     |
-| Content Title: [URI Event Distribution] (3)                                    |
-| Search String: (4)                                                             |
-|   index = web_logs | stats count by URI | sort - count                         |
-|--------------------------------------------------------------------------------|
-| [Add to Dashboard] (5)                                                         |
-+--------------------------------------------------------------------------------+
-| Pie Chart Visualization:                                                       |
-|--------------------------------------------------------------------------------|
-| >>> Pie chart showing URI event distribution <<<                               |
-| URIs represented: /pictures.html, /payments.html, /restricted.html,            |
-|                   /index.html, /about.html, /trainings.html, /contact.html     |
-+--------------------------------------------------------------------------------+
++---------------------------------------------------------------------------+
+|                               ADD PANEL                                   |
++---------------------------------------------------------------------------+
+| New (15)                                                                  |
+|   - Events                                                                |
+|   - Statistics Table                                                      |
+|   - Line Chart                                                            |
+|   - Area Chart                                                            |
+|   - Column Chart                                                          |
+|   - Bar Chart                                                             |
+|   - Pie Chart   (1. Selected)                                             |
+|   - Scatter Chart                                                         |
++---------------------------------------------------------------------------+
+|                               NEW PIE CHART                               |
++---------------------------------------------------------------------------+
+| Time Range: [All time] (2)                                                |
+| Content Title: [URI Event Distribution] (3)                               |
+| Search String: (4)                                                        |
+|   index = web_logs | stats count by URI | sort - count                    |
+|---------------------------------------------------------------------------|
+| [Add to Dashboard] (5)                                                    |
++---------------------------------------------------------------------------+
+| Pie Chart Visualization:                                                  |
+|---------------------------------------------------------------------------|
+| >>> Pie chart showing URI event distribution <<<                          |
+| URIs represented: /pictures.html, /payments.html, /restricted.html,       |
+|                   /index.html, /about.html, /trainings.html, /contact.html|
++---------------------------------------------------------------------------+
 ```
 
 Great job! You've officially built an informative and visually appealing dashboard in Splunk, but why stop there? We can add more panels to display any information we like. In the previous task, we looked at the /restricted.html URI field. Let's create a stats table for our dashboard that shows:
@@ -318,12 +318,13 @@ Great job! You've officially built an informative and visually appealing dashboa
 - total amount of events overall
 
 Similarly doing the same for restricted.html in statistics table start with, Add Panel button as you did previously, but this time, choose New → Statistics Table. Next, set your Time Range to All time and enter the following query as the Search String:
-
+```
 index = web_logs URI = /restricted.html
 | stats count by status_code
 | eventstats sum(count) as total
 | eval percent = round(count * 100.0 / total, 2) 
 | sort - count
+```
 ```
 +--------------------------------------------------------------------------------+
 |                                 ADD PANEL                                      |
