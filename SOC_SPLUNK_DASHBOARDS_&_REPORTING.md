@@ -253,14 +253,14 @@ Dashboard Studio is Splunk's newer dashboard builder, designed to provide users 
 ```
 
 Back in the dashboards tab, go ahead and select the Web Logs Overview dashboard. Currently, our dashboard has a single panel that visualizes the count of events over time from the web_logs index. This dashboard is helpful, but we can further enhance it by adding more visualizations to better understand the data from our web server. Go ahead and click Edit, then + Add Panel as highlighted in the screenshot below, so we can expand our current dashboard.
-
+```
 +---------------------------------------------------------------+
 |                    EDIT DASHBOARD - SPLUNK                    |
 +---------------------------------------------------------------+
 | [UI] [Source] [Add Panel] [Add Input] [Dark Theme]            |
 |---------------------------------------------------------------|
 | Web Logs Overview                                             |
-| This dashboard provides an overview of data from the web_logs. |
+| This dashboard provides an overview of data from the web_logs.|
 |---------------------------------------------------------------|
 | No title                                                      |
 |---------------------------------------------------------------|
@@ -270,15 +270,14 @@ Back in the dashboards tab, go ahead and select the Web Logs Overview dashboard.
 |---------------------------------------------------------------|
 | Buttons: [Cancel] [Save as...] [Save]                         |
 +---------------------------------------------------------------+
-
+```
 
 Perhaps, we want to build a pie chart that shows the event count for the URI field in the web_logs index, helping us visualize how many times each URI was accessed within our available events. In the Add Panel pop-out, choose:
 
-New → Pie Chart
-Set the time to All time
-Enter a Content Title
-Enter the search string
-index = web_logs | stats count by URI | sort - count
+New → Pie Chart (1.)
+Set the time to All time (2.)
+Enter a Content Title (3. something like URI Distribution)
+Enter the search string (4.)(index = web_logs | stats count by URI | sort - count)
 Click Add to Dashboard
 ```
 +--------------------------------------------------------------------------------+
@@ -291,17 +290,17 @@ Click Add to Dashboard
 |   - Area Chart                                                                 |
 |   - Column Chart                                                               |
 |   - Bar Chart                                                                  |
-|   - Pie Chart   (1️⃣ Selected)                                                 |
+|   - Pie Chart   (1. Selected)                                                 |
 |   - Scatter Chart                                                              |
 +--------------------------------------------------------------------------------+
 |                               NEW PIE CHART                                    |
 +--------------------------------------------------------------------------------+
-| Time Range: [All time] (2️⃣)                                                   |
-| Content Title: [URI Event Distribution] (3️⃣)                                  |
-| Search String: (4️⃣)                                                           |
+| Time Range: [All time] (2)                                                   |
+| Content Title: [URI Event Distribution] (3)                                  |
+| Search String: (4)                                                           |
 |   index = web_logs | stats count by URI | sort - count                         |
 |--------------------------------------------------------------------------------|
-| [Add to Dashboard] (5️⃣)                                                       |
+| [Add to Dashboard] (5)                                                       |
 +--------------------------------------------------------------------------------+
 | Pie Chart Visualization:                                                       |
 |--------------------------------------------------------------------------------|
@@ -343,19 +342,19 @@ index = web_logs URI = /restricted.html
 +--------------------------------------------------------------------------------+
 | Time Range: [All time]                                                         |
 | Content Title: [status to /restricted.html]                                    |
-| Search String:                                                                |
+| Search String:                                                                 |
 |   index = web_logs URI = /restricted.html                                      |
 |   | stats count by status_code                                                 |
 |   | eventstats sum(count) as total                                             |
 |   | eval percent = round(count * 100.0 / total, 2)                             |
 |   | sort - count                                                               |
 |--------------------------------------------------------------------------------|
-| [Add to Dashboard]                                                            |
+| [Add to Dashboard]                                                             |
 |--------------------------------------------------------------------------------|
 | Panel Options: Displaying New Stats Table                                      |
 |--------------------------------------------------------------------------------|
 | status_code | count | percent | total                                          |
-|--------------|--------|----------|--------                                      |
+|--------------|--------|----------|--------                                     |
 | 204          | 196    | 13.30    | 1474                                        |
 | 201          | 189    | 12.82    | 1474                                        |
 | 301          | 189    | 12.82    | 1474                                        |
@@ -365,7 +364,7 @@ index = web_logs URI = /restricted.html
 **Q1 Task4: Inspect the URI pie chart you built in the dashboard above.
 Which URI field value has the least amount of events present?**
 
-/________.____
+/pictures.html is quickly determined 
 
 Check
 **Q2 Task4: Add another statistics table to your dashboard to view the Source_IP, URI, and status_code fields.
