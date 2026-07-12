@@ -290,17 +290,17 @@ Click Add to Dashboard
 |   - Area Chart                                                                 |
 |   - Column Chart                                                               |
 |   - Bar Chart                                                                  |
-|   - Pie Chart   (1. Selected)                                                 |
+|   - Pie Chart   (1. Selected)                                                  |
 |   - Scatter Chart                                                              |
 +--------------------------------------------------------------------------------+
 |                               NEW PIE CHART                                    |
 +--------------------------------------------------------------------------------+
-| Time Range: [All time] (2)                                                   |
-| Content Title: [URI Event Distribution] (3)                                  |
-| Search String: (4)                                                           |
+| Time Range: [All time] (2)                                                     |
+| Content Title: [URI Event Distribution] (3)                                    |
+| Search String: (4)                                                             |
 |   index = web_logs | stats count by URI | sort - count                         |
 |--------------------------------------------------------------------------------|
-| [Add to Dashboard] (5)                                                       |
+| [Add to Dashboard] (5)                                                         |
 +--------------------------------------------------------------------------------+
 | Pie Chart Visualization:                                                       |
 |--------------------------------------------------------------------------------|
@@ -312,11 +312,12 @@ Click Add to Dashboard
 
 Great job! You've officially built an informative and visually appealing dashboard in Splunk, but why stop there? We can add more panels to display any information we like. In the previous task, we looked at the /restricted.html URI field. Let's create a stats table for our dashboard that shows:
 
-status_code field
-count of events
-percent of events
-total amount of events overall
-Go ahead and click + Add Panel button as you did previously, but this time, choose New → Statistics Table. Next, set your Time Range to All time and enter the following query as the Search String:
+- status_code field
+- count of events
+- percent of events
+- total amount of events overall
+
+Similarly doing the same for restricted.html in statistics table start with, Add Panel button as you did previously, but this time, choose New → Statistics Table. Next, set your Time Range to All time and enter the following query as the Search String:
 
 index = web_logs URI = /restricted.html
 | stats count by status_code
@@ -364,11 +365,21 @@ index = web_logs URI = /restricted.html
 **Q1 Task4: Inspect the URI pie chart you built in the dashboard above.
 Which URI field value has the least amount of events present?**
 
-/pictures.html is quickly determined 
+/pictures.html is quickly determined using the instructions above
 
 Check
 **Q2 Task4: Add another statistics table to your dashboard to view the Source_IP, URI, and status_code fields.
+
 How many times did 172.16.0.1 receive the status_code 200 from /payments.html?**
 
+This requires minor adjustment to the query used, adding source_ip and URI:
+```
+index="web_logs" URI=/restricted.html 
+| stats count by Source_IP URI status_code
+| eventstats sum(count) as total
+| eval percent=round(count * 100.0 / total, 2)
+| sort - count
+```
+Really only needs the first 2 and last line to sort it, giving us 41 times 172.16.0.1 received a status 200.
 __
 
