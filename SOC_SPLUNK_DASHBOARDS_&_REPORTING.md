@@ -191,19 +191,22 @@ Values	    Count	    %
 192.0.2.1	  282	     51.087%	
 203.0.113.1	270	     48.913%
 ```
-shows only **2** source IP results. 
+shows answer is only 2 source IP results. 
 
 **Q2 Task 3: How many total 404 status_code were recorded at /payments.html?**
+
 The previous query just using the first line only 
 ```
 index = web_logs URI = /payments.html status_code="404"'
 ```
 **Q3 Task 3: Total 404s at /payments.html:**
-189, found by just using the first line from above:
+
+Answer: 189 found by just using the first line from above:
 ```
 index = web_logs URI = /payments.html status_code = 404
 ```
 **Q4 Task3: Highest 404 count in any hour:**
+
 16 is answer, the example above gives a complete answer and gives concise example.
 
 
