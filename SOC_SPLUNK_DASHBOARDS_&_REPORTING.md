@@ -401,10 +401,10 @@ Really only needs the first 2 and last line to sort it, giving us 50 times 172.1
 ---
 ## Task4: Extending Splunk's Functionality
 
-Splunk’s core platform ingests and indexes log data, but modern SOCs extend it with advanced security tools. Splunk Enterprise Security (ES) adds a full security operations framework on top of Splunk Enterprise/Cloud, providing correlation searches, notable events, MITRE ATT&CK mapping, risk scoring, investigation workflows, and the SOC Operations dashboard for visibility into analyst workload and efficiency.
+Splunk’s core platform ingests and indexes log data, but modern SOCs extend it with advanced security tools. Splunk Enterprise Security (ES) adds a full security operations framework on top of Splunk Enterprise/Cloud, providing correlation searches, notable events, MITRE ATT&CK mapping, risk scoring, investigation workflows, and the SOC Operations dashboard for visibility into analyst workload and efficiency. Note Enterprise Security, UEBA, and SOAR are not part of the splunk components through tryhackme, which appears to be mainly community edition, or what is left after the trial Enterprise version expires. 
 
 Splunk UEBA enhances ES by detecting insider threats and compromised accounts through behavioral analytics. It evaluates user and entity activity over time, aggregates anomalies, assigns risk scores, and maps suspicious behavior to MITRE ATT&CK techniques.
 
-Splunk SOAR (formerly Phantom) introduces automated response (note paid component of splunk not accessible in community addition). Using playbooks, SOAR can perform actions such as isolating hosts, disabling accounts, or checking IP reputation automatically, reducing manual workload and improving response consistency. Playbooks can include conditions, filters, and branching logic to adapt to different alert types and severity levels.
+Splunk SOAR (formerly Phantom) introduces automated response. Using playbooks, SOAR can perform actions such as isolating hosts, disabling accounts, or checking IP reputation automatically, reducing manual workload and improving response consistency. Playbooks can include conditions, filters, and branching logic to adapt to different alert types and severity levels.
 
 Together, ES + UEBA + SOAR transform Splunk from a visibility tool into a full detection, investigation, and automated response ecosystem.
