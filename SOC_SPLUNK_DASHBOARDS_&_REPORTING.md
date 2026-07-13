@@ -176,7 +176,7 @@ index = web_logs URI = /payments.html status_code="404"
 ---
 ### Lab Questions
 
-**Q1 Task3: How many Source_IP addresses outside of the expected range accessed /restricted.html?**
+**Q1 Task 3: How many Source_IP addresses outside of the expected range accessed /restricted.html?**
 using the query: 
 ```
 index = web_logs URI = /restricted.html NOT Source_IP IN (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
@@ -205,7 +205,7 @@ Answer: 189 found by just using the first line from above:
 ```
 index = web_logs URI = /payments.html status_code = 404
 ```
-**Q4 Task3: Highest 404 count in any hour:**
+**Q4 Task 3: Highest 404 count in any hour:**
 
 16 is answer, the example above gives a complete answer and gives concise example.
 
@@ -380,12 +380,12 @@ index = web_logs URI = /restricted.html
 ---
 ### Lab Questions
 
-**Q1 Task4: Inspect the URI pie chart you built in the dashboard above. Which URI field value has the least amount of events present?**
+**Q1 Task 4: Inspect the URI pie chart you built in the dashboard above. Which URI field value has the least amount of events present?**
 
 /pictures.html is quickly determined using the instructions above
 
 
-**Q2 Task4: Add another statistics table to your dashboard to view the Source_IP, URI, and status_code fields. How many times did 172.16.0.1 receive the status_code 200 from /payments.html?**
+**Q2 Task 4: Add another statistics table to your dashboard to view the Source_IP, URI, and status_code fields. How many times did 172.16.0.1 receive the status_code 200 from /payments.html?**
 
 This requires minor adjustment to the query used, adding source_ip and URI:
 ```
