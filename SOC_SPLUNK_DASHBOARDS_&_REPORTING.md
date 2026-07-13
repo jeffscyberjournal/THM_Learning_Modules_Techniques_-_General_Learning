@@ -173,7 +173,7 @@ index = web_logs URI = /payments.html status_code="404"
 ```
 
 
-
+---
 ### Lab Questions
 
 **Q1 Task3: How many Source_IP addresses outside of the expected range accessed /restricted.html?**
@@ -360,11 +360,14 @@ index = web_logs URI = /restricted.html
 | 204          | 196    | 13.30    | 1474                                        |
 | 201          | 189    | 12.82    | 1474                                        |
 | 301          | 189    | 12.82    | 1474                                        |
-| 500         
+...   
 ```
 
-**Q1 Task4: Inspect the URI pie chart you built in the dashboard above.
-Which URI field value has the least amount of events present?**
+
+---
+### Lab Questions
+
+**Q1 Task4: Inspect the URI pie chart you built in the dashboard above. Which URI field value has the least amount of events present?**
 
 /pictures.html is quickly determined using the instructions above
 
