@@ -178,10 +178,16 @@ index = web_logs URI = /payments.html status_code="404"
 
 **Q1 Task3: How many Source_IP addresses outside of the expected range accessed /restricted.html?**
 using the query: 
-```index = web_logs URI = /restricted.html NOT Source_IP IN (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
 ```
-search for source_ip below on left. 
-shows only **2** results 
+index = web_logs URI = /restricted.html NOT Source_IP IN (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
+```
+search for source_ip below on left. Listing 552 events out of the files ~10000.
+
+Values	    Count	    % 
+192.0.2.1	  282	     51.087%	
+203.0.113.1	270	     48.913%
+
+shows only **2** source IP results. 
 
 **Q2 Task 3: How many total 404 status_code were recorded at /payments.html?**
 The previous query just using the first line only 
