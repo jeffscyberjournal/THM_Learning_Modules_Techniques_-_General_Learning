@@ -405,6 +405,6 @@ Splunk’s core platform ingests and indexes log data, but modern SOCs extend it
 
 Splunk UEBA enhances ES by detecting insider threats and compromised accounts through behavioral analytics. It evaluates user and entity activity over time, aggregates anomalies, assigns risk scores, and maps suspicious behavior to MITRE ATT&CK techniques.
 
-Splunk SOAR (formerly Phantom) introduces automated response. Using playbooks, SOAR can perform actions such as isolating hosts, disabling accounts, or checking IP reputation automatically, reducing manual workload and improving response consistency. Playbooks can include conditions, filters, and branching logic to adapt to different alert types and severity levels.
+Splunk SOAR (formerly Phantom) introduces automated response, is a paid product, however, a free Community Edition(opens in new tab) is available for on-premises deployments. Using playbooks, SOAR can perform actions such as isolating hosts, disabling accounts, or checking IP reputation automatically, reducing manual workload and improving response consistency. Playbooks can include conditions, filters, and branching logic to adapt to different alert types and severity levels.
 
 Together, ES + UEBA + SOAR transform Splunk from a visibility tool into a full detection, investigation, and automated response ecosystem.
