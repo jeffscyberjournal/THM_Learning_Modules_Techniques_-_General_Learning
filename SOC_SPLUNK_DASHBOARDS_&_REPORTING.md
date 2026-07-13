@@ -191,7 +191,7 @@ Values	    Count	    %
 192.0.2.1	  282	     51.087%	
 203.0.113.1	270	     48.913%
 ```
-shows answer is only 2 source IP results. 
+Shows answer is only 2 source IP results. 
 
 **Q2 Task 3: How many total 404 status_code were recorded at /payments.html?**
 
