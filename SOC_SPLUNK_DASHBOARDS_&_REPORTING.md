@@ -368,20 +368,18 @@ Which URI field value has the least amount of events present?**
 
 /pictures.html is quickly determined using the instructions above
 
-Check
-**Q2 Task4: Add another statistics table to your dashboard to view the Source_IP, URI, and status_code fields.
 
-How many times did 172.16.0.1 receive the status_code 200 from /payments.html?**
+**Q2 Task4: Add another statistics table to your dashboard to view the Source_IP, URI, and status_code fields. How many times did 172.16.0.1 receive the status_code 200 from /payments.html?**
 
 This requires minor adjustment to the query used, adding source_ip and URI:
 ```
-index="web_logs" URI=/restricted.html 
+index="web_logs" URI=/payments.html 
 | stats count by Source_IP URI status_code
 | eventstats sum(count) as total
 | eval percent=round(count * 100.0 / total, 2)
 | sort - count
 ```
-Really only needs the first 2 and last line to sort it, giving us 41 times 172.16.0.1 received a status 200.
+Really only needs the first 2 and last line to sort it, giving us 50 times 172.16.0.1 received a status 200.
 
 
 ---
