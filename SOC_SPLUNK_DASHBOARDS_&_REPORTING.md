@@ -23,7 +23,7 @@ Splunk collects huge volumes of security logs, and this module teaches you how t
 
 
 ---
-## Task 2: Creating Reports for Recurring Searches — concise summary
+## Task 2: Creating Reports for Recurring Searches 
 
 Splunk’s Search & Reporting app lets analysts run queries across large datasets, but raw event logs (10k+ events in this lab) are too noisy to review manually. Reports solve this by saving useful searches and running them automatically.
 
@@ -42,9 +42,7 @@ index = vpn_server | stats count by Username | sort - count
 This counts VPN login events per user; Sarah has the most (86 events).
 
 2. Save the search as a Report.
-
 3. Add a title, description, and choose whether the time picker is active.
-
 4. The report can now be viewed, edited, opened in Search, or added to dashboards.
 
 **Scheduling reports**
@@ -57,7 +55,8 @@ This counts VPN login events per user; Sarah has the most (86 events).
   - Scheduling window
 - Splunk Free does not support scheduling.
 
-### Lab answers
+---
+### Lab Questions
 
 **Q1 Task2: Head to the Splunk Reports tab and open the Web Connections by Source IP report.
 Which Source_IP field value recorded the highest number of events?**
@@ -207,6 +206,8 @@ index = web_logs URI = /payments.html status_code = 404
 **Q4 Task 3: Highest 404 count in any hour:**
 
 16 is answer, obtained from previous query used.
+
+
 
 
 --- 
@@ -397,6 +398,7 @@ index="web_logs" URI=/payments.html
 Really only needs the first 2 and last line to sort it, giving us 50 times 172.16.0.1 received a status 200.
 
 
+
 ---
 ## Task5: Extending Splunk’s Functionality
 
@@ -409,7 +411,7 @@ Splunk UEBA extends ES by detecting insider threats and compromised accounts thr
 
 Splunk SOAR (formerly Phantom) introduces automated response capabilities. Although SOAR is a paid product, a free Community Edition is available for on‑premises use. SOAR uses playbooks—containing conditions, filters, and branching logic—to automate actions such as isolating hosts, disabling accounts, and checking IP reputation, reducing manual workload and improving response consistency.
 
---
+---
 ### Lab Questions
 
 **Q1 Task 5: Which feature in Splunk Enterprise Security provides visibility into SOC efficiency and performance?** 
