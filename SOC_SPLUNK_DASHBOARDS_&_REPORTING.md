@@ -172,7 +172,6 @@ index = web_logs URI = /payments.html status_code="404"
 | eval alert = "HIGH 404s: ".hits." in 1h (normal: ~7.6/hr)" 
 ```
 
-
 ---
 ### Lab Questions
 
@@ -207,7 +206,7 @@ index = web_logs URI = /payments.html status_code = 404
 ```
 **Q4 Task 3: Highest 404 count in any hour:**
 
-16 is answer, the example above gives a complete answer and gives concise example.
+16 is answer, obtained from previous query used.
 
 
 --- 
@@ -399,12 +398,24 @@ Really only needs the first 2 and last line to sort it, giving us 50 times 172.1
 
 
 ---
-## Task4: Extending Splunk's Functionality
+## Task5: Extending Splunk’s Functionality
 
-Splunk’s core platform ingests and indexes log data, but modern SOCs extend it with advanced security tools. Splunk Enterprise Security (ES) adds a full security operations framework on top of Splunk Enterprise/Cloud, providing correlation searches, notable events, MITRE ATT&CK mapping, risk scoring, investigation workflows, and the SOC Operations dashboard for visibility into analyst workload and efficiency. Note Enterprise Security, UEBA, and SOAR are paid editions not part of the splunk components through tryhackme, which appears to be mainly community edition, or what is left after the trial Enterprise version expires. 
+Splunk’s core platform focuses on ingesting, indexing, and searching log data, 
+but modern SOCs expand its capabilities using advanced security add‑ons. Splunk Enterprise Security (ES) provides a full security operations framework on top of Splunk Enterprise/Cloud, adding correlation searches, notable events, MITRE ATT&CK mapping, risk scoring, investigation workflows, and the SOC Operations dashboard for visibility into analyst workload and efficiency.
 
-Splunk UEBA enhances ES by detecting insider threats and compromised accounts through behavioral analytics. It evaluates user and entity activity over time, aggregates anomalies, assigns risk scores, and maps suspicious behavior to MITRE ATT&CK techniques.
+Note: ES, UEBA, and SOAR are paid products and not included in TryHackMe’s Splunk environment, which is based on the Community Edition or the limited functionality available after an Enterprise trial expires.
 
-Splunk SOAR (formerly Phantom) introduces automated response, is a paid product, however, a free Community Edition(opens in new tab) is available for on-premises deployments. Using playbooks, SOAR can perform actions such as isolating hosts, disabling accounts, or checking IP reputation automatically, reducing manual workload and improving response consistency. Playbooks can include conditions, filters, and branching logic to adapt to different alert types and severity levels.
+Splunk UEBA extends ES by detecting insider threats and compromised accounts through behavioral analytics. It aggregates anomalies, assigns risk scores to users and entities, and maps suspicious activity to MITRE ATT&CK techniques.
 
-Together, ES + UEBA + SOAR transform Splunk from a visibility tool into a full detection, investigation, and automated response ecosystem.
+Splunk SOAR (formerly Phantom) introduces automated response capabilities. Although SOAR is a paid product, a free Community Edition is available for on‑premises use. SOAR uses playbooks—containing conditions, filters, and branching logic—to automate actions such as isolating hosts, disabling accounts, and checking IP reputation, reducing manual workload and improving response consistency.
+
+--
+### Lab Questions
+
+**Q1 Task 5: Which feature in Splunk Enterprise Security provides visibility into SOC efficiency and performance?** 
+
+Answer: SOC Operations
+
+**Q2 Task 5: What does Splunk SOAR use to automate response actions based on conditions, filters, and decision logic?**
+
+Answer: Playbooks
