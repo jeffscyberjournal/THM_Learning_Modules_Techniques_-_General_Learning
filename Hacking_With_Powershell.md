@@ -26,4 +26,76 @@ Very light overview of powershell Nouns and Verbs and commands.
 
 ## Task 3: Basic Powershell Commands
 
-- Intro to 'Get-Help Command-Name' command.
+Takeaway: The section teaches how to explore, inspect, filter, sort, and manipulate PowerShell cmdlet output using core discovery commands (Get-Help, Get-Command) and object‑handling commands (Get-Member, Select-Object, Where-Object, Sort-Object).
+
+### Core ideas
+
+**1. Discovering commands**
+
+Get-Help <cmdlet> — shows documentation; add -Examples for usage demonstrations.
+
+Get-Command — lists all installed cmdlets, functions, and aliases.
+
+Supports pattern matching:
+
+Get-Command Verb-*
+
+Get-Command *-Noun
+
+**2. Understanding objects**
+
+PowerShell pipes objects, not text.
+
+Use Get-Member to inspect an object’s methods and properties:
+
+Verb-Noun | Get-Member
+
+Get-Command | Get-Member -MemberType Method
+
+**3. Creating new objects**
+
+Select-Object extracts chosen properties:
+
+Get-ChildItem | Select-Object Mode, Name
+
+Useful flags: -First, -Last, -Unique, -Skip.
+
+**4. Filtering**
+
+here-Object filters objects by property values:
+
+Verb-Noun | Where-Object -Property Status -eq Stopped
+
+Or using script block:
+
+Verb-Noun | Where-Object { $_.Status -eq 'Stopped' }
+
+Operators include -Contains, -EQ, -GT, etc.
+
+**5. Sorting**
+
+Sort-Object sorts piped output:
+
+Verb-Noun | Sort-Object
+
+Lab Questions
+
+1 What is the location of the file "interesting-file.txt" based on most information given, trying to keep inline with those commands if it were in same directory the following would work,
+But its clearly not.
+```
+PS C:\Windows\system32> get-childitem | where-object -property name -eq 'interesting-file.txt.txt'
+PS C:\Windows\system32> 
+```
+Recursive search is required and starting path point:
+Note: -ErrorAction SilentlyContinue is there because searching the whole C:\ drive produces errors, and without suppressing them, PowerShell will spam your screen and stop the pipeline.
+```
+get-childitem -path c:\ -include 'interesting-file.txt.txt' -File -recurse -erroraction silentlycontinue
+
+
+    Directory: C:\Program Files
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----        10/3/2019  11:38 PM             23 interesting-file.txt.txt
+```
