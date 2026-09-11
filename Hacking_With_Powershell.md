@@ -129,3 +129,8 @@ MD5             49A586A2A9456226F8A1B4CEC6FAB329                                
 ```
 Get-location
 ```
+**Q5 Task 3:Does the path "C:\Users\Administrator\Documents\Passwords" Exist (Y/N)?**
+```
+PS C:\Windows\system32> test-path "c:\program files\interesting-file.txt.txt"
+True
+```
