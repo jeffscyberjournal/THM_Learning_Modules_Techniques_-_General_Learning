@@ -125,3 +125,7 @@ Algorithm       Hash                                                            
 ---------       ----                                                                   ----
 MD5             49A586A2A9456226F8A1B4CEC6FAB329                                       C:\program files\interesting-file.txt.txt
 ```
+**Q4 Task 3: What is the command to get the current working directory?**
+```
+Get-location
+```
