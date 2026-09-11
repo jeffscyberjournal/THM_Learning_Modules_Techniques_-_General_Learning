@@ -78,7 +78,8 @@ Sort-Object sorts piped output:
 
 Verb-Noun | Sort-Object
 
-Lab Questions
+
+### Lab Questions
 
 **Q1 Task 3:  What is the location of the file "interesting-file.txt"** based on most information given, trying to keep inline with those commands if it were in same directory the following would work,
 But its clearly not.
@@ -140,4 +141,23 @@ A common technique used to download files was:
 Invoke-WebRequest -Uri "http://example.com:8000/file.txt" -OutFile "file.txt"
 The answer is Invoke-WebRequest. 
 
+```
+**Q7 Task 3: Base64 decode the file b64.txt on Windows?**
+```
+PS C:\Windows\system32> get-childitem -path c:\ -include 'b64.txt' -File -recurse -erroraction silentlycontinue
+
+    Directory: C:\Users\Administrator\Desktop
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----        10/3/2019  11:56 PM            432 b64.txt
+
+PS C:\Windows\system32> certutil -decode "C:\Users\Administrator\Desktop\b64.txt" "decoded_hash.txt"
+Input Length = 432
+Output Length = 323
+CertUtil: -decode command completed successfully.
+PS C:\Windows\system32> type .\decoded_hash.txt
+this is the flag - ihopeyoudidthisonwindows
+the rest is garbage
+...
 ```
