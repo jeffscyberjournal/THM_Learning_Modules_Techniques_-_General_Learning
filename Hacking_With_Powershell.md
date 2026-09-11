@@ -134,3 +134,10 @@ Get-location
 PS C:\Windows\system32> test-path "c:\users\Administrator\documents\password*"
 False
 ```
+**Q6 Task3: What command would you use to make a request to a web server?**
+```
+A common technique used to download files was:
+Invoke-WebRequest -Uri "http://example.com:8000/file.txt" -OutFile "file.txt"
+The answer is Invoke-WebRequest. 
+
+```
