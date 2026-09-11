@@ -118,3 +118,10 @@ Minimum  :
 Property :
 ```
 
+```
+PS C:\Windows\system32> get-filehash "c:\program files\interesting-file.txt.txt" -algorithm MD5
+
+Algorithm       Hash                                                                   Path
+---------       ----                                                                   ----
+MD5             49A586A2A9456226F8A1B4CEC6FAB329                                       C:\program files\interesting-file.txt.txt
+```
