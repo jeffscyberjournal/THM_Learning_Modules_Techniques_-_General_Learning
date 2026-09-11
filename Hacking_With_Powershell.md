@@ -80,7 +80,7 @@ Verb-Noun | Sort-Object
 
 Lab Questions
 
-1 What is the location of the file "interesting-file.txt" based on most information given, trying to keep inline with those commands if it were in same directory the following would work,
+**Q1 Task 3:  What is the location of the file "interesting-file.txt"** based on most information given, trying to keep inline with those commands if it were in same directory the following would work,
 But its clearly not.
 ```
 PS C:\Windows\system32> get-childitem | where-object -property name -eq 'interesting-file.txt.txt'
@@ -99,3 +99,22 @@ Mode                LastWriteTime         Length Name
 ----                -------------         ------ ----
 -a----        10/3/2019  11:38 PM             23 interesting-file.txt.txt
 ```
+**Q2 Task 3: Contents of interesting-file.txt.txt**:
+```
+C:\Windows\system32>type "c:\program Files\interesting-file.txt.txt"
+notsointerestingcontent
+C:\Windows\system32>
+```
+
+**Q3 Task 3: How many cmdlets are installed on the system(only cmdlets, not functions and aliases)?:**
+```
+PS C:\Windows\system32> get-command | where-object -property commandtype -eq cmdlet|measure-object
+
+Count    : 6638
+Average  :
+Sum      :
+Maximum  :
+Minimum  :
+Property :
+```
+
