@@ -131,6 +131,6 @@ Get-location
 ```
 **Q5 Task 3:Does the path "C:\Users\Administrator\Documents\Passwords" Exist (Y/N)?**
 ```
-PS C:\Windows\system32> test-path "c:\program files\interesting-file.txt.txt"
-True
+PS C:\Windows\system32> test-path "c:\users\Administrator\documents\password*"
+False
 ```
