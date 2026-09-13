@@ -146,6 +146,7 @@ the rest is garbage
 ## Task 4 Enumeration
 
 **Q1 Task 4: How many users are there on the machine?**
+
 Five users.
 ```
 PS C:\Windows\system32> get-localuser
@@ -159,6 +160,7 @@ duck2          True
 Guest          False   Built-in account for guest acces...
 ```
 **Q2 Task 4: Which local user does this SID(S-1-5-21-1394777289-3961777894-1791813945-501) belong to?**
+
 Guest user.
 ```
 PS C:\Windows\system32> get-localuser | select name,sid
@@ -172,6 +174,7 @@ duck2          S-1-5-21-1394777289-3961777894-1791813945-1009
 Guest          S-1-5-21-1394777289-3961777894-1791813945-501
 ```
 **Q3 Task 4: How many users have their password required values set to False?**
+
 4 Users.
 ```
 PS C:\Windows\system32> get-localuser | select name,sid,passwordrequired
@@ -185,6 +188,7 @@ duck2             S-1-5-21-1394777289-3961777894-1791813945-1009  False
 Guest             S-1-5-21-1394777289-3961777894-1791813945-501   False
 ```
 **Q4 Task 4: How many local groups exist?**
+
 24 groups.
 ```
 PS C:\Windows\system32> get-localgroup
@@ -222,6 +226,7 @@ PS C:\Windows\system32> get-localgroup | measure
 Count    : 24
 ```
 **Q5 Task 4: What command did you use to get the ip address info?**
+
 Get-NetIPAddress similar to ipconfig
 ```
 PS C:\Windows\system32> Get-NetIPAddress
@@ -255,6 +260,7 @@ PolicyStore       : ActiveStore
 ...
 ```
 **Q6 Task 4: How many ports are listed as listening?**
+
 20, avoiding netstat the best options is get-nettcpconnection -state listen
 ```
  get-nettcpconnection -state listen
@@ -295,6 +301,7 @@ Property :
 ::, localhost is the IP set for remote port listening.
 
 **Q8 Task 4: How many patches have been applied?**
+
 20 seems to be popular here!
 ```
 PS C:\Windows\system32> get-hotfix
@@ -347,6 +354,7 @@ Mode                LastWriteTime         Length Name
 
 
 PS C:\windows\winsxs> get-content "C:\Program Files (x86)\Internet Explorer\passwords.bak.txt"
+
 backpassflag
 ```
 **Q9 Task 4: Search for all files containing API_KEY
@@ -373,4 +381,25 @@ C:\Users\Public\Music\config.xml:1:API_KEY=fakekey123
 
 Get-process
 
+**Q11 Task 4: What is the path of the scheduled task called new-sched-task?**
 
+\ is the directory.
+```
+try
+(Get-ScheduledTask -TaskName "new-sched-task").TaskPath
+or
+Get-ScheduledTask -TaskName "new-sched-task" | Select-Object TaskName, TaskPath, Actions
+
+PS C:\windows\system32> get-scheduledtask -taskname "new-sched-task" | select-object Taskname,Taskpath,Actions
+
+Taskname       Taskpath Actions
+--------       -------- -------
+new-sched-task \        {MSFT_TaskExecAction}
+```
+**Q12 Task 4: Who is the owner of the C:\**
+
+```
+(Get-Acl C:\).Owner
+or
+Get-Acl C:\ | Format-List
+```
