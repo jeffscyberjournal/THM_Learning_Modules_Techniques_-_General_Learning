@@ -349,4 +349,28 @@ Mode                LastWriteTime         Length Name
 PS C:\windows\winsxs> get-content "C:\Program Files (x86)\Internet Explorer\passwords.bak.txt"
 backpassflag
 ```
+**Q9 Task 4: Search for all files containing API_KEY
+Tried a few things starting with file names and only one showed up multiple times
+```
+PS C:\windows\winsxs> get-childitem -path C:\ -recurse -filter *API_KEY* -ErrorAction SilentlyContinue
+
+
+    Directory: C:\Windows\System32\migwiz\dlmanifests
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----        7/16/2016   1:18 PM           4533 dpapi_keys-DL.man
+... (several same file name in different locations)
+```
+In the file itself several options but the others took way longer even though more direct. This got the answer without wondering if the process is frozen.
+```
+PS C:\windows\winsxs> get-childitem c:\* -recurse | select-string "API_KEY"
+...hundreds of lines omitted
+C:\Users\Public\Music\config.xml:1:API_KEY=fakekey123
+```
+**Q10 Task 4: What command do you do to list all the running processes?**
+
+Get-process
+
 
