@@ -63,8 +63,9 @@ Sort-Object sorts piped output:
 
 ### Lab Questions
 
-**Q1 Task 3:  What is the location of the file "interesting-file.txt"** based on most information given, trying to keep inline with those commands if it were in same directory the following would work,
-But its clearly not.
+**Q1 Task 3:  What is the location of the file "interesting-file.txt"**? It's actually .txt.txt instead.
+
+Based on most information given, trying to keep inline with those commands used. 
 ```
 PS C:\Windows\system32> get-childitem | where-object -property name -eq 'interesting-file.txt.txt'
 PS C:\Windows\system32> 
