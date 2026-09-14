@@ -439,71 +439,24 @@ Sddl   : O:S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464G:S-1-5
 ---
 ## Task 5 Basic scripting challenge
 
-Which file contains the password?
+Given a basic example the idea is to build a script to obtain file name containing password, the password and the HTTP: address associated with it: 
+```
+$system_ports = Get-NetTCPConnection -State Listen
 
-What is the password?
+$text_port = Get-Content -Path C:\Users\Administrator\Desktop\ports.txt
 
-Which files contain an HTTPS link?
+foreach($port in $text_port){
 
-The folder is:
-C:\Users\Administrator\Desktop\emails\
+    if($port -in $system_ports.LocalPort){
+        echo $port
+     }
 
-🧩 1. Find which file contains the password
-PowerShell Script
-powershell
-Get-ChildItem -Path "C:\Users\Administrator\Desktop\emails" -File |
-    Select-String -Pattern "password" -SimpleMatch
-Explanation
-Get-ChildItem lists all files.
+}
+```
+- Assuming password or Passwords might be present indicating the password.
+- Provided email folder is C:\Users\Administrator\Desktop\emails
 
-Select-String searches inside each file.
-
-"password" is the keyword we’re hunting.
-
-Expected Output Format
-You will see something like:
-
-Code
-C:\Users\Administrator\Desktop\emails\mary.txt: password is 12345
-✅ Answer: The file containing the password
-mary.txt
-
-🧩 2. Extract the password
-PowerShell Script
-powershell
-Select-String -Path "C:\Users\Administrator\Desktop\emails\mary.txt" -Pattern "password"
-If the line is formatted like:
-
-Code
-The password is: 12345
-You can extract just the value:
-
-powershell
-(Select-String -Path "C:\Users\Administrator\Desktop\emails\mary.txt" -Pattern "password").Line
-Or more precise:
-
-powershell
-$line = (Select-String -Path "C:\Users\Administrator\Desktop\emails\mary.txt" -Pattern "password").Line
-$line.Split(":")[1].Trim()
-✅ Answer: The password
-12345  
-(THM uses simple demo passwords.)
-
-🧩 3. Find which files contain an HTTPS link
-PowerShell Script
-powershell
-Get-ChildItem -Path "C:\Users\Administrator\Desktop\emails" -File |
-    Select-String -Pattern "https://" 
-Expected Output Format
-You will see something like:
-
-Code
-C:\Users\Administrator\Desktop\emails\john.txt: https://example.com
-C:\Users\Administrator\Desktop\emails\martha.txt: https://secure-site.com
-✅ Answer: Files containing HTTPS links
-john.txt  
-martha.txt
-
+Straight PowerShell can arrive at the first 2 answers as follows:  
 ```
 PS C:\Windows\system32> Get-childitem -path "C:\Users\Administrator\Desktop\emails\*" -Recurse |select-string -pattern "password|Password"
 
@@ -543,3 +496,8 @@ FOUND IN: C:\Users\Administrator\Desktop\emails\martha\Doc3M.txt
 LINE: password is johnisalegend99
 PS C:\Windows\system32>
 ```
+A minor tweak can change pattern search to HTTP instead of password, leading to answer:
+```
+Desktop\emails\mary\Doc2Mary.txt:5:https://www.howtoworkwell.rand/
+```
+
