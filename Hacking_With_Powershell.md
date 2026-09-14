@@ -403,3 +403,33 @@ new-sched-task \        {MSFT_TaskExecAction}
 or
 Get-Acl C:\ | Format-List
 ```
+```
+PS C:\Windows\system32> get-acl c:\
+
+    Directory:
+
+Path Owner                       Access
+---- -----                       ------
+C:\  NT SERVICE\TrustedInstaller CREATOR OWNER Allow  268435456...
+
+PS C:\Windows\system32> (get-acl c:\).owner
+NT SERVICE\TrustedInstaller
+```
+Or
+```
+PS C:\Windows\system32> get-acl c:\ |format-list
+
+Path   : Microsoft.PowerShell.Core\FileSystem::C:\
+Owner  : NT SERVICE\TrustedInstaller
+Group  : NT SERVICE\TrustedInstaller
+Access : CREATOR OWNER Allow  268435456
+         NT AUTHORITY\SYSTEM Allow  FullControl
+         BUILTIN\Administrators Allow  FullControl
+         BUILTIN\Users Allow  AppendData
+         BUILTIN\Users Allow  CreateFiles
+         BUILTIN\Users Allow  ReadAndExecute, Synchronize
+Audit  :
+Sddl   : O:S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464G:S-1-5-80-956008885-3418522649-1831038044-185
+         3292631-2271478464D:PAI(A;OICIIO;GA;;;CO)(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;CI;LC;;;BU)(A;CIIO;DC;;;BU)(A;OICI
+         ;0x1200a9;;;BU)
+```
