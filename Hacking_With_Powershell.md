@@ -433,3 +433,113 @@ Sddl   : O:S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464G:S-1-5
          3292631-2271478464D:PAI(A;OICIIO;GA;;;CO)(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;CI;LC;;;BU)(A;CIIO;DC;;;BU)(A;OICI
          ;0x1200a9;;;BU)
 ```
+
+
+
+---
+## Task 5 Basic scripting challenge
+
+Which file contains the password?
+
+What is the password?
+
+Which files contain an HTTPS link?
+
+The folder is:
+C:\Users\Administrator\Desktop\emails\
+
+🧩 1. Find which file contains the password
+PowerShell Script
+powershell
+Get-ChildItem -Path "C:\Users\Administrator\Desktop\emails" -File |
+    Select-String -Pattern "password" -SimpleMatch
+Explanation
+Get-ChildItem lists all files.
+
+Select-String searches inside each file.
+
+"password" is the keyword we’re hunting.
+
+Expected Output Format
+You will see something like:
+
+Code
+C:\Users\Administrator\Desktop\emails\mary.txt: password is 12345
+✅ Answer: The file containing the password
+mary.txt
+
+🧩 2. Extract the password
+PowerShell Script
+powershell
+Select-String -Path "C:\Users\Administrator\Desktop\emails\mary.txt" -Pattern "password"
+If the line is formatted like:
+
+Code
+The password is: 12345
+You can extract just the value:
+
+powershell
+(Select-String -Path "C:\Users\Administrator\Desktop\emails\mary.txt" -Pattern "password").Line
+Or more precise:
+
+powershell
+$line = (Select-String -Path "C:\Users\Administrator\Desktop\emails\mary.txt" -Pattern "password").Line
+$line.Split(":")[1].Trim()
+✅ Answer: The password
+12345  
+(THM uses simple demo passwords.)
+
+🧩 3. Find which files contain an HTTPS link
+PowerShell Script
+powershell
+Get-ChildItem -Path "C:\Users\Administrator\Desktop\emails" -File |
+    Select-String -Pattern "https://" 
+Expected Output Format
+You will see something like:
+
+Code
+C:\Users\Administrator\Desktop\emails\john.txt: https://example.com
+C:\Users\Administrator\Desktop\emails\martha.txt: https://secure-site.com
+✅ Answer: Files containing HTTPS links
+john.txt  
+martha.txt
+
+```
+PS C:\Windows\system32> Get-childitem -path "C:\Users\Administrator\Desktop\emails\*" -Recurse |select-string -pattern "password|Password"
+
+C:\Users\Administrator\Desktop\emails\john\Doc3.txt:6:I got some errors trying to access my passwords file - is there
+any way you can help? Here is the output I got
+C:\Users\Administrator\Desktop\emails\martha\Doc3M.txt:6:I managed to fix the corrupted file to get the output, but
+the password is buried somewhere in these logs:
+C:\Users\Administrator\Desktop\emails\martha\Doc3M.txt:106:password is johnisalegend99
+```
+While this delivers the answers its not addressing the scripting, this is the same thing more or less as a script:
+```
+# Get all email files
+$email_files = Get-ChildItem -Path "C:\Users\Administrator\Desktop\emails" -Recurse -File
+
+# Loop through each file
+foreach ($file in $email_files) {
+
+    # Read file contents
+    $content = Get-Content $file.FullName
+
+    # Check each line for the word "password"
+    foreach ($line in $content) {
+        if ($line -match "password") {
+            Write-Output "FOUND IN: $($file.FullName)"
+            Write-Output "LINE: $line"
+        }
+    }
+}
+
+OUTPUT:
+
+FOUND IN: C:\Users\Administrator\Desktop\emails\john\Doc3.txt
+LINE: I got some errors trying to access my passwords file - is there any way you can help? Here is the output I got
+FOUND IN: C:\Users\Administrator\Desktop\emails\martha\Doc3M.txt
+LINE: I managed to fix the corrupted file to get the output, but the password is buried somewhere in these logs:
+FOUND IN: C:\Users\Administrator\Desktop\emails\martha\Doc3M.txt
+LINE: password is johnisalegend99
+PS C:\Windows\system32>
+```
