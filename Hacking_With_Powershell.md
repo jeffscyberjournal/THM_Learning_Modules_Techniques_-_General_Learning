@@ -358,7 +358,7 @@ PS C:\windows\winsxs> get-content "C:\Program Files (x86)\Internet Explorer\pass
 
 backpassflag
 ```
-**Q9 Task 4: Search for all files containing API_KEY
+**Q9 Task 4: Search for all files containing API_KEY**
 Tried a few things starting with file names and only one showed up multiple times
 ```
 PS C:\windows\winsxs> get-childitem -path C:\ -recurse -filter *API_KEY* -ErrorAction SilentlyContinue
