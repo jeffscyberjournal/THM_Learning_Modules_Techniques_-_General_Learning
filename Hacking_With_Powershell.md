@@ -502,3 +502,44 @@ A minor tweak can change pattern search to HTTP instead of password, leading to 
 Desktop\emails\mary\Doc2Mary.txt:5:https://www.howtoworkwell.rand/
 ```
 
+
+---
+## Task 5 Intermediate scripting challenge
+
+Write a simple TCP connect scanner in PowerShell, scan localhost, ports 130–140, and answer:
+
+How many open ports did you find between 130 and 140 (inclusive)?
+
+Listening ports are just 2 the tryhackme module actual answer expected is 11 and this is just counting between 130..140, which makes no sense.  Test‑NetConnection checks one port at a time, not a range. It performs a connect test, which is slow and doesn’t show the full TCP state table. Get‑NetTCPConnection, on the other hand, queries the system’s TCP table, instantly listing every port and its state.
+
+
+This can be solved with this simple line.
+```
+Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -ge 130 -and $_.LocalPort -le 140 }
+
+LocalAddress    LocalPort  RemoteAddress
+------------    ---------  -------------
+::              135        ::
+10.66.160.93    139        0.0.0.0
+0.0.0.0         135        0.0.0.0
+```
+Similar results using a script: 
+```
+$ports = 130..140
+$open = @()
+
+$system_ports = Get-NetTCPConnection -State Listen
+
+foreach ($p in $ports) {
+    if ($p -in $system_ports.LocalPort) {
+        Write-Output "OPEN: $p"
+        $open += $p
+    }
+    else {
+        Write-Output "CLOSED: $p"
+    }
+}
+Write-Output "`nTotal open ports: $($open.Count)"
+```
+
+
