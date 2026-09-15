@@ -410,7 +410,7 @@ Note: ES, UEBA, and SOAR are paid products and not included in TryHackMe’s Spl
 
 Splunk UEBA extends ES by detecting insider threats and compromised accounts through behavioral analytics. It aggregates anomalies, assigns risk scores to users and entities, and maps suspicious activity to MITRE ATT&CK techniques.
 
-Splunk SOAR (formerly Phantom) introduces automated response capabilities. Although SOAR is a paid product, a free Community Edition is available for on‑premises use. SOAR uses playbooks—containing conditions, filters, and branching logic—to automate actions such as isolating hosts, disabling accounts, and checking IP reputation, reducing manual workload and improving response consistency.
+Splunk SOAR (formerly Phantom) introduces automated response capabilities. Although SOAR is a paid product, a free Community Edition is available for on‑premises use. SOAR uses playbooks containing conditions, filters, and branching logic to automate actions such as isolating hosts, disabling accounts, and checking IP reputation, reducing manual workload and improving response consistency.
 
 ---
 ### Lab Questions
