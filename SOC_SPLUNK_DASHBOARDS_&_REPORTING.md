@@ -323,7 +323,8 @@ Click Add to Dashboard
 +---------------------------------------------------------------------------+
 ```
 
-Great job! You've officially built an informative and visually appealing dashboard in Splunk, but why stop there? We can add more panels to display any information we like. In the previous task, we looked at the /restricted.html URI field. Let's create a stats table for our dashboard that shows:
+**Adding panel to dashboard** 
+We can add more panels to display any information we like. In the previous task, we looked at the /restricted.html URI field. Let's create a stats table for our dashboard that shows:
 
 - status_code field
 - count of events
