@@ -23,42 +23,8 @@ This network teaches several core AD enumeration methods:
 
 These represent the most common real-world enumeration approaches.
 
-### 3. Connecting to the Network
 
-Depending on your setup:
-
-AttackBox
-- Automatically connected to the TryHackMe AD network.
-- Must manually configure DNS using:
-
-```
-sed -i '1s|^|nameserver $THMDCIP\n|' /etc/resolv-dnsmasq
-```
-This did not work resolv-dnsmasq not recognised in kali vm, I instead just added the THMDCIP to the /etc/resolv.conf file was enough (nameserver <THMDCIP>).
-
-DNS resets every ~3 hours, so reapply if needed.
-
-Verify DNS with:
-
-```
-nslookup thmdc.za.tryhackme.com
-```
-Your Own Machine
-- Download the OpenVPN config from the EnumeratingAD network.
-- Connect using:
-```
-sudo openvpn adenumeration.ovpn
-```
-- After “Initialization Sequence Completed,” you’re connected.
-- Must still configure DNS manually.
-- Be aware: DNS queries to the DC are logged.
-
-Kali
-- Use Network Manager GUI to set DNS to the DC IP.
-- Add a public DNS (e.g., 1.1.1.1) for internet access.
-- Restart NetworkManager.
-
-### 4. Getting Your Initial AD Credentials
+### 3. Getting Your Initial AD Credentials
 
 Visit: http://distributor.za.tryhackme.com/creds
 
@@ -73,7 +39,7 @@ ssh za.tryhackme.com\\<username>@thmjmp1.za.tryhackme.com
 THMJMP1 acts as a jump host, simulating a foothold into the internal network.
 
 
-### 5. Task Answers
+### 4. Task Answers
 
 All three questions are informational confirmations — no written answers required.
 
