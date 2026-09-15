@@ -88,7 +88,6 @@ Location is C:\Program Files folder.
 ```
 C:\Windows\system32>type "c:\program Files\interesting-file.txt.txt"
 notsointerestingcontent
-C:\Windows\system32>
 ```
 
 **Q3 Task 3: How many cmdlets are installed on the system(only cmdlets, not functions and aliases)?:**
