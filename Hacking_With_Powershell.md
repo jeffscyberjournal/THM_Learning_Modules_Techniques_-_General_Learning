@@ -52,6 +52,7 @@ here-Object filters objects by property values:
 Or using script block:
 
 - Verb-Noun | Where-Object { $_.Status -eq 'Stopped' }
+($_.Status checks the "Status" property of each individual service as it flies through the pipeline.)
 - Operators include -Contains, -EQ, -GT, etc.
 
 **5. Sorting**
