@@ -1,4 +1,4 @@
-# Splunk: Dashboards and Reports — ultra‑concise summary
+# Splunk: Dashboards and Reports 
 
 Splunk collects huge volumes of security logs, and this module teaches you how to turn that raw data into structured, actionable insight.
 
