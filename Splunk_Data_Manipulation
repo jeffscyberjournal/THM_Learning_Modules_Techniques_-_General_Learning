@@ -1,0 +1,62 @@
+# Splunk: Data Manipulation
+
+Splunk needs clean, well‑parsed data so logs become structured, searchable fields. When the data is organized, security teams can correlate events across systems, spot anomalies faster, and build reliable alerts. Good parsing directly improves threat detection, incident investigation, and overall system monitoring.
+Concise summary of your scenario briefing
+
+---
+## Task 2 Scenario Briefing
+
+You’re acting as a SOC analyst at Cybertees Ltd, configuring Splunk to ingest a custom log source. Your tasks are to:
+
+- Ensure Splunk correctly breaks incoming logs into individual events
+- Handle multi‑line logs so they’re parsed as single events
+- Mask sensitive data to meet PCI DSS requirements
+- Extract useful fields for analysis
+- The lab environment places Splunk in /opt/splunk and your scripts in /home/ubuntu/Downloads/scripts. Switch to root with sudo su, and restart Splunk with /opt/splunk/bin/splunk restart if needed.
+- If Splunk stops responding at any point, run /opt/splunk/bin/splunk restart as root and wait for a few minutes. Then access from the proxy port given
+```
+root@tryhackme:/opt/splunk/bin# ./splunk restart
+splunkd 1926 was not running.
+Stopping splunk helpers...
+
+Done.
+Stopped helpers.
+Removing stale pid file... done.
+splunkd is not running.
+
+Splunk> Needle. Haystack. Found.
+
+Checking prerequisites...
+	Checking http port [8000]: open
+...ommited output
+Waiting for web server at http://127.0.0.1:8000 to be available.................................. Done
+If you get stuck, we're here to help.  
+Look for answers here: http://docs.splunk.com
+
+The Splunk web interface is at http://tryhackme:8000
+
+root@tryhackme:/opt/splunk/bin# 
+```
+Lab Questions
+
+**Q1 What is the full file path to the Splunk directory?** 
+
+/opt/splunk
+
+**Q2 How many executables are available in the /scripts directory?**
+
+Scripts provided in /home/ubuntu/Downloads/scripts for this module. Answer is 3 executables.
+```
+authentication_logs  purchase-details  vpnlogs
+root@tryhackme:/home/ubuntu/Downloads/scripts# ls -la
+total 14636
+drwxr-xr-x 2 ubuntu ubuntu    4096 Sep 28  2023 .
+drwxr-xr-x 3 ubuntu ubuntu    4096 Sep 25  2023 ..
+-rwxrwxrwx 1 ubuntu ubuntu 4990272 Sep 25  2023 authentication_logs
+-rwxrwxrwx 1 ubuntu ubuntu 4990360 Sep 25  2023 purchase-details
+```
+
+
+---
+
+
