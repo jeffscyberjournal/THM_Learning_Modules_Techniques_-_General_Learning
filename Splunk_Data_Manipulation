@@ -109,3 +109,72 @@ inputs.conf
 
 /opt/splunk/etc/system/default
 
+
+---
+## Task 4 Exploring Configuration Files
+
+Splunk uses several configuration files to control how data is ingested, parsed, transformed, stored, and forwarded. Each file is organized into stanzas, sections in square brackets, that define how Splunk should handle a specific component (input, sourcetype, field, index, or output group).
+Please note that the files in /opt/splunk/etc/system/default should not be altered, as they are overwritten with updates. In this room, we will be making changes in the /local directory.
+
+1. transforms.conf — create or transform fields
+Used for data transformations and regex‑based field creation.
+
+Example: extract a username from a log line
+
+Code
+[extract_username]
+REGEX = User\s+(\S+)\s+logged
+FORMAT = username::$1
+2. fields.conf — define how fields behave
+Controls whether fields are indexed, searchable, or how Splunk stores them.
+
+Example: enable indexing for the new field
+
+Code
+[username]
+INDEXED = true
+3. indexes.conf — configure indexes
+Defines storage paths, retention, and size limits.
+
+Example: create a custom index
+
+Code
+[my_index]
+homePath = $SPLUNK_DB/my_index/db
+coldPath = $SPLUNK_DB/my_index/colddb
+thawedPath = $SPLUNK_DB/my_index/thaweddb
+maxTotalDataSizeMB = 100000
+4. outputs.conf — forward data to other systems
+Specifies where indexed data should be sent (e.g., remote indexers).
+
+Example: forward to a remote Splunk instance
+
+Code
+[tcpout:group1]
+server = 10.10.10.100:9997
+Stanzas Recap
+A stanza can represent:
+
+an input (inputs.conf)
+
+a sourcetype (props.conf)
+
+a field transformation (transforms.conf)
+
+an index (indexes.conf)
+
+an output group (outputs.conf)
+
+These files work together:
+inputs.conf brings data in → props.conf interprets it → transforms.conf extracts fields → fields.conf defines field behavior → indexes.conf stores it → outputs.conf forwards it.
+
+Answers
+Which file defines output destinations?  
+outputs.conf
+
+What line goes in fields.conf for the custom field?
+
+Code
+[SourceIP]
+INDEXED = true
+#
