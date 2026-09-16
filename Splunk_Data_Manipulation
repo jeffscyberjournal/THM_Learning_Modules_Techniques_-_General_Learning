@@ -58,5 +58,54 @@ drwxr-xr-x 3 ubuntu ubuntu    4096 Sep 25  2023 ..
 
 
 ---
+## Task 3 How Splunk Processes Data
 
+Splunk turns raw logs into structured events by identifying formats, assigning sourcetypes, breaking events, and extracting fields.
+- You control ingestion with inputs.conf, parsing rules with props.conf, and optional field extractions.
+- Default configs live in /opt/splunk/etc/system/default, while custom overrides go in /opt/splunk/etc/system/local.
+- Splunk’s UI can also manage sourcetypes, field extractions, and parsing settings without editing files manually.
+
+
+Splunk turns raw logs into structured events by identifying timestamps, breaking events, assigning sourcetypes, and extracting fields. You control ingestion with inputs.conf, parsing behavior with props.conf, and optional field extractions.
+
+1. Ingesting Logs (inputs.conf)
+You tell Splunk which log file to monitor and how to classify it:
+```
+[monitor:///path/to/your/data]
+disabled = false
+index = your_index
+sourcetype = your_sourcetype
+```
+This defines the log source, index, and sourcetype — the foundation for all later parsing.
+
+2. Parsing Log Structure (props.conf)
+You define how Splunk should interpret the log format:
+```
+[your_sourcetype]
+SHOULD_LINEMERGE = false
+TIME_FORMAT = %Y-%m-%d %H:%M:%S
+```
+This controls event breaking, multi‑line handling, and timestamp recognition.
+
+3. Extracting Fields from Logs
+You can pull values out of log lines using regex‑based field extractions:
+```
+[your_sourcetype]
+EXTRACT-fieldname1 = regular_expression1
+EXTRACT-fieldname2 = regular_expression2
+```
+These turn raw log content into searchable fields.
+
+4. UI Alternative
+Splunk’s web interface can configure sourcetypes, field extractions, and parsing rules without editing files manually.
+
+### Lab Questions
+ 
+**Q1 Which configuration file instructs Splunk on what data to ingest?**  
+
+inputs.conf
+
+**Q2 Full path to Splunk’s default configuration files:**
+
+/opt/splunk/etc/system/default
 
