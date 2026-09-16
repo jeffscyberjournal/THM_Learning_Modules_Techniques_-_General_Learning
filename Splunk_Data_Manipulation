@@ -168,13 +168,14 @@ These files work together:
 
 inputs.conf brings data in → props.conf interprets it → transforms.conf extracts fields → fields.conf defines field behavior → indexes.conf stores it → outputs.conf forwards it.
 
-Answers
-Which file defines output destinations?  
+### Lab Questions
+**Q1 Which file defines output destinations?**  
+
 outputs.conf
 
-What line goes in fields.conf for the custom field?
+**Q2 What line goes in fields.conf for the custom field?**
 
-Code
+```
 [SourceIP]
 INDEXED = true
-#
+```
