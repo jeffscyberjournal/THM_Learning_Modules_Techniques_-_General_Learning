@@ -179,3 +179,102 @@ outputs.conf
 [SourceIP]
 INDEXED = true
 ```
+
+
+
+## Task 5 Creating a Splunk App (with commands + outputs)
+Starting Splunk
+```
+cd /opt/splunk/bin
+./splunk start
+```
+Access the UI at: http://<proxy-IP>8000 (10.66.156.154 in Bing)
+
+### Creating the App
+1. In Splunk UI → Manage Apps 
+2. Click Create App
+3. Fill in details (e.g., Friendly name for app to display in splunk, folder name, Visible, Author name, Description, Template upload asset, note friendly name to description only  required for this example
+3. Then Save should be visible in list displayed in 
+
+Your app is created at:
+
+```
+/opt/splunk/etc/apps/DataApp
+
+### Viewing Installed Apps
+```
+ls /opt/splunk/etc/apps
+```
+Example output:
+```
+DataApp                        splunk-dashboard-studio
+SplunkForwarder                splunk_archiver
+SplunkLightForwarder           splunk_assist
+alert_logevent                 splunk_essentials_9_0
+alert_webhook                  splunk_gdi
+...
+```
+
+### Exploring Your App Directory
+```
+cd /opt/splunk/etc/apps/DataApp
+ls
+```
+Output:
+```
+bin  default  local  metadata
+```
+Folder purposes:
+
+- bin – scripts/executables
+- default – default configs
+- local – custom configs
+- metadata – permissions
+
+### Creating a Log‑Generating Script
+```
+cd bin
+echo 'print("This is a sample log...")' > samplelogs.py
+python3 samplelogs.py
+```
+Output:
+```
+This is a sample log...
+```
+
+### Creating inputs.conf
+```
+cd ../local
+nano inputs.conf
+```
+Add:
+```
+[script:///opt/splunk/etc/apps/DataApp/bin/samplelogs.py]
+INDEX = main
+SOURCETYPE = testing
+HOST = test
+INTERVAL = 5
+```
+Restart Splunk:
+```
+/opt/splunk/bin/splunk restart
+```
+
+### Verifying Log Ingestion
+
+In Splunk UI:
+- Open DataApp
+- Search: index=main
+- Time range: All time (real‑time)  
+- You should see logs from samplelogs.py.
+
+### Lab Questions
+**Q1 When Splunk is first installed, how many default applications are available?**
+
+25
+
+**What is the full path to your newly created application directory?***
+
+/opt/splunk/etc/apps/DataApp
+
+
