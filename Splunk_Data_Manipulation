@@ -191,7 +191,7 @@ cd /opt/splunk/bin
 Access the UI at: http://<proxy-IP>8000 (10.66.156.154 in Bing)
 
 ### Creating the App
-1. In Splunk UI → Manage Apps 
+1. In Splunk UI → Manage Apps (this page shows the lst of default applications installed, Q1 below)
 2. Click Create App
 3. Fill in details (e.g., Friendly name for app to display in splunk, folder name, Visible, Author name, Description, Template upload asset, note friendly name to description only  required for this example
 3. Then Save should be visible in list displayed in APPs section in Manage Apps
@@ -202,7 +202,7 @@ Name 	Folder name 	Version 	Update checking 	Visible 	Sharing 	        Status 	 
 DataApp 	DataApp 	0.0.1 	    Yes                 Yes         App | Permissions 	Enabled | Disable 	Launch app | Edit properties | View objects
 ```
 
-Your app is created at:
+Your app is created at: (The answer to question 2 in this task)
 
 ```
 /opt/splunk/etc/apps/DataApp
@@ -241,6 +241,7 @@ ls
 ```
 Output:
 ```
+root@tryhackme:/opt/splunk/etc/apps/DataApp# ls
 bin  default  local  metadata
 ```
 Folder purposes:
@@ -258,7 +259,10 @@ python3 samplelogs.py
 ```
 Output:
 ```
+root@tryhackme:/opt/splunk/etc/apps/DataApp/bin# echo 'print("This is a sample log...")'>samplelogs.py
+root@tryhackme:/opt/splunk/etc/apps/DataApp/bin# python3 samplelogs.py
 This is a sample log...
+root@tryhackme:/opt/splunk/etc/apps/DataApp/bin# 
 ```
 
 ### Creating inputs.conf
@@ -274,7 +278,7 @@ SOURCETYPE = testing
 HOST = test
 INTERVAL = 5
 ```
-Restart Splunk:
+Splunk takes the output from samplelogs.py and ingests it into the main index every 5 seconds using the sourcetype testing and host test. After creating the inputs.conf entry, restart Splunk with:
 ```
 /opt/splunk/bin/splunk restart
 ```
