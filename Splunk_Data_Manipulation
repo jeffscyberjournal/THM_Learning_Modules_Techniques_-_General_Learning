@@ -305,7 +305,8 @@ In Splunk UI:
 
 ---
 ## Task 6 Configuring Event Boundaries in Splunk
-1. Copy and Run the VPN Log Script
+
+### 1. Copy and Run the VPN Log Script
 ```
 cp /home/ubuntu/Downloads/scripts/vpnlogs /opt/splunk/etc/apps/DataApp/bin/
 cd /opt/splunk/etc/apps/DataApp/bin
@@ -339,7 +340,7 @@ index=main sourcetype=vpn_logs
 ```
 Issue: Splunk merges all lines into one event because it cannot detect boundaries.
 
-3. Fix Event Boundaries (props.conf)
+### 3. Fix Event Boundaries (props.conf)
 Events always end with CONNECT or DISCONNECT, so use that pattern.
 
 Test regex:
