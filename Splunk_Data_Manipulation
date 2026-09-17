@@ -181,7 +181,7 @@ INDEXED = true
 ```
 
 
-
+---
 ## Task 5 Creating a Splunk App (with commands + outputs)
 Starting Splunk
 ```
@@ -301,3 +301,69 @@ In Splunk UI:
 /opt/splunk/etc/apps/DataApp
 
 
+
+
+---
+## Task 6 Configuring Event Boundaries in Splunk
+1. Copy and Run the VPN Log Script
+```
+cp /home/ubuntu/Downloads/scripts/vpnlogs /opt/splunk/etc/apps/DataApp/bin/
+cd /opt/splunk/etc/apps/DataApp/bin
+./vpnlogs
+```
+Sample output:
+```
+User: John Doe, Server: Server B, Action: DISCONNECT
+User: Bob Johnson, Server: Server A, Action: CONNECT
+User: John Doe, Server: Server D, Action: CONNECT
+...
+```
+Each line contains three fields: User, Server, Action.
+
+### 2. Ingest VPN Logs (inputs.conf)
+Add to /opt/splunk/etc/apps/DataApp/local/inputs.conf:
+```
+[script:///opt/splunk/etc/apps/DataApp/bin/vpnlogs]
+INDEX = main
+SOURCETYPE = vpn_logs
+HOST = vpn_server
+INTERVAL = 5
+```
+Restart Splunk:
+```
+/opt/splunk/bin/splunk restart
+```
+Search:
+```
+index=main sourcetype=vpn_logs
+```
+Issue: Splunk merges all lines into one event because it cannot detect boundaries.
+
+3. Fix Event Boundaries (props.conf)
+Events always end with CONNECT or DISCONNECT, so use that pattern.
+
+Test regex:
+```
+(CONNECT|DISCONNECT)
+```
+Create /opt/splunk/etc/apps/DataApp/local/props.conf:
+```
+[vpn_logs]
+SHOULD_LINEMERGE = false
+MUST_BREAK_AFTER = (CONNECT|DISCONNECT)
+```
+Restart Splunk again:
+```
+/opt/splunk/bin/splunk restart
+```
+Now each log line appears as a separate event.
+
+### Task 6 Lab Questions
+
+**Q1 Which configuration file is used to specify parsing rules?**  
+
+props.conf
+
+**What regex pattern is used to break the events?** 
+
+(CONNECT|DISCONNECT)
