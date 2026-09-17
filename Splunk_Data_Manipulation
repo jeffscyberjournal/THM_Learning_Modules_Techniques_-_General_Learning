@@ -194,7 +194,15 @@ Access the UI at: http://<proxy-IP>8000 (10.66.156.154 in Bing)
 1. In Splunk UI → Manage Apps 
 2. Click Create App
 3. Fill in details (e.g., Friendly name for app to display in splunk, folder name, Visible, Author name, Description, Template upload asset, note friendly name to description only  required for this example
-3. Then Save should be visible in list displayed in 
+3. Then Save should be visible in list displayed in APPs section in Manage Apps
+
+What it should lok like in table of APPs
+```
+Name 	Folder name 	Version 	Update checking 	Visible 	Sharing 	        Status 	            Actions
+DataApp 	DataApp 	0.0.1 	    Yes                 Yes         App | Permissions 	Enabled | Disable 	Launch app | Edit properties | View objects
+```
+
+
 
 Your app is created at:
 
