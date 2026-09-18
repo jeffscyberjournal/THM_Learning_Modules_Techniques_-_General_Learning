@@ -312,6 +312,10 @@ cp /home/ubuntu/Downloads/scripts/vpnlogs /opt/splunk/etc/apps/DataApp/bin/
 cd /opt/splunk/etc/apps/DataApp/bin
 ./vpnlogs
 ```
+Usually this script wont run but since running with sudo su before hand it wont be necessary to run the following to ensure execution of script allowed.
+```
+chmod +x vpnlogs
+```
 Sample output:
 ```
 User: John Doe, Server: Server B, Action: DISCONNECT
@@ -334,11 +338,27 @@ Restart Splunk:
 ```
 /opt/splunk/bin/splunk restart
 ```
-Search:
+Search and set the time range for 'All time (real-time)' :
 ```
 index=main sourcetype=vpn_logs
 ```
 Issue: Splunk merges all lines into one event because it cannot detect boundaries.
+
+This should present a growing list of entries similar to this every 5 seconds.
+```
+9/18/26
+12:23:28.000 PM	
+User: Bob Johnson, Server: Server D, Action: DISCONNECT
+User: Alice Smith, Server: Server B, Action: DISCONNECT
+User: Bob Johnson, Server: Server E, Action: DISCONNECT
+User: Bob Johnson, Server: Server D, Action: CONNECT
+User: Bob Johnson, Server: Server E, Action: DISCONNECT
+Show all 10 lines
+
+    host = vpn_server
+    source = /opt/splunk/etc/apps/DataApp/bin/vpnlogs
+    sourcetype = vpn_logs
+```
 
 ### 3. Fix Event Boundaries (props.conf)
 Events always end with CONNECT or DISCONNECT, so use that pattern.
@@ -359,6 +379,25 @@ Restart Splunk again:
 ```
 Now each log line appears as a separate event.
 
+```
+9/18/26
+12:42:01.000 PM	
+User: Alice Smith, Server: Server E, Action: DISCONNECT
+
+    host = vpn_server
+    source = /opt/splunk/etc/apps/DataApp/bin/vpnlogs
+    sourcetype = vpn_logs
+...
+
+9/18/26
+12:42:26.000 PM	
+User: Michael Brown, Server: Server E, Action: CONNECT
+
+    host = vpn_server
+    source = /opt/splunk/etc/apps/DataApp/bin/vpnlogs
+    sourcetype = vpn_logs
+...
+```
 ### Task 6 Lab Questions
 
 **Q1 Which configuration file is used to specify parsing rules?**  
