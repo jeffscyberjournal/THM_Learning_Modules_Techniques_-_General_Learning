@@ -377,6 +377,22 @@ Restart Splunk again:
 ```
 /opt/splunk/bin/splunk restart
 ```
+To test splunk is running the script run:
+```
+/opt/splunk/bin/splunk btool inputs list --debug | grep vpnlogs
+```
+You should see your stanza.
+```
+root@tryhackme:/opt/splunk/etc/apps/DataApp/local# /opt/splunk/bin/splunk btool inputs list --debug | grep vpnlogs
+/opt/splunk/etc/apps/DataApp/local/inputs.conf                         [script:///opt/splunk/etc/apps/DataApp/bin/vpnlogs]
+```
+This confirms:
+- Your inputs.conf is in the correct folder
+- Splunk has parsed it
+- Splunk has merged it into the active configuration
+- The stanza name is correct
+- The script path is correct
+
 Now each log line appears as a separate event.
 
 ```
