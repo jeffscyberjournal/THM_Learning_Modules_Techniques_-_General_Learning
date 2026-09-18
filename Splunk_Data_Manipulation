@@ -423,3 +423,65 @@ props.conf
 **What regex pattern is used to break the events?** 
 
 (CONNECT|DISCONNECT)
+
+## Task 7 Parsing Multi‑Line Events — Concise Version
+
+### 1. Copy and Run the Authentication Log Script
+```
+cp /home/ubuntu/Downloads/scripts/authentication_logs /opt/splunk/etc/apps/DataApp/bin/
+ /opt/splunk/etc/apps/DataApp/bin/authentication_logs
+```
+
+Sample output:
+```
+[Authentication]: A login attempt was observed from the user Johny Bil and machine Nepture
+at: Fri Nov 28 09:06:53 2025 which belongs to the Development department. The login attempt looks Normal.
+```
+
+This is a multi‑line event, so Splunk must merge both lines into one.
+
+### 2. Ingest the Logs (inputs.conf)
+
+Add to /opt/splunk/etc/apps/DataApp/local/inputs.conf:
+```
+[script:///opt/splunk/etc/apps/DataApp/bin/authentication_logs]
+index = main
+sourcetype = auth_logs
+host = auth_server
+interval = 5
+```
+Restart Splunk:
+```
+/opt/splunk/bin/splunk restart
+```
+Splunk ingests the logs but incorrectly splits each event into two.
+
+### 3. Fix Multi‑Line Event Boundaries (props.conf)
+
+Each event starts with [Authentication], so use that as the boundary marker.
+
+Create /opt/splunk/etc/apps/DataApp/local/props.conf:
+```
+[auth_logs]
+SHOULD_LINEMERGE = true
+BREAK_ONLY_BEFORE = 
+
+\[Authentication\]
+```
+
+Restart Splunk:
+```
+/opt/splunk/bin/splunk restart
+```
+Now Splunk correctly treats each multi‑line block as a single event.
+
+### Lab Questions Answers
+
+**Q1 Which configuration setting ensures Splunk breaks the event boundary before the regex pattern?**  
+
+BREAK_ONLY_BEFORE
+
+**Q2 Which regex pattern was used to specify where Splunk should break events?**  
+
+\[𝐴𝑢𝑡ℎ𝑒𝑛𝑡𝑖𝑐𝑎𝑡𝑖𝑜𝑛\]
+
