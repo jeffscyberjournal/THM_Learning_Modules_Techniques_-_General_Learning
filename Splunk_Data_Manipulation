@@ -204,28 +204,9 @@ DataApp 	DataApp 	0.0.1 	    Yes                 Yes         App | Permissions 	
 
 Your app is created at: (The answer to question 2 in this task)
 
-```
-/opt/splunk/etc/apps/DataApp
-
-```
-ubuntu@tryhackme:~$ sudo su
-root@tryhackme:/home/ubuntu# ls /opt/splunk/etc/apps
-DataApp                        splunk-dashboard-studio
-SplunkForwarder                splunk_archiver
-SplunkLightForwarder           splunk_assist
-alert_logevent                 splunk_essentials_9_0
-alert_webhook                  splunk_gdi
-appsbrowser                    splunk_httpinput
-...
-root@tryhackme:/home/ubuntu# 
-```
-
 ### Viewing Installed Apps
 ```
 ls /opt/splunk/etc/apps
-```
-Example output:
-```
 DataApp                        splunk-dashboard-studio
 SplunkForwarder                splunk_archiver
 SplunkLightForwarder           splunk_assist
@@ -236,12 +217,8 @@ alert_webhook                  splunk_gdi
 
 ### Exploring Your App Directory
 ```
-cd /opt/splunk/etc/apps/DataApp
-ls
-```
-Output:
-```
-root@tryhackme:/opt/splunk/etc/apps/DataApp# ls
+~# cd /opt/splunk/etc/apps/DataApp
+/opt/splunk/etc/apps/DataApp# ls
 bin  default  local  metadata
 ```
 Folder purposes:
@@ -262,7 +239,6 @@ Output:
 root@tryhackme:/opt/splunk/etc/apps/DataApp/bin# echo 'print("This is a sample log...")'>samplelogs.py
 root@tryhackme:/opt/splunk/etc/apps/DataApp/bin# python3 samplelogs.py
 This is a sample log...
-root@tryhackme:/opt/splunk/etc/apps/DataApp/bin# 
 ```
 
 ### Creating inputs.conf
