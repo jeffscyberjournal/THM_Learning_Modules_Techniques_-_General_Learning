@@ -34,10 +34,9 @@ If you get stuck, we're here to help.
 Look for answers here: http://docs.splunk.com
 
 The Splunk web interface is at http://tryhackme:8000
-
-root@tryhackme:/opt/splunk/bin# 
 ```
-Lab Questions
+
+### Lab Questions
 
 **Q1 What is the full file path to the Splunk directory?** 
 
