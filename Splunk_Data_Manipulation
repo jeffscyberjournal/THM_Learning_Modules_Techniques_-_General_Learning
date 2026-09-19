@@ -404,13 +404,16 @@ props.conf
 ### 1. Copy and Run the Authentication Log Script
 ```
 cp /home/ubuntu/Downloads/scripts/authentication_logs /opt/splunk/etc/apps/DataApp/bin/
- /opt/splunk/etc/apps/DataApp/bin/authentication_logs
+
+Then run script:
+
+/opt/splunk/etc/apps/DataApp/bin/authentication_logs
 ```
 
 Sample output:
 ```
-[Authentication]: A login attempt was observed from the user Johny Bil and machine Nepture
-at: Fri Nov 28 09:06:53 2025 which belongs to the Development department. The login attempt looks Normal.
+[Authentication]:A login attempt was observed from the user Emily Davis and machine Linux_SR01
+at: Sat Sep 19 15:22:01 2026 which belongs to the Finance department. The login attempt looks Normal.
 ```
 
 This is a multi‑line event, so Splunk must merge both lines into one.
@@ -430,6 +433,24 @@ Restart Splunk:
 /opt/splunk/bin/splunk restart
 ```
 Splunk ingests the logs but incorrectly splits each event into two.
+```
+9/19/26
+3:32:44.000 PM	
+at: Sat Sep 19 15:32:44 2026 which belongs to the Marketing department. The login attempt looks suspicious.
+
+    host = auth_server
+    source = /opt/splunk/etc/apps/DataApp/bin/authentication_logs
+    sourcetype = auth_logs
+
+9/19/26
+3:32:44.000 PM	
+[Authentication]:A login attempt was observed from the user Emily Davis and machine Win_SR01
+
+    host = auth_server
+    source = /opt/splunk/etc/apps/DataApp/bin/authentication_logs
+    sourcetype = auth_logs
+```
+
 
 ### 3. Fix Multi‑Line Event Boundaries (props.conf)
 
