@@ -471,6 +471,26 @@ Restart Splunk:
 ```
 Now Splunk correctly treats each multi‑line block as a single event.
 
+```
+9/19/26
+3:46:02.000 PM	
+[Authentication]:A login attempt was observed from the user Michael Brown and machine MAC_01
+at: Sat Sep 19 15:46:02 2026 which belongs to the Marketing department. The login attempt looks suspicious.
+
+    host = auth_server
+    source = /opt/splunk/etc/apps/DataApp/bin/authentication_logs
+    sourcetype = auth_logs
+
+9/19/26
+3:45:57.000 PM	
+[Authentication]:A login attempt was observed from the user Michael Brown and machine Venus
+at: Sat Sep 19 15:45:57 2026 which belongs to the Finance department. The login attempt looks Normal.
+
+    host = auth_server
+    source = /opt/splunk/etc/apps/DataApp/bin/authentication_logs
+    sourcetype = auth_logs
+```
+
 ### Lab Questions Answers
 
 **Q1 Which configuration setting ensures Splunk breaks the event boundary before the regex pattern?**  
