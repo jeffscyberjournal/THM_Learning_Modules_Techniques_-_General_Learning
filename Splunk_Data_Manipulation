@@ -406,7 +406,7 @@ props.conf
 
 
 ---
-## Task 7 Parsing Multi‑Line Events — Concise Version
+## Task 7 Parsing Multi‑Line Events
 
 ### 1. Copy and Run the Authentication Log Script
 ```
@@ -632,10 +632,134 @@ User Jane Smith made a purchase with credit card 4012-XXXX-XXXX-XXXX.
 
 ### Lab Questions Answers
 
-Which payment security standard did you adhere to?  
+**Q1 Which payment security standard did you adhere to?**  
+
 PCI DSS
 
-Full value of the SEDCMD used:
+**Q2 Full value of the SEDCMD used:**
 ```
 SEDCMD-cc = s/-\d{4}-\d{4}-\d{4}/-XXXX-XXXX-XXXX/g
 ```
+
+
+---
+## Task 9 Custom Field Extraction
+
+### 1. Inspect VPN Logs
+
+Run:
+```
+index = main sourcetype = vpn_logs
+```
+
+Each event contains three fields:
+- User
+- Server
+- Action
+
+### 2. Create Regex Pattern
+
+Use this regex to capture all three fields:
+```
+User:\s(.+?),\sServer:\s(.+?),\sAction:\s(\w+)
+```
+
+Sample log:
+```
+User: John Doe, Server: Server B, Action: DISCONNECT
+```
+This produces three capture groups:
+$1 = User, $2 = Server, $3 = Action.
+
+### 3. transforms.conf
+
+Create /opt/splunk/etc/apps/DataApp/local/transforms.conf:
+```
+[vpn_custom_fields]
+REGEX = User:\s(.+?),\sServer:\s(.+?),\sAction:\s(\w+)
+FORMAT = User::$1 Server::$2 Action::$3
+WRITE_META = true
+```
+
+### 4. props.conf
+
+Update your existing stanza:
+```
+[vpn_logs]
+SHOULD_LINEMERGE = false
+MUST_BREAK_AFTER = (CONNECT|DISCONNECT)
+TRANSFORM-vpn = vpn_custom_fields
+```
+This tells Splunk to apply the extraction defined in transforms.conf.
+
+### 5. fields.conf
+
+Create /local/fields.conf:
+```
+[User]
+INDEXED = true
+
+[Server]
+INDEXED = true
+
+[Action]
+INDEXED = true
+```
+
+Restart Splunk:
+```
+/opt/splunk/bin/splunk restart
+```
+Run:
+```
+index = main sourcetype = vpn_logs
+```
+Your events now show User, Server, and Action as searchable fields.
+
+### Purchase Log Field Extraction (Concise)
+
+Regex for Purchase Logs
+Add to transforms.conf:
+```
+[purchase_fields]
+REGEX = ^User\s+([A-Za-z]+(?:\s+[A-Za-z]+)*?)\s+made a purchase with credit card\s+([0-9]{4}(?:-XXXX){3}|(?:\d{4}[\s-]?){3}\d{4})\.
+FORMAT = User::$1 CC_Number::$2
+WRITE_META = true
+```
+
+props.conf
+Add:
+```
+[purchase_logs]
+TRANSFORM-purchase = purchase_fields
+```
+
+fields.conf
+Add:
+```
+[User]
+INDEXED = true
+
+[CC_Number]
+INDEXED = true
+```
+
+Restart Splunk:
+```
+/opt/splunk/bin/splunk restart
+```
+
+Search:
+```
+index = main sourcetype = purchase_logs
+```
+You will now see extracted User and CC_Number fields.
+
+### Lab Question Answers
+
+**Q1 How many User field values exist?**
+
+Count the distinct User values in the purchase logs after extraction.
+
+**Q2 How many unique masked CC_Number values exist?**
+**Count the distinct masked credit card values (e.g., 6011-XXXX-XXXX-XXXX).
