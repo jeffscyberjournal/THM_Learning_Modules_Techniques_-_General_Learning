@@ -516,44 +516,47 @@ cp /home/ubuntu/Downloads/scripts/purchase-details /opt/splunk/etc/apps/DataApp/
  /opt/splunk/etc/apps/DataApp/bin/purchase-details
 ```
 Sample output:
+```
+User David made a purchase with credit card 6011-1111-1111-1117.
+User Michael made a purchase with credit card 4012-8888-8888-1881.
+User Alice Johnson made a purchase with credit card 6011-1234-5678-9012.
+User Jane Smith made a purchase with credit card 3056-9309-0259-0434.
+User Emma made a purchase with credit card 9876-5432-1098-7654.
+```
+### 2. Ingest Purchase Logs (inputs.conf)
 
-Code
-User Emma made a purchase with credit card 5555-5555-5555-5555.
-User Sophia made a purchase with credit card 6011-1111-1111-1117.
-User Michael made a purchase with credit card 5555-5555-5555-5555.
-User David made a purchase with credit card 6011-1234-5678-9012.
-User Olivia made a purchase with credit card 6011-1234-5678-9012.
-2. Ingest Purchase Logs (inputs.conf)
 Add to /opt/splunk/etc/apps/DataApp/local/inputs.conf:
-
-Code
+```
 [script:///opt/splunk/etc/apps/DataApp/bin/purchase-details]
 index = main
 sourcetype = purchase_logs
 host = order_server
 interval = 5
+```
 Restart Splunk:
 
-Code
+```
 /opt/splunk/bin/splunk restart
-3. Set Event Boundaries (props.conf)
-Each log ends with a four‑digit block followed by a period. Use that pattern:
+```
+### 3. Set Event Boundaries (props.conf)
+
+Each log ends with a **four digit** block followed by a period. Use that pattern:
 
 Regex tested:
-
-Code
+```
 \d{4}\.
+```
 Add to /opt/splunk/etc/apps/DataApp/local/props.conf:
-
-Code
+```
 [purchase_logs]
 SHOULD_LINEMERGE = true
 MUST_BREAK_AFTER = \d{4}\.
+```
 Restart Splunk:
-
-Code
+```
 /opt/splunk/bin/splunk restart
-Splunk now breaks events correctly — but credit card numbers remain visible.
+```
+Splunk now breaks events correctly, but credit card numbers remain visible.
 ```
 9/20/26
 7:17:54.000 AM	
@@ -563,23 +566,21 @@ User John boy made a purchase with credit card 9876-5432-1098-7654.
     source = /opt/splunk/etc/apps/DataApp/bin/purchase-details
     sourcetype = purchase_logs
 
-	9/20/26
+9/20/26
 7:17:54.000 AM	
 User John boy made a purchase with credit card 3714-4963-5398-4313.
 
     host = tryhackme
     source = /opt/splunk/etc/apps/DataApp/bin/purchase-details
     sourcetype = purchase_logs
-
-
 ```
 
+### 4. Mask Credit Card Numbers (props.conf)
 
-4. Mask Credit Card Numbers (props.conf)
 Add a SEDCMD to replace the last 12 digits with masked values:
-
-Code
+```
 SEDCMD-cc = s/-\d{4}-\d{4}-\d{4}/-XXXX-XXXX-XXXX/g
+```
 Final stanza:
 
 Code
@@ -592,6 +593,24 @@ Restart Splunk again:
 Code
 /opt/splunk/bin/splunk restart
 Now Splunk displays masked credit card numbers in all events.
+
+```
+9/20/26
+8:13:15.000 AM	
+User Sophia made a purchase with credit card 3530-XXXX-XXXX-XXXX.
+
+    host = tryhackme
+    source = /opt/splunk/etc/apps/DataApp/bin/purchase-details
+    sourcetype = purchase_logs
+
+9/20/26
+8:13:15.000 AM	
+User Jane Smith made a purchase with credit card 4012-XXXX-XXXX-XXXX.
+
+    host = tryhackme
+    source = /opt/splunk/etc/apps/DataApp/bin/purchase-details
+    sourcetype = purchase_logs
+```
 
 Answers
 Which payment security standard did you adhere to?  
