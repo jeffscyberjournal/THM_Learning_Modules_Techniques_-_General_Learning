@@ -577,6 +577,24 @@ User John boy made a purchase with credit card 3714-4963-5398-4313.
 
 ### 4. Mask Credit Card Numbers (props.conf)
 
+SEDCMD is used in this example to filter and hide the last 12 digits. Here is how SEDCMD Works
+
+The syntax is:
+```
+SEDCMD-<name> = s/<regex>/<replacement>/g
+```
+Where:
+
+SEDCMD-<name> → you choose the name (e.g., cc, maskip, cleanup)
+
+s/.../.../g → standard sed substitution
+
+<regex (-\d{4}-\d{4}-\d{4})> → pattern to match
+
+<replacement (-XXXX-XXXX-XXXX)> → what to replace it with
+
+g → replace all occurrences
+
 Add a SEDCMD to replace the last 12 digits with masked values:
 ```
 SEDCMD-cc = s/-\d{4}-\d{4}-\d{4}/-XXXX-XXXX-XXXX/g
