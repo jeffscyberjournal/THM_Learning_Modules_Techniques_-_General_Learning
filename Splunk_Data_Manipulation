@@ -1,7 +1,11 @@
 # Splunk: Data Manipulation
 
 Splunk needs clean, well‑parsed data so logs become structured, searchable fields. When the data is organized, security teams can correlate events across systems, spot anomalies faster, and build reliable alerts. Good parsing directly improves threat detection, incident investigation, and overall system monitoring.
-Concise summary of your scenario briefing
+Concise summary of your scenario briefing. 
+
+Most work here is tied to an APP in this case one created with name DataAPP. A Splunk app is a modular package containing configuration files, scripts, dashboards, and parsing rules that together support a specific data source or workflow. It’s not just filters, it’s the entire ingestion, parsing, and visualization pipeline bundled into one installable unit. 
+
+So gist is If you’re monitoring a PC3, a VPN, an authentication system, or any other single log‑producing component, you can bundle all scripts, parsing rules, filters, dashboards, and field extractions into one Splunk app.
 
 ---
 ## Task 2 Scenario Briefing
@@ -399,6 +403,9 @@ props.conf
 
 (CONNECT|DISCONNECT)
 
+
+
+---
 ## Task 7 Parsing Multi‑Line Events — Concise Version
 
 ### 1. Copy and Run the Authentication Log Script
@@ -501,3 +508,96 @@ BREAK_ONLY_BEFORE
 
 \[𝐴𝑢𝑡ℎ𝑒𝑛𝑡𝑖𝑐𝑎𝑡𝑖𝑜𝑛\]
 
+## Masking Sensitive Data
+
+### 1. Copy and Run the Purchase Log Script
+```
+cp /home/ubuntu/Downloads/scripts/purchase-details /opt/splunk/etc/apps/DataApp/bin/
+ /opt/splunk/etc/apps/DataApp/bin/purchase-details
+```
+Sample output:
+
+Code
+User Emma made a purchase with credit card 5555-5555-5555-5555.
+User Sophia made a purchase with credit card 6011-1111-1111-1117.
+User Michael made a purchase with credit card 5555-5555-5555-5555.
+User David made a purchase with credit card 6011-1234-5678-9012.
+User Olivia made a purchase with credit card 6011-1234-5678-9012.
+2. Ingest Purchase Logs (inputs.conf)
+Add to /opt/splunk/etc/apps/DataApp/local/inputs.conf:
+
+Code
+[script:///opt/splunk/etc/apps/DataApp/bin/purchase-details]
+index = main
+sourcetype = purchase_logs
+host = order_server
+interval = 5
+Restart Splunk:
+
+Code
+/opt/splunk/bin/splunk restart
+3. Set Event Boundaries (props.conf)
+Each log ends with a four‑digit block followed by a period. Use that pattern:
+
+Regex tested:
+
+Code
+\d{4}\.
+Add to /opt/splunk/etc/apps/DataApp/local/props.conf:
+
+Code
+[purchase_logs]
+SHOULD_LINEMERGE = true
+MUST_BREAK_AFTER = \d{4}\.
+Restart Splunk:
+
+Code
+/opt/splunk/bin/splunk restart
+Splunk now breaks events correctly — but credit card numbers remain visible.
+```
+9/20/26
+7:17:54.000 AM	
+User John boy made a purchase with credit card 9876-5432-1098-7654.
+
+    host = tryhackme
+    source = /opt/splunk/etc/apps/DataApp/bin/purchase-details
+    sourcetype = purchase_logs
+
+	9/20/26
+7:17:54.000 AM	
+User John boy made a purchase with credit card 3714-4963-5398-4313.
+
+    host = tryhackme
+    source = /opt/splunk/etc/apps/DataApp/bin/purchase-details
+    sourcetype = purchase_logs
+
+
+```
+
+
+4. Mask Credit Card Numbers (props.conf)
+Add a SEDCMD to replace the last 12 digits with masked values:
+
+Code
+SEDCMD-cc = s/-\d{4}-\d{4}-\d{4}/-XXXX-XXXX-XXXX/g
+Final stanza:
+
+Code
+[purchase_logs]
+SHOULD_LINEMERGE = true
+MUST_BREAK_AFTER = \d{4}\.
+SEDCMD-cc = s/-\d{4}-\d{4}-\d{4}/-XXXX-XXXX-XXXX/g
+Restart Splunk again:
+
+Code
+/opt/splunk/bin/splunk restart
+Now Splunk displays masked credit card numbers in all events.
+
+Answers
+Which payment security standard did you adhere to?  
+PCI DSS
+
+Full value of the SEDCMD used:
+
+Code
+SEDCMD-cc = s/-\d{4}-\d{4}-\d{4}/-XXXX-XXXX-XXXX/g
