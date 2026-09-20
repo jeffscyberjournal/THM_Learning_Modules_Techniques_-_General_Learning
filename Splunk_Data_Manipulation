@@ -582,16 +582,16 @@ Add a SEDCMD to replace the last 12 digits with masked values:
 SEDCMD-cc = s/-\d{4}-\d{4}-\d{4}/-XXXX-XXXX-XXXX/g
 ```
 Final stanza:
-
-Code
+```
 [purchase_logs]
 SHOULD_LINEMERGE = true
 MUST_BREAK_AFTER = \d{4}\.
 SEDCMD-cc = s/-\d{4}-\d{4}-\d{4}/-XXXX-XXXX-XXXX/g
+```
 Restart Splunk again:
-
-Code
+```
 /opt/splunk/bin/splunk restart
+```
 Now Splunk displays masked credit card numbers in all events.
 
 ```
@@ -612,11 +612,12 @@ User Jane Smith made a purchase with credit card 4012-XXXX-XXXX-XXXX.
     sourcetype = purchase_logs
 ```
 
-Answers
+### Lab Questions Answers
+
 Which payment security standard did you adhere to?  
 PCI DSS
 
 Full value of the SEDCMD used:
-
-Code
+```
 SEDCMD-cc = s/-\d{4}-\d{4}-\d{4}/-XXXX-XXXX-XXXX/g
+```
