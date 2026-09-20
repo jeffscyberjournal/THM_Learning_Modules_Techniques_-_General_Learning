@@ -577,7 +577,7 @@ User John boy made a purchase with credit card 3714-4963-5398-4313.
 
 ### 4. Mask Credit Card Numbers (props.conf)
 
-SEDCMD is used in this example to filter and hide the last 12 digits. Here is how SEDCMD Works
+SEDCMD is used in this example to filter and hide the last 12 digits. SEDCMD is a Splunk preprocessing command that uses **sed** style regex substitution to mask or rewrite sensitive data before indexing. Here is how SEDCMD Works
 
 The syntax is:
 ```
