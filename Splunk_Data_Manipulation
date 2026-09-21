@@ -656,6 +656,7 @@ Each event contains three fields:
 - User
 - Server
 - Action
+- A regex for this task can be created using this resource "https://regex101.com/"
 
 ### 2. Create Regex Pattern
 
@@ -663,6 +664,9 @@ Use this regex to capture all three fields:
 ```
 User:\s(.+?),\sServer:\s(.+?),\sAction:\s(\w+)
 ```
+This was derived using the line "User: Alice Smith, Server: Server E, Action: DISCONNECT" 
+
+
 
 Sample log:
 ```
@@ -672,6 +676,8 @@ This produces three capture groups:
 $1 = User, $2 = Server, $3 = Action.
 
 ### 3. transforms.conf
+
+As discussed in Task 4, transforms.conf allows you to define data transformations and enrichments on indexed events. 
 
 Create /opt/splunk/etc/apps/DataApp/local/transforms.conf:
 ```
@@ -714,7 +720,7 @@ Run:
 ```
 index = main sourcetype = vpn_logs
 ```
-Your events now show User, Server, and Action as searchable fields.
+Your events now show User, Server, and Action as searchable fields. You will require to select "3 more fields" in the fields on left side column next to resutls to add User:, Actions: and Server:. Or just add field to search box in appropriate form.
 
 ### Purchase Log Field Extraction (Concise)
 
