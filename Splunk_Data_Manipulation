@@ -720,11 +720,40 @@ Run:
 ```
 index = main sourcetype = vpn_logs
 ```
-Your events now show User, Server, and Action as searchable fields. You will require to select "3 more fields" in the fields on left side column next to resutls to add User:, Actions: and Server:. Or just add field to search box in appropriate form.
+Your events should now show the fields User, Server, and Action as searchable fields, but they may not automatically appear in the results panel. Fields only display if they are listed under Selected Fields. They may or may not appear under Interesting Fields, and sometimes they are hidden under the 3 more fields section just below it. If you still don’t see them, open All Fields to view every available field and add them as needed. Once added, you can filter your search by clicking the field values or by typing the field names directly into the New Search bar at the top.
 
-### Purchase Log Field Extraction (Concise)
+```
+9/21/26
+11:01:35.000 AM	
+User: John Doe, Server: Server A, Action: DISCONNECT
+
+    Action = DISCONNECT
+    Server = Server A
+    User = John Doe
+    host = tryhackme
+    source = /opt/splunk/etc/apps/DataApp/bin/vpnlogs
+    sourcetype = vpn_logs
+
+	9/21/26
+11:01:35.000 AM	
+User: Alice Smith, Server: Server B, Action: CONNECT
+
+    Action = CONNECT
+    Server = Server B
+    User = Alice Smith
+    host = tryhackme
+    source = /opt/splunk/etc/apps/DataApp/bin/vpnlogs
+    sourcetype = vpn_logs
+...
+```
+
+
+### Purchase Log Field Extraction
 
 Regex for Purchase Logs
+
+Naturally this requires that the logs are already in place from earlier. This time only requiring changes to fields.conf and props.conf.
+
 Add to transforms.conf:
 ```
 [purchase_fields]
@@ -759,13 +788,71 @@ Search:
 ```
 index = main sourcetype = purchase_logs
 ```
-You will now see extracted User and CC_Number fields.
+You will now see extracted User and CC_Number fields. Either make sure selected from **Interesting fields** and are listed in **Selected Fields** on left next to results.
+```
+9/21/26
+10:52:20.000 AM	
+User David made a purchase with credit card 6011-XXXX-XXXX-XXXX.
 
+    CC_Number = 6011-XXXX-XXXX-XXXX
+    User = David
+    host = order_server
+    source = /opt/splunk/etc/apps/DataApp/bin/purchase-details
+    sourcetype = purchase_logs
+
+	9/21/26
+10:52:20.000 AM	
+User David made a purchase with credit card 4111-XXXX-XXXX-XXXX.
+
+    CC_Number = 4111-XXXX-XXXX-XXXX
+    User = David
+    host = order_server
+    source = /opt/splunk/etc/apps/DataApp/bin/purchase-details
+    sourcetype = purchase_logs
+...
+```
 ### Lab Question Answers
 
 **Q1 How many User field values exist?**
 
 Count the distinct User values in the purchase logs after extraction.
 
+```
+User Selected
+
+14 Values, 100% of events 
+...
+Top 10 Values 	  Count 	  % 	 
+Bob Williams 	  20 	      9.091% 	
+Sophia 	          20 	      9.091% 	
+Alex 	          18 	      8.182% 	
+William 	      18 	      8.182% 	
+Jane 	          17 	      7.727% 	
+Michael 	      17 	      7.727% 	
+Alice Johnson 	  16 	      7.273% 	
+Emily 	          15 	      6.818% 	
+Jane Smith 	      15 	      6.818%
+```
+
 **Q2 How many unique masked CC_Number values exist?**
-**Count the distinct masked credit card values (e.g., 6011-XXXX-XXXX-XXXX).
+
+Count the distinct masked credit card values (e.g., 6011-XXXX-XXXX-XXXX). Inspect new field for CC_Number
+```
+CC_Number
+Selected
+
+10 Values, 100% of events 
+...
+Top 10 Values		  	Count 	% 	 
+6011-XXXX-XXXX-XXXX 	110 	23.404% 	
+5105-XXXX-XXXX-XXXX 	54 	    11.489% 	
+4111-XXXX-XXXX-XXXX 	53    	11.276% 	
+3714-XXXX-XXXX-XXXX 	50  	10.638% 	
+5555-XXXX-XXXX-XXXX 	45  	9.574% 	
+3530-XXXX-XXXX-XXXX 	44  	9.362% 	
+3056-XXXX-XXXX-XXXX 	39  	8.298% 	
+4012-XXXX-XXXX-XXXX 	27  	5.745% 	
+1234-XXXX-XXXX-XXXX 	24  	5.106% 	
+9876-XXXX-XXXX-XXXX 	24  	5.106% 	
+
+```
