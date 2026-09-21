@@ -720,7 +720,7 @@ Run:
 ```
 index = main sourcetype = vpn_logs
 ```
-Your events should now show the fields User, Server, and Action as searchable fields, but they may not automatically appear in the results panel. Fields only display if they are listed under Selected Fields. They may or may not appear under Interesting Fields, and sometimes they are hidden under the 3 more fields section just below it. If you still don’t see them, open All Fields to view every available field and add them as needed. Once added, you can filter your search by clicking the field values or by typing the field names directly into the New Search bar at the top.
+Your events should now show the fields User, Server, and Action as searchable fields, but they may not automatically appear in the results panel. Fields only display if they are listed under Selected Fields. They may or may not appear under Interesting Fields, and sometimes they are hidden under the 3 more fields section just below it. If you still don’t see them, open All Fields to view every available field and add them as needed. Once added, you can filter your search by clicking the field values or by typing the field names directly into the New Search bar at the top. This is also the case for the next example using the purchase-details folder from previous exercise.
 
 ```
 9/21/26
@@ -752,7 +752,7 @@ User: Alice Smith, Server: Server B, Action: CONNECT
 
 Regex for Purchase Logs
 
-Naturally this requires that the logs are already in place from earlier. This time only requiring changes to fields.conf and props.conf.
+Naturally this requires that the purchase-details folder logs are already in place from earlier. This time only requiring changes to fields.conf and props.conf.
 
 Add to transforms.conf:
 ```
@@ -788,7 +788,7 @@ Search:
 ```
 index = main sourcetype = purchase_logs
 ```
-You will now see extracted User and CC_Number fields. Either make sure selected from **Interesting fields** and are listed in **Selected Fields** on left next to results.
+You will now see extracted User and CC_Number fields. Either make sure selected from **Interesting fields** and are listed in **Selected Fields** on left next to results. If not listed in **Selected or Interesting fields** check **All Fields** and select them. 
 ```
 9/21/26
 10:52:20.000 AM	
