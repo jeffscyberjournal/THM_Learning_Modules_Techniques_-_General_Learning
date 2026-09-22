@@ -35,20 +35,26 @@ Answer the questions below
 
 /opt/splunk/etc/apps/fixit
 
-**Investigate the inputs.conf configuration file of the Fixit app.**
+**Q2 Investigate the inputs.conf configuration file of the Fixit app.**
 What is the full path of the network-logs script?
 
 /opt/splunk/etc/apps/fixit/bin/network-logs
 
-Check
 
-Which Splunk stanza setting will you use to define the event boundaries for the scenario logs?
+**Q3 Which Splunk stanza setting will you use to define the event boundaries for the scenario logs?** 
 
-_________________
+Hint "This is the hint you’re looking for: This setting tells Splunk to break into a new event before a specified pattern."
 
-Check
+BREAK_ONLY_BEFORE
 
-Which regex pattern should be used to define the start of each event?
+This is the same answer to question 1 in Task 7 from Splunk Data Manipulation module.
+```
+**Q1 Which configuration setting ensures Splunk breaks the event boundary before the regex pattern?**  
+
+BREAK_ONLY_BEFORE
+```
+
+**Q4 Which regex pattern should be used to define the start of each event?**
 
 _\____________\_:
 
