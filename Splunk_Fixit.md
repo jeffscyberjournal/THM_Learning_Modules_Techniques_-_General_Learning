@@ -31,17 +31,14 @@ Phase 3: Analyzing Event Data
 Once the log data is flowing in correctly and the fields have been extracted, it's time to begin your analysis. Using the available data, apply your skills to uncover what's happening on the network!
 
 Answer the questions below
-What is the full path to the Fixit app directory in your instance?
+**Q1 What is the full path to the Fixit app directory in your instance?**
 
 /opt/splunk/etc/apps/fixit
 
-Correct Answer
-Investigate the inputs.conf configuration file of the Fixit app.
+**Investigate the inputs.conf configuration file of the Fixit app.**
 What is the full path of the network-logs script?
 
 /opt/splunk/etc/apps/fixit/bin/network-logs
-root@tryhackme:/opt/splunk/etc/apps/fixit# ls
-bin  default  local  metadata
 
 Check
 
