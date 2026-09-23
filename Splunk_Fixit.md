@@ -98,6 +98,54 @@ Answer required is ^\[Network-log\]:
 
 **Q5 After you’ve extracted the relevant fields, what Domain appears in the log data?**
 
+Well its completely overkill at this point but the boundaries of logs are split so, using data maniplation module for splunk I have added the inputs.conf and props.conf to merge into related events:
+
+From default it looks like the following 
+```
+9/23/26
+12:32:32.000 PM	
+India at: Wed Sep 23 12:32:32 2026
+
+    host = tryhackme
+    source = networks
+    sourcetype = network_logs
+
+	9/23/26
+12:32:32.000 PM	
+[Network-log]: User named Daniel Martin from IT department accessed the resource Cybertees.THM/dashboard.html from the source IP 172.16.0.4 and country 
+
+    host = tryhackme
+    source = networks
+    sourcetype = network_logs
+```
+
+The following is something like what it should look like, bit it 
+```
+9/23/26
+12:56:32.000 PM	
+[Network-log]: User named Robert Wilson from Custom department accessed the resource Cybertees.THM/dashboard.html from the source IP 192.168.1.100 and country 
+Canada at: Wed Sep 23 12:56:32 2026
+
+    host = tryhackme
+    source = networks
+    sourcetype = network_logs
+```
+Given sourcetype = network_logs and trying to include inputs.conf and props.conf file that don't presently exist.
+
+Inputs.conf
+```
+[script:///opt/splunk/etc/apps/Fixit/bin/network-logs]
+index = main
+sourcetype = network_logs
+host = tryhackme
+interval = 5
+```
+props.conf
+```
+[network_logs]
+SHOULD_LINEMERGE = true
+BREAK_ONLY_BEFORE = ^\[Network-log\]:
+```
 _________.___
 
 
