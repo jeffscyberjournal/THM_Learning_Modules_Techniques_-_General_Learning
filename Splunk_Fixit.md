@@ -150,7 +150,54 @@ _________.___
 
 
 How many Username field values exist within the events generated?
+This time I had a quick look in the fields recognised, none presently set for **Usernames** or anything like that.
 
+Based on Data Manipulation module and using a similar method. We need to add transforms.conf and add to props.conf file.
+
+transforms.conf
+```
+[network_user_extract]
+REGEX = User named ([A-Za-z]+)\s([A-Za-z]+)\sfrom\s([A-Za-z]+)\sdepartment
+FORMAT = firstname::$1 lastname::$2 department::$3
+WRITE_META = true
+```
+Add to props.conf
+```
+[network_logs]
+SHOULD_LINEMERGE = true
+BREAK_ONLY_BEFORE = ^\[Network-log\]:
+TRANSFORMS-userfields = network_user_extract
+```
+And a fields.conf file
+```
+[firstname]
+INDEXED = true
+ 
+[lastname]
+INDEXED = true
+
+[department]
+INDEXED =  true
+```
+
+This partially worked it showed 24 first names and 24 last names but its not really addressing usernames, I suspect there are combinations of them altering the value required. 
+
+Instead change transforms.conf to 
+```
+[username_extract]
+REGEX = User named ([A-Za-z]+\s[A-Za-z]+)
+FORMAT = Username::$1
+WRITE_META = true
+```
+And for props either add or replace with 
+```
+[network_logs]
+TRANSFORMS-username = username_extract
+```
+Then restart Splunk to accept the changes.
+```
+/opt/splunk/bin/splunk restart
+```
 __
 
 Check
