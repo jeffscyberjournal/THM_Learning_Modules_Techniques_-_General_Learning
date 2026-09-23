@@ -462,8 +462,8 @@ at: Sat Sep 19 15:32:44 2026 which belongs to the Marketing department. The logi
 
 ### 3. Fix Multi‑Line Event Boundaries (props.conf)
 
-Each event starts with [Authentication], so use that as the boundary marker.
-
+- Each event starts with [Authentication], so use that as the boundary marker. 
+- not the starting clock in props should match the sourcetype similar to that directly above and as stated in Task 1.
 Create /opt/splunk/etc/apps/DataApp/local/props.conf:
 ```
 [auth_logs]
