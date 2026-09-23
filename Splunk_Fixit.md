@@ -192,7 +192,11 @@ WRITE_META = true
 And for props either add or replace with 
 ```
 [network_logs]
-TRANSFORMS-username = username_extract
+SHOULD_LINEMERGE = true
+BREAK_ONLY_BEFORE = ^\[Network-log\]:
+TRANSFORMS-userfields = network_user_extract
+TRANSFORMS-user = network_user_extract
+
 ```
 Then restart Splunk to accept the changes.
 ```
