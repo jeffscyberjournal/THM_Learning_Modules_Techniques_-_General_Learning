@@ -146,73 +146,89 @@ sourcetype = network_logs
 host = tryhackme
 interval = 5
 ```
-props.conf
+This does not create the index. It tells Splunk:
+
+- Run the script network-logs
+- Whatever the script outputs becomes events
+- Store those events in the existing main index
+- Label them with sourcetype network_logs
+- Set the host field to tryhackme
+
+
+props.conf (fixit_fields points to transforms.conf)
 ```
 [network_logs]
 SHOULD_LINEMERGE = true
 BREAK_ONLY_BEFORE = ^\[Network-log\]:
+REPORT-fixit = fixit_fields
 ```
-_________.___
-
-
-How many Username field values exist within the events generated?
-This time I had a quick look in the fields recognised, none presently set for **Usernames** or anything like that.
-
-Based on Data Manipulation module and using a similar method. We need to add transforms.conf and add to props.conf file.
-
 transforms.conf
 ```
-[network_user_extract]
-REGEX = User named ([A-Za-z]+)\s([A-Za-z]+)\sfrom\s([A-Za-z]+)\sdepartment
-FORMAT = firstname::$1 lastname::$2 department::$3
+[fixit_fields]
+REGEX = User named (.*?) from (.*?) department accessed the resource ([^/]+)/([^\s]+) from the source IP (\d{1,3}(?:\.\d{1,3}){3}) and country ([^ ]+) at:
+FORMAT = Username::$1 Department::$2 Domain::$3 URI::$4 SourceIP::$5 Country::$6
 WRITE_META = true
 ```
-Add to props.conf
+fields.conf
 ```
-[network_logs]
-SHOULD_LINEMERGE = true
-BREAK_ONLY_BEFORE = ^\[Network-log\]:
-TRANSFORMS-userfields = network_user_extract
-```
-And a fields.conf file
-```
-[firstname]
+[Username]
 INDEXED = true
  
-[lastname]
+[Department]
 INDEXED = true
+ 
+[Domain]
+INDEXED = true
+ 
+[URI]
+INDEXED = true
+ 
+[SourceIP]
+INDEXED = true
+ 
+[Country]
+INDEXED = true
+```
+Fields are then added, but you need to select from below the interesting fields, which is below selected fields. Note below the Country, Department, Domain, URI, Username, SourceIP were added after and wont be initially present.
+```
+Selected Fields
 
-[department]
-INDEXED =  true
-```
+    a Country 12
+    a Department 6
+    a Domain 1
+    a host 1
+    a punct 14
+    a source 1
+    a SourceIP 52
+    a sourcetype 1
+    a URI 12
+    a Username 28
 
-This partially worked it showed 24 first names and 24 last names but its not really addressing usernames, I suspect there are combinations of them altering the value required. 
+Interesting Fields
 
-Instead change transforms.conf to 
-```
-[username_extract]
-REGEX = User named ([A-Za-z]+\s[A-Za-z]+)
-FORMAT = Username::$1
-WRITE_META = true
-```
-And for props either add or replace with 
-```
-[network_logs]
-SHOULD_LINEMERGE = true
-BREAK_ONLY_BEFORE = ^\[Network-log\]:
-TRANSFORMS-userfields = network_user_extract
-TRANSFORMS-user = network_user_extract
+    a index 1
+    # linecount 2
+    a splunk_server 1
+    a timestamp 1
 
+10 more fields
+Extract New Fields 
 ```
-Then restart Splunk to accept the changes.
-```
-/opt/splunk/bin/splunk restart
-```
-__
+Selecting Domain only 1 will be listed.
 
-Check
-How many URI field values were you able to extract from the available logs?
+Cybertees.THM
 
+
+
+
+**Q6 How many Username field values exist within the events generated?**
+
+From previous questions answer is 28.
+
+
+**Q7 How many URI field values were you able to extract from the available logs?**
+
+From URI its 12. These results are necessary in next few questions.
 ```
 URI
 ...
@@ -232,24 +248,61 @@ products/product2.html 		370 	8.274%
 profile.html 				365 	8.162%
 ```
 
-As you begin analyzing the network traffic, how many individual /products pages appear in the data?
+**Q8 As you begin analyzing the network traffic, how many individual /products pages appear in the data?**
+
 From previous question answer is 2
 
-What is the only URI field value found in the event data without a file extension?
+**Q9 What is the only URI field value found in the event data without a file extension?**
+
 From second last question:
 /sales/
 
-Check
-Who is the most active User on the network?
+**Q10 Who is the most active User on the network?**
+
+```
+Username
+...
+28 Values, 65.152% of events
+...
+Events with this field
+Top 10 Values 	Count 	% 	 
+Robert Wilson 	910 	20.349% 	
+Alice Smith 	170 	3.801% 	
+Kevin Jackson 	166 	3.712% 	
+Nancy Lewis 	152 	3.399% 	
+Karen Harris 	151 	3.376% 	
+Bob Johnson 	144 	3.22% 	
+Alice Johnson 	141 	3.153% 	
+Michael Brown 	139 	3.108% 	
+Mary Davis 		138 	3.086% 	
+Michael Taylor 	138 	3.086%
+```
+
 
 ______ ______
 
 Check
 How many unique IP ranges are represented in the observed network traffic?
+52 different IP sources but only 3 IP ranges.
+```
+SourceIP
+52 Values, 75.909% of events
+...
+Events with this field
+Top 10 Values 	Count 	% 	 
+192.168.1.8 	166 	2.202% 	
+192.168.1.5 	164 	2.176% 	
+192.168.1.101 	163 	2.163% 	
+192.168.0.6 	161 	2.136% 	
+192.168.2.1 	161 	2.136% 	
+192.168.1.3 	160 	2.123% 	
+192.168.0.11 	159 	2.11% 	
+10.0.0.4 		158 	2.096% 	
+10.0.0.8 		158 	2.096% 	
+192.168.0.10 	158 	2.096%
+```
 
-_
 
-Check
 Which user accessed the secret-document.pdf on your client's server?
 
 _____ ____
