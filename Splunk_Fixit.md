@@ -140,7 +140,7 @@ Given sourcetype = network_logs and trying to include inputs.conf and props.conf
 
 Inputs.conf
 ```
-[script:///opt/splunk/etc/apps/Fixit/bin/network-logs]
+[script:///opt/splunk/etc/apps/fixit/bin/network-logs]
 index = main
 sourcetype = network_logs
 host = tryhackme
