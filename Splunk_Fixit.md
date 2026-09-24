@@ -3,6 +3,7 @@
 The Fixit TryHackMe module introduces basic network and system troubleshooting techniques. It teaches you how to investigate and resolve common issues by analyzing logs, checking configurations, validating services, and using troubleshooting tools. The room focuses on developing a structured approach to identifying the root cause of problems, helping learners build practical diagnostic skills that are useful in both IT support and cybersecurity environments.
 
 Skip Task 1 it's just connection information to target.
+Here the THM attach box is fine with no reason for log in to person VM here
 
 ## Task 2 The Fixit Challenge
 
