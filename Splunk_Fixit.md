@@ -52,6 +52,7 @@ Germany at: Mon Dec  1 10:13:42 2025
 Mexico at: Mon Dec  1 10:13:48 2025
 ```
 **Phase 3: Analyzing Event Data**
+
 Use Splunk search queries (SPL) on your freshly parsed and structured logs to investigate network activity and answer the final challenge questions.
 
 ### Lab Question Answers
@@ -88,6 +89,7 @@ BREAK_ONLY_BEFORE
 ```
 
 **Q4 Which regex pattern should be used to define the start of each event?**
+
 Start of each event starts with [Network-logs]: this is pattern of interest here. 
 
 Breaking down of the required pattern:
@@ -102,7 +104,7 @@ Answer required is ^\[Network-log\]:
 
 **Q5 After you’ve extracted the relevant fields, what Domain appears in the log data?**
 
-Well its completely overkill at this point but the boundaries of logs are split so, using data maniplation module for splunk I have added the inputs.conf and props.conf to merge into related events:
+Using findings from **Data Maniplation** module for Splunk I have added the inputs.conf and props.conf to merge into related events:
 
 From default it looks like the following 
 ```
