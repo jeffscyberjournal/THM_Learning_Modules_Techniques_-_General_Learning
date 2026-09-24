@@ -213,18 +213,31 @@ __
 Check
 How many URI field values were you able to extract from the available logs?
 
-__
+```
+URI
+...
+12 Values, 65.152% of events
+...
+Events with this field
+Top 10 Values 				Count 		% 	 
+login.html 					450 	10.063% 	
+index.html 					425 	9.504% 	
+about.html 					412 	9.213% 	
+signup.html 				403 	9.012% 	
+contact.html 				400 	8.944% 	
+dashboard.html 				395 	8.833% 	
+sales/ 						385 	8.609% 	
+products/product1.html 		380 	8.497% 	
+products/product2.html 		370 	8.274% 	
+profile.html 				365 	8.162%
+```
 
-Check
 As you begin analyzing the network traffic, how many individual /products pages appear in the data?
-
-_
-
-Check
+From previous question answer is 2
 
 What is the only URI field value found in the event data without a file extension?
-
-/_____/
+From second last question:
+/sales/
 
 Check
 Who is the most active User on the network?
