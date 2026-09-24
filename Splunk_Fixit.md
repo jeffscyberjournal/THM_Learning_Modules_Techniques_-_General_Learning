@@ -1,6 +1,6 @@
 # Splunk Fixit
 
-## Task 2:
+The Fixit TryHackMe module introduces basic network and system troubleshooting techniques. It teaches you how to investigate and resolve common issues by analyzing logs, checking configurations, validating services, and using troubleshooting tools. The room focuses on developing a structured approach to identifying the root cause of problems, helping learners build practical diagnostic skills that are useful in both IT support and cybersecurity environments.
 
 ## Task 2 The Fixit Challenge
 
@@ -22,7 +22,7 @@ If you look closely at the two events highlighted in the green box:
 1. The Second Event: Starts correctly with [Network-log]: User named Patricia Allen... at 2:18:21.000 AM.
 2. The First Event: Contains the text Australia at: Fri Nov 21 02:18:21 2025 at that exact same timestamp (2:18:21.000 AM).
   
-What Went WrongThe text in the first event actually belongs to the end of a previous log message (likely reading something like "...and country Australia at..."). Because Splunk does not know where the log entries officially start and stop, it treated that trailing sentence fragment as a brand-new, standalone log entry.
+What Went WrongThe text in the first event actually belongs to the end of a previous log message. Because Splunk does not know where the log entries officially start and stop, it treated that trailing sentence fragment as a brand-new, standalone log entry.
 
 Once you properly apply BREAK_ONLY_BEFORE = \[Network-log\]:, Splunk will stop creating these broken, fragmented events and cleanly merge those lines together.
 
