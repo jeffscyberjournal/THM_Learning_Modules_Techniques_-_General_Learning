@@ -7,6 +7,7 @@ Skip Task 1 it's just connection information to target.
 ## Task 2 The Fixit Challenge
 
 **Phase 1: Fixing Event Boundaries**
+
 The core objective of Phase 1 is to fix improper log ingestion within the Fixit app's configuration files. Because Splunk cannot automatically detect where one event ends and the next begins, it is fragmenting single log entries into unreadable pieces. You must manually configure the event boundaries (using props.conf) to make the data cleanly structured and ready for analysis.
 
 using a simple index = main in example we get the following example of events boundaries not configured:
@@ -29,6 +30,7 @@ What Went WrongThe text in the first event actually belongs to the end of a prev
 Once you properly apply BREAK_ONLY_BEFORE = \[Network-log\]:, Splunk will stop creating these broken, fragmented events and cleanly merge those lines together.
 
 **Phase 2: Extracting Custom Fields**
+
 The core objective of Phase 2 is to extract specific, meaningful fields from the raw log data to make it searchable. You can do this either by manually updating the Fixit app's configuration files (transforms.conf and props.conf) or by using the Splunk Web UI field extraction wizard.
 
 **Use the sample logs below to help extract the following fields:**
