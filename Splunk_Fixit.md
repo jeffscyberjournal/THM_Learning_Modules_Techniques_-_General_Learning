@@ -279,10 +279,8 @@ Michael Taylor 	138 	3.086%
 ```
 
 
-______ ______
+**Q11 How many unique IP ranges are represented in the observed network traffic?**
 
-Check
-How many unique IP ranges are represented in the observed network traffic?
 52 different IP sources but only 3 IP ranges.
 ```
 SourceIP
@@ -301,10 +299,19 @@ Top 10 Values 	Count 	%
 10.0.0.8 		158 	2.096% 	
 192.168.0.10 	158 	2.096%
 ```
+Catch is only TOP 10 listed. To show full range use statistics view
+```
+index=main sourcetype=network_logs
+| dedup SourceIP
+| table SourceIP
+| sort SourceIP"
+```
 
+**Q12 Which user accessed the secret-document.pdf on your client's server?**
 
-Which user accessed the secret-document.pdf on your client's server?
-
-_____ ____
-
-Check
+Selecting the URI will list the files but since 12 requires selecting rarest URI for other 2 listed. But can filter Username connected to the URI using the following: 
+```
+index=main sourcetype=network_logs "secret-document.pdf"
+| table Username
+```
+Sarah Hall
