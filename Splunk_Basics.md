@@ -152,11 +152,11 @@ The repeated requests for /.git/config and /phpinfo.php indicate active enumerat
 
 ```
 _time	                  path	        user_agent	        status
-2025-10-12 00:03:57.198	/phpinfo.php	zgrab/0.x	          401
+2025-10-12 00:03:57.198	/phpinfo.php	zgrab/0.x           401
 ...
-2025-10-12 00:28:43.198	/phpinfo.php	curl/7.88.1	        403
-2025-10-12 00:28:50.198	/.git/config	zgrab/0.x	          404
-2025-10-12 00:31:20.198	/phpinfo.php	Wget/1.21.4	        404
+2025-10-12 00:28:43.198	/phpinfo.php	curl/7.88.1         403
+2025-10-12 00:28:50.198	/.git/config	zgrab/0.x           404
+2025-10-12 00:31:20.198	/phpinfo.php	Wget/1.21.4         404
 ...
 2025-10-12 05:06:42.198	/.git/config	Go-http-client/1.1	 403
 2025-10-12 00:33:30.198	/.env	        zgrab/0.x	         401
