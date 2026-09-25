@@ -89,9 +89,9 @@ Exclude normal browsers:
 ```
 Top values	
 
-Values	                                  Count	%	 
-Wget/1.21.4	                             1,240	15.744%	
-zgrab/0.x	                               1,238	15.719%	
+Values                                   Count	%	 
+Wget/1.21.4                              1,240	15.744%	
+zgrab/0.x                                1,238	15.719%	
 curl/7.88.1	                             1,220	15.49%	
 Go-http-client/1.1                       1,201	15.249%	
 Havij/1.17 (Automated SQL Injection)       993	12.608%	
@@ -104,16 +104,16 @@ Output: These are suspicious because they are automated tools rather than normal
 
 What each user agent suggests
 ```
-User Agent	            Likely Activitywget	Automated file retrieval
-curl	                  Command-line web requests
-zgrab	                  Internet-wide service scanning (commonly related to zmap to perform
+User Agent             Likely Activitywget	Automated file retrieval
+curl                   Command-line web requests
+zgrab                  Internet-wide service scanning (commonly related to zmap to perform
                         application-layer probing of the discovered hosts and collect banners,
                         metadata, certificates, HTTP responses, and other details.
-Go-http-client	        Custom Go-based tooling
-Havij	                  Automated SQL injection
-sqlmap	                Automated SQL injection
-python-requests	        Python scripting/automation
-Ruby (Webshell Runner)	Post-exploitation or webshell activity
+Go-http-client         Custom Go-based tooling
+Havij                  Automated SQL injection
+sqlmap                 Automated SQL injection
+python-requests        Python scripting/automation
+Ruby (Webshell Runner) Post-exploitation or webshell activity
 ```
 Top suspicious IPs:
 ```
