@@ -100,6 +100,8 @@ Answer required is ^\[Network-log\]:
 
 **Q5 After you’ve extracted the relevant fields, what Domain appears in the log data?**
 
+**Phase 1 Fixing boundaries:**
+
 Using findings from **Data Maniplation** module for Splunk I have added the inputs.conf and props.conf to merge into related events:
 
 From default it looks like the following 
@@ -132,9 +134,11 @@ Canada at: Wed Sep 23 12:56:32 2026
     source = networks
     sourcetype = network_logs
 ```
-Given sourcetype = network_logs and trying to include inputs.conf and props.conf file that don't presently exist.
 
-Inputs.conf
+**Phase 2 Seperating fields**
+
+Extract the fields Username, Department, Country, SourceIP, Domain and URI from events with the sourcetype `network_logs`.
+Given that `sourcetype = network_logs`, all that is required is the addition of `props.conf`, `transforms.conf`, and `fields.conf`. If an `inputs.conf` file were required for ingestion, it would resemble the following scripted input configuration:
 ```
 [script:///opt/splunk/etc/apps/fixit/bin/network-logs]
 index = main
