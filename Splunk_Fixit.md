@@ -13,20 +13,15 @@ The core objective of Phase 1 is to fix improper log ingestion within the Fixit 
 
 using a simple index = main in example we get the following example of events boundaries not configured:
 ```
->  11/21/25         Australia at: Fri Nov 21 02:18:21 2025
-   2:18:21.000 AM   host = tryhackme   source = networks   sourcetype = network_logs
-
 >  11/21/25         [Network-log]: User named Patricia Allen from Development department accessed the resource Cybertees.THM/checkout.html
    2:18:21.000 AM   from the source IP 192.168.1.4 and country
                     host = tryhackme   source = networks   sourcetype = network_logs
-...
-```
-If you look closely at the two events highlighted in the green box:
 
-1. The Second Event: Starts correctly with [Network-log]: User named Patricia Allen... at 2:18:21.000 AM.
-2. The First Event: Contains the text Australia at: Fri Nov 21 02:18:21 2025 at that exact same timestamp (2:18:21.000 AM).
-  
-What Went WrongThe text in the first event actually belongs to the end of a previous log message. Because Splunk does not know where the log entries officially start and stop, it treated that trailing sentence fragment as a brand-new, standalone log entry.
+>  11/21/25         Australia at: Fri Nov 21 02:18:21 2025
+   2:18:21.000 AM   host = tryhackme   source = networks   sourcetype = network_logs
+...
+```  
+The text in the second event actually belongs to the end of a previous log message. Because Splunk does not know where the log entries officially start and stop, it treated that trailing sentence fragment as a brand-new, standalone log entry.
 
 Once you properly apply BREAK_ONLY_BEFORE = \[Network-log\]:, Splunk will stop creating these broken, fragmented events and cleanly merge those lines together.
 
