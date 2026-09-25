@@ -138,7 +138,9 @@ Canada at: Wed Sep 23 12:56:32 2026
 **Phase 2 Seperating fields**
 
 Extract the fields Username, Department, Country, SourceIP, Domain and URI from events with the sourcetype `network_logs`.
-Given that `sourcetype = network_logs`, all that is required is the addition of `props.conf`, `transforms.conf`, and `fields.conf`. If an `inputs.conf` file were required for ingestion, it would resemble the following scripted input configuration:
+Given that `sourcetype = network_logs`, all that is required is the addition of `props.conf`, `transforms.conf`, and `fields.conf`. 
+
+If an `inputs.conf` file were required for ingestion, it would resemble the following scripted input configuration:
 ```
 [script:///opt/splunk/etc/apps/fixit/bin/network-logs]
 index = main
