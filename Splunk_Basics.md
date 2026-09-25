@@ -4,54 +4,64 @@
 
 
 ## Task 2 Log Analysis with Splunk
+- No VM required, states "you can connect to the Splunk SIEM by visiting https://**-**-**-**.reverse-proxy.cell-prod-????.vm.tryhackme.com in your browser." 
 
 ### 1. Explore the Logs
 
 View all ingested logs:
+- First select the "Search and Reporting" link to begin.
+- Start with index=main
+- Set time range to All Time.
 
-Apache Config
-spl isn’t fully supported. Syntax highlighting is based on Apache Config.
-index=main
-Show more lines
-
-Set time range to All Time.
-
-Available sourcetypes:
+There should be 2 available sourcetypes under "Selected Fields":
 
 web_traffic → Web requests to/from the server
 firewall_logs → Allowed/blocked network traffic
-Web server IP: 10.10.1.5
-2. Initial Triage
 
-Show all web traffic:
+### 2. Initial Triage
 
-Apache Config
-spl isn’t fully supported. Syntax highlighting is based on Apache Config.
+Inially select Web_traffic this change search bar to:
+```
 index=main sourcetype=web_traffic
-Show more lines
+```
+**Key observations:**
 
-Key observations:
+- Top is main search parameter space below is 4 tabs.
+  - Events (7,876) this is main area for focusing on fields to narrow down searches.
+  - Patterns this shows patterns associated with current search parameters.
+  - Statistics - this if stats included in search parameters may allow statistics to be presented in findings.
+  - Visualization - usually requires some form of stats, chart or timechart function to present data.
 
+For now focusing on events: 
 ~17k web events
-Noticeable traffic spike indicating attack activity
-Useful fields:
-client_ip
-user_agent
-path
-status
-3. Find Peak Traffic Day
 
-Daily event counts:
+**Useful fields:**
+**client_ip**
+ Identifies the source IP address making requests to the web server. This field is useful for identifying suspicious hosts, determining which IP generated the most activity, spotting scanning or attack behavior, and tracking an attacker's actions throughout the intrusion.
 
-Apache Config
-spl isn’t fully supported. Syntax highlighting is based on Apache Config.
-index=main sourcetype=web_traffic | timechart span=1d count
-Show more lines
+**user_agent**
+ Identifies the application, browser, script, or tool making the request. This field helps distinguish legitimate users (Chrome, Firefox, Safari, Mozilla) from automated attack tools such as curl, wget, sqlmap, Havij, or custom scripts. Unusual user agents are often strong indicators of malicious activity.
 
-Sort highest day first:
+**path**
+ Shows the URI or resource requested on the web server. This field reveals what the client attempted to access and can expose reconnaissance, exploitation, and post-exploitation activity. Examples include requests for sensitive files (/.env, /.git), path traversal attempts (../../etc/passwd), SQL injection payloads, webshell access (shell.php), and ransomware staging files (bunnylock.bin).
 
-Apache Config
-spl isn’t fully supported. Syntax highlighting is based on Apache Config.
+**status**
+ Contains the HTTP response code returned by the server. This helps determine whether an attack succeeded or failed:
+
+200 = Request succeeded
+301/302 = Redirect
+401 = Unauthorized
+403 = Forbidden
+404 = Resource not found
+500 = Server error
+504 = Gateway timeout (often seen during time-based SQL injection testing)
+
+### 3. Find Peak Traffic Day
+
+Daily event counts: (looking at sourcetype web_traffic for example)
+
+Run search command:
+
 index=main sourcetype=web_traffic
 | timechart span=1d count
 | sort by count
