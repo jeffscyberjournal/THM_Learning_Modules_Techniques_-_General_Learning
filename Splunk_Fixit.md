@@ -98,9 +98,12 @@ Breaking down of the required pattern:
 
 Answer required is ^\[Network-log\]:
 
+---
+### Phase 1 Fixing boundaries:
+
 **Q5 After you’ve extracted the relevant fields, what Domain appears in the log data?**
 
-**Phase 1 Fixing boundaries:**
+
 
 Using findings from **Data Maniplation** module for Splunk I have added the inputs.conf and props.conf to merge into related events:
 
@@ -135,7 +138,8 @@ Canada at: Wed Sep 23 12:56:32 2026
     sourcetype = network_logs
 ```
 
-**Phase 2 Seperating fields**
+---
+### Phase 2 Seperating fields
 
 Extract the fields Username, Department, Country, SourceIP, Domain and URI from events with the sourcetype `network_logs`.
 Given that `sourcetype = network_logs`, all that is required is the addition of `props.conf`, `transforms.conf`, and `fields.conf`. 
@@ -221,8 +225,8 @@ Selecting Domain only 1 will be listed.
 
 Cybertees.THM
 
-
-
+---
+### Phase 3: Analyzing Event Data
 
 **Q6 How many Username field values exist within the events generated?**
 
