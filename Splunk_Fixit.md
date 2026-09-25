@@ -155,6 +155,7 @@ This does not create the index. It tells Splunk:
 - Store those events in the existing main index
 - Label them with sourcetype network_logs
 - Set the host field to tryhackme
+- Not required for this module
 
 
 props.conf (fixit_fields points to transforms.conf)
