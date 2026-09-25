@@ -293,24 +293,25 @@ SourceIP
 ...
 Events with this field
 Top 10 Values 	Count 	% 	 
-192.168.1.8 	166 	2.202% 	
-192.168.1.5 	164 	2.176% 	
-192.168.1.101 	163 	2.163% 	
-192.168.0.6 	161 	2.136% 	
-192.168.2.1 	161 	2.136% 	
-192.168.1.3 	160 	2.123% 	
-192.168.0.11 	159 	2.11% 	
-10.0.0.4 		158 	2.096% 	
-10.0.0.8 		158 	2.096% 	
-192.168.0.10 	158 	2.096%
+192.168.1.4 	3 	6.977% 	
+10.0.0.2 		2 	4.651% 	
+10.0.0.3 		2 	4.651% 	
+172.16.0.2 		2 	4.651% 	
+172.16.0.3 		2 	4.651% 	
+172.16.0.7 		2 	4.651% 	
+172.16.0.8 		2 	4.651% 	
+172.16.0.9 		2 	4.651% 	
+192.168.0.1 	2 	4.651% 	
+192.168.0.11 	2 	4.651% 	
 ```
-This still shows 3 ip ranges but only TOP 10 listed. To show full range use statistics view, result will be same.
+This still shows 3 ip ranges but only TOP 10 listed. To show full range use statistics view, result will be same. Class A, B and C Ip ranges.
 ```
 index=main sourcetype=network_logs
 | dedup SourceIP
 | table SourceIP
 | sort SourceIP"
 ```
+
 
 **Q12 Which user accessed the secret-document.pdf on your client's server?**
 
