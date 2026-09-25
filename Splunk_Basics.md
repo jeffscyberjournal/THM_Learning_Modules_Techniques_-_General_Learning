@@ -93,11 +93,11 @@ Values	                                  Count	%
 Wget/1.21.4	                             1,240	15.744%	
 zgrab/0.x	                               1,238	15.719%	
 curl/7.88.1	                             1,220	15.49%	
-Go-http-client/1.1	                      1,201	15.249%	
-Havij/1.17 (Automated SQL Injection)  	    993	12.608%	
-sqlmap/1.7.9#stable (http://sqlmap.org)	   967	12.278%	
-python-requests/2.28.1	                    510	6.475%	
-Ruby/2.7.0 (Webshell Runner)	              507	6.437%
+Go-http-client/1.1                       1,201	15.249%	
+Havij/1.17 (Automated SQL Injection)       993	12.608%	
+sqlmap/1.7.9#stable (http://sqlmap.org)    967	12.278%	
+python-requests/2.28.1                     510	6.475%	
+Ruby/2.7.0 (Webshell Runner)               507	6.437%
 ```
 
 Output: These are suspicious because they are automated tools rather than normal web browsers.
