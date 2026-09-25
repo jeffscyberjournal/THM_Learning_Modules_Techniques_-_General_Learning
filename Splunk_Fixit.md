@@ -88,13 +88,11 @@ BREAK_ONLY_BEFORE
 
 Start of each event starts with [Network-logs]: this is pattern of interest here. 
 
-Breaking down of the required pattern:
-- \[ Escapes the opening square bracket so regex treats it as text. Network-log: Matches the exact word phrase.
-- \] Escapes the closing square bracket
-- ^\[ is required at the start of the regex pattern to match only to start of line.
-  - ^\[ (Best practice): Matches only when [Network-log] is at the absolute start of a line. This prevents accidental splits if the text appears in the middle of a log message, and it makes Splunk parse data much faster.
-  - \[ (Risky): Matches [Network-log] anywhere in the text. If the phrase appears in the middle of an error message, Splunk will accidentally cut your log entry in half.
+Breaking down the required pattern:
 
+- \[ escapes the opening square bracket so the regex treats it as a literal character.
+Network-log matches the event identifier.
+- \] escapes the closing square bracket.
 
 Answer required is ^\[Network-log\]:
 
@@ -166,7 +164,7 @@ props.conf (fixit_fields points to transforms.conf)
 ```
 [network_logs]
 SHOULD_LINEMERGE = true
-BREAK_ONLY_BEFORE = ^\[Network-log\]:
+BREAK_ONLY_BEFORE = \[Network-log\]:
 REPORT-fixit = fixit_fields
 ```
 transforms.conf
@@ -306,7 +304,7 @@ Top 10 Values 	Count 	%
 10.0.0.8 		158 	2.096% 	
 192.168.0.10 	158 	2.096%
 ```
-Catch is only TOP 10 listed. To show full range use statistics view
+This still shows 3 ip ranges but only TOP 10 listed. To show full range use statistics view, result will be same.
 ```
 index=main sourcetype=network_logs
 | dedup SourceIP
