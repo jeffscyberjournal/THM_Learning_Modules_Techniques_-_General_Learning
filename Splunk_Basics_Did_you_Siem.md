@@ -148,7 +148,7 @@ user_agent!=*Firefox*
 | head 5
 ```
 
-Output: The most common client_ip should be on top if high volume of attack, in this case just one IP 198.51.100.55 listed.
+Output: The most common client_ip should be on top if high volume of attack, in this case just one IP 198.51.100.55 listed. Head here is like head Linux command, but here its top 5 lines in Linux command usually head -5 file.txt.
 
 ### 5. Trace the Attacker
 
