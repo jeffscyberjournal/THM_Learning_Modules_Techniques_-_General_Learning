@@ -1,10 +1,10 @@
-# 
+# Splunk Basics Did you Siem?
 
 ## Task 1 Is just start machine and 
 
+No VM required, states "you can connect to the Splunk SIEM by visiting https://**-**-**-**.reverse-proxy.cell-prod-????.vm.tryhackme.com in your browser." 
 
 ## Task 2 Log Analysis with Splunk
-- No VM required, states "you can connect to the Splunk SIEM by visiting https://**-**-**-**.reverse-proxy.cell-prod-????.vm.tryhackme.com in your browser." 
 
 ### 1. Explore the Logs
 
@@ -85,11 +85,11 @@ Output: Identifies the attack day with the highest event volume.
 ### 4. Identify Suspicious User Agents
 
 Exclude normal browsers:
-
 ```
-Top values	
+Top values
 
 Values                                   Count	%	 
+-----------                              -------------
 Wget/1.21.4                              1,240	15.744%	
 zgrab/0.x                                1,238	15.719%	
 curl/7.88.1	                             1,220	15.49%	
@@ -152,6 +152,7 @@ The repeated requests for /.git/config and /phpinfo.php indicate active enumerat
 
 ```
 _time	                  path	        user_agent	        status
+----------------------- ------------ ------------------ ------
 2025-10-12 00:03:57.198	/phpinfo.php	zgrab/0.x           401
 ...
 2025-10-12 00:28:43.198	/phpinfo.php	curl/7.88.1         403
@@ -240,25 +241,25 @@ Plain Text
 /shell.php?cmd=./bunnylock.bin
 Show more lines
 Confirms RCE and ransomware deployment
-6. Confirm C2 Communication
+
+### 6. Confirm C2 Communication
 
 Check outbound connections:
 
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+```
 sourcetype=firewall_logs
 src_ip="10.10.1.5"
 AND dest_ip="<ATTACKER_IP>"
 AND action="ALLOWED"
 | table _time action protocol src_ip dest_ip dest_port reason
-Show more lines
-
+```
 Output:
 
 Outbound connection from compromised server
 Suspicious C2 destination port
 reason=C2_CONTACT
-7. Calculate Exfiltrated Data
+
+### 7. Calculate Exfiltrated Data
 
 Total bytes sent to C2:
 
