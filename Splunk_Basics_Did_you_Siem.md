@@ -152,6 +152,7 @@ Output: The most common client_ip should be on top if high volume of attack
 
 ### 5. Trace the Attacker
 
+From previous we see strong correlation to just a small IP range likely responsible for attack. We can focus down on paths, user_agent, times or status codes to learn more about what they were up to.
 Replace <ATTACKER_IP> with the identified IP.
 
 ```
@@ -180,8 +181,8 @@ _time	                  path	        user_agent	        status
 2025-10-12 00:28:50.198	/.git/config	zgrab/0.x           404
 2025-10-12 00:31:20.198	/phpinfo.php	Wget/1.21.4         404
 ...
-2025-10-12 05:06:42.198	/.git/config	Go-http-client/1.1	 403
-2025-10-12 00:33:30.198	/.env	        zgrab/0.x	         401
+2025-10-12 05:06:42.198	/.git/config	Go-http-client/1.1  403
+2025-10-12 00:33:30.198	/.env         zgrab/0.x           401
 ```
 
 
