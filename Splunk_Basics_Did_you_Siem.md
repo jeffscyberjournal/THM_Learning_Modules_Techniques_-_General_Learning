@@ -89,7 +89,7 @@ index=main sourcetype=web_traffic
 | sort by count
 | reverse
 ```
-Output: Identifies the attack day with the highest event volume.
+Output: Identifies the attack day with the highest event volume. 
 
 ### 4. Identify Suspicious User Agents
 
@@ -148,7 +148,7 @@ user_agent!=*Firefox*
 | head 5
 ```
 
-Output: The most common client_ip should be on top if high volume of attack
+Output: The most common client_ip should be on top if high volume of attack, in this case just one IP 198.51.100.55 listed.
 
 ### 5. Trace the Attacker
 
