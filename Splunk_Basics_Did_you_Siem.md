@@ -148,7 +148,7 @@ user_agent!=*Firefox*
 | head 5
 ```
 
-Output: The most common client_ip should be on top if high volume of attack, in this case just one IP 198.51.100.55 listed. Head here is like head Linux command, but here its top 5 lines in Linux command usually head -5 file.txt.
+Output: The most common client_ip should be on top if high volume of attack, in this case just one IP 198.51.100.55 listed. Head here is like head/tail Linux command, but here its top 5 lines, in Linux command usually head -5 file.txt.
 
 ### 5. Trace the Attacker
 
@@ -194,6 +194,18 @@ client_ip="<ATTACKER_IP>"
 AND path="*..*"
 OR path="*redirect*"
 ```
+Output example:
+```
+10/20/25
+8:24:07.198 AM	
+2025-10-20T08:24:07,198.51.100.55,GET,/download?file=../../etc/passwd,403,2884,https://tbfc.thm/,Go-http-client/1.1,tbfc.thm
+host = labsource = access.csvsourcetype = web_traffic
+10/20/25
+8:06:02.198 AM	
+2025-10-20T08:06:02,198.51.100.55,POST,/?redirect=http://evil.site,500,2070,https://tbfc.thm/,curl/7.88.1,tbfc.thm
+host = labsource = access.csvsourcetype = web_traffic
+```
+
 
 Count attempts:
 
@@ -205,6 +217,11 @@ OR path="*redirect*"
 | stats count by path
 ```
 Output: Attempts to access sensitive files such as /etc/passwd.
+```
+path	                                   Count
+/?redirect=http://evil.site	             633
+/download?file=../../etc/passwd	         658
+```
 
 SQL Injection
 
@@ -223,6 +240,16 @@ SQLMap/Havij activity
 SLEEP(5) payloads
 504 responses suggesting successful time-based SQLi
 Data Exfiltration
+
+```
+_time	path	status
+2025-10-08 00:29:28.198	/search.php?q=test'%20AND%20SLEEP(5)--	200
+2025-10-08 00:26:30.198	/search.php?q=test'%20AND%20SLEEP(5)--	200
+2025-10-07 23:34:12.198	/item.php?id=1 AND SLEEP(5)--	          504
+2025-10-07 23:14:05.198	/item.php?id=1 AND SLEEP(5)--	          500
+2025-10-07 21:31:24.198	/item.php?id=1	                        504
+
+```
 
 Look for archive downloads:
 
