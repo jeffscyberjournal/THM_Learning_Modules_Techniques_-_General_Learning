@@ -82,19 +82,30 @@ Identifies the application, browser, script, or tool making the request. This fi
 
 Daily event counts: (looking at sourcetype web_traffic for example)
 
-Run search command:
+Run search command (total counts per day from lowest to highest, use '| reverse' for highest to lowest):
 ```
 index=main sourcetype=web_traffic
 | timechart span=1d count
 | sort by count
 | reverse
 ```
-
 Output: Identifies the attack day with the highest event volume.
 
 ### 4. Identify Suspicious User Agents
 
-Exclude normal browsers:
+User_agent filters any browser normal or suspicious. For this reason, it's likely beneficial to filter out Chrome, Mozilla, Safari, firefox or what ever browsers commonly used internally. Exclude normal browsers:
+
+```
+sourcetype=web_traffic
+user_agent!=*Mozilla*
+user_agent!=*Chrome*
+user_agent!=*Safari*
+user_agent!=*Firefox*
+| stats count by client_ip
+| sort -count
+```
+- '-count' like 'reverse' can be used in to change order to highest to lowest. 
+
 ```
 Top values
 
