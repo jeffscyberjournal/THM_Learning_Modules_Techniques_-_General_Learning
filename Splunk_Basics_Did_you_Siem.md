@@ -26,8 +26,24 @@ index=main sourcetype=web_traffic
 ```
 **Key observations:**
 
-- **Events:**
-Displays the raw log events returned by the search. This is the primary workspace for investigations, allowing analysts to review individual events, inspect extracted fields, and refine searches based on findings.
+- **Search Query:**
+Searches all web traffic events in the main index to establish a baseline before narrowing the investigation.
+
+- **Time Range:**
+Set to All Time to capture the complete dataset. The range can later be reduced to focus on suspicious activity periods.
+
+- **Timeline:**
+Displays event volume over time, helping identify abnormal spikes that may correspond to attack activity.
+
+**4 Tabs Below Timeline**
+  - **Event Details & Field Extraction:**
+Displays individual log entries and their extracted values, allowing analysts to examine specific requests, tools used, targeted resources, source IPs, and server responses.
+
+  - **Selected Fields:**
+Shows default metadata fields (host, source, sourcetype) used to identify where events originated.
+
+  - **Interesting Fields:**
+Lists extracted fields useful for analysis. Key fields such as client_ip, user_agent, path, and status confirm successful parsing of the web logs and provide valuable indicators for investigating attacker behavior.
  
 - **Patterns:**
 Automatically groups similar events and highlights recurring behaviour within the results. This helps identify anomalies, common attack patterns, scanning activity, or repeated requests without manually reviewing every event.
