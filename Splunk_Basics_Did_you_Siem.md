@@ -280,37 +280,46 @@ _time	path	user_agent
 Search for webshell execution:
 
 ```
-sourcetype=web_traffic
-client_ip="<ATTACKER_IP>"
-AND path IN ("*bunnylock.bin*","*shell.php?cmd=*")
-| table _time path user_agent status
+sourcetype=web_traffic client_ip="<REDACTED>" AND path IN ("*bunnylock.bin*", "*shell.php?cmd=*")
+| table _time, path, user_agent, status
 ```
 
 Output:
 
 Successful webshell access
 Execution of:
-Plain Text
-/shell.php?cmd=./bunnylock.bin
-Show more lines
-Confirms RCE and ransomware deployment
+- Plain Text
+- /shell.php?cmd=./bunnylock.bin
+- Confirms RCE and ransomware deployment
+```
+_time	path	            user_agent                                                        status
+2025-10-20 19:32:47.198	/shell.php?cmd=whoami	Ruby/2.7.0 (Webshell Runner)	              500
+2025-10-20 16:31:24.198	/bunnylock.bin	zgrab/0.x                                         200
+2025-10-20 16:29:12.198	/shell.php?cmd=chmod%20+x%20bunnylock.bin	python-requests/2.28.1	500
+2025-10-20 15:15:30.198	/bunnylock.bin	Wget/1.21.4	                                      403
+...
+```
 
 ### 6. Confirm C2 Communication
 
 Check outbound connections:
 
 ```
-sourcetype=firewall_logs
-src_ip="10.10.1.5"
-AND dest_ip="<ATTACKER_IP>"
-AND action="ALLOWED"
-| table _time action protocol src_ip dest_ip dest_port reason
+sourcetype=firewall_logs src_ip="10.10.1.5" AND dest_ip="198.51.100.55" AND action="ALLOWED" | table _time, action, protocol, src_ip, dest_ip, dest_port, reason
 ```
 Output:
 
 Outbound connection from compromised server
 Suspicious C2 destination port
 reason=C2_CONTACT
+
+```
+_time               action	protocol	    src_ip	dest_ip	      dest_port	reason
+2025-10-20 12:59:10	ALLOWED	TCP	        10.10.1.5	198.51.100.55	8080	    C2_CONTACT
+2025-10-20 10:52:20	ALLOWED	TCP	        10.10.1.5	198.51.100.55	8080	    C2_CONTACT
+2025-10-20 06:57:40	ALLOWED	TCP	        10.10.1.5	198.51.100.55	8080	    C2_CONTACT
+...
+```
 
 ### 7. Calculate Exfiltrated Data
 
@@ -325,21 +334,47 @@ AND action="ALLOWED"
 ```
 Output: Total volume of data exfiltrated from the server.
 
-Attack Chain Summary
-Recon → Probed .env, .git, phpinfo
-Enumeration → Tested path traversal and redirects
-SQLi → Used SQLMap/Havij and time-based payloads
-Exfiltration → Downloaded backups and logs
-RCE → Accessed shell.php
-Payload Execution → Ran bunnylock.bin
-C2 Communication → Outbound connection confirmed in firewall logs
-Data Theft → Large volume transferred to attacker infrastructure
-Questions to Answer
+```
+src_ip	       sum(bytes_transferred)
+10.10.1.5	          126167
+```
 
-Use the queries above to determine:
 
-Attacker IP
-Peak traffic date (YYYY-MM-DD)
-Number of Havij user-agent events
-Number of path traversal attempts
-Total bytes transferred to the C2 server
+### Attack Chain Summary
+
+- **Identity:** Attacker identified by the highest volume of malicious web traffic from a single external IP.
+
+- **Intrusion:** Web logs (sourcetype=web_traffic) revealed a clear attack progression from reconnaissance to compromise.
+
+- **Reconnaissance:** Tools such as curl and wget probed sensitive files (/.env, .git, phpinfo.php) and tested path traversal vulnerabilities.
+
+- **Exploitation:** SQLmap and Havij user agents, along with payloads such as SLEEP(5), indicated successful SQL injection attempts.
+
+- **Payload Delivery:** The attacker executed cmd=./bunnylock.bin through a webshell, achieving their objective.
+
+- **C2 Activity:** Firewall logs (sourcetype=firewall_logs) confirmed the compromised server (10.10.1.5) established an outbound C2 connection to the attacker's IP.
+
+
+### Lab Question Answers
+
+**Q1 What is the attacker IP found attacking and compromising the web server?**
+
+198.51.100.55
+
+**Q2 Which day was the peak traffic in the logs? (Format: YYYY-MM-DD)**
+
+2025-10-12
+
+**Q3 What is the count of Havij user_agent events found in the logs?**
+
+993
+
+**Q4 How many path traversal attempts to access sensitive files on the server were observed?**
+
+658
+
+**Q5 Examine the firewall logs. How many bytes were transferred to the C2 server IP from the compromised web server?**
+
+126167
+
+**the Incident Handling With Splunk room (https://tryhackme.com/room/splunk201) is the next step building upon skills covered here.**
