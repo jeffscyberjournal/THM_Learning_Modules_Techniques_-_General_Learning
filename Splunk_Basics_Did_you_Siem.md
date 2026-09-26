@@ -15,8 +15,8 @@ View all ingested logs:
 
 There should be 2 available sourcetypes under "Selected Fields":
 
-web_traffic → Web requests to/from the server
-firewall_logs → Allowed/blocked network traffic
+- web_traffic → Web requests to/from the server
+- firewall_logs → Allowed/blocked network traffic
 
 ### 2. Initial Triage
 
