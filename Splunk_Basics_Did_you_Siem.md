@@ -1,7 +1,5 @@
 # Splunk Basics Did you Siem?
-- h
-    - --h
-* hh
+
 ## Task 1 Is just start machine and 
 
 No VM required, states "you can connect to the Splunk SIEM by visiting https://**-**-**-**.reverse-proxy.cell-prod-????.vm.tryhackme.com in your browser." 
@@ -41,10 +39,10 @@ Displays event volume over time, helping identify abnormal spikes that may corre
   - **Event Details & Field Extraction:**
 Displays individual log entries and their extracted values, allowing analysts to examine specific requests, tools used, targeted resources, source IPs, and server responses.
 
-  - **Selected Fields:**
+    - **Selected Fields:**
 Shows default metadata fields (host, source, sourcetype) used to identify where events originated.
 
-  - **Interesting Fields:**
+    - **Interesting Fields:**
 Lists extracted fields useful for analysis. Key fields such as client_ip, user_agent, path, and status confirm successful parsing of the web logs and provide valuable indicators for investigating attacker behavior.
  
 - **Patterns:**
