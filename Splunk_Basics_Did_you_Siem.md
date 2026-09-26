@@ -166,38 +166,34 @@ _time	                  path	        user_agent	        status
 
 Find traversal and redirect testing:
 
-Apache Config
-spl isn’t fully supported. Syntax highlighting is based on Apache Config.
+```
 sourcetype=web_traffic
 client_ip="<ATTACKER_IP>"
 AND path="*..*"
 OR path="*redirect*"
-Show more lines
+```
 
 Count attempts:
 
-Apache Config
-spl isn’t fully supported. Syntax highlighting is based on Apache Config.
+```
 sourcetype=web_traffic
 client_ip="<ATTACKER_IP>"
 AND path="*..\/..\/*"
 OR path="*redirect*"
 | stats count by path
-Show more lines
-
+```
 Output: Attempts to access sensitive files such as /etc/passwd.
 
 SQL Injection
 
 Search for SQLMap/Havij:
 
-Apache Config
-spl isn’t fully supported. Syntax highlighting is based on Apache Config.
+```
 sourcetype=web_traffic
 client_ip="<ATTACKER_IP>"
 AND user_agent IN ("*sqlmap*","*Havij*")
 | table _time path status
-Show more lines
+```
 
 Output:
 
@@ -208,14 +204,12 @@ Data Exfiltration
 
 Look for archive downloads:
 
-Apache Config
-spl isn’t fully supported. Syntax highlighting is based on Apache Config.
+```
 sourcetype=web_traffic
 client_ip="<ATTACKER_IP>"
 AND path IN ("*backup.zip*","*logs.tar.gz*")
 | table _time path user_agent
-`
-Show more lines
+```
 
 Output:
 
@@ -225,13 +219,12 @@ Webshell & Ransomware
 
 Search for webshell execution:
 
-Apache Config
-spl isn’t fully supported. Syntax highlighting is based on Apache Config.
+```
 sourcetype=web_traffic
 client_ip="<ATTACKER_IP>"
 AND path IN ("*bunnylock.bin*","*shell.php?cmd=*")
 | table _time path user_agent status
-Show more lines
+```
 
 Output:
 
@@ -263,16 +256,13 @@ reason=C2_CONTACT
 
 Total bytes sent to C2:
 
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+```
 sourcetype=firewall_logs
 src_ip="10.10.1.5"
 AND dest_ip="<ATTACKER_IP>"
 AND action="ALLOWED"
 | stats sum(bytes_transferred) by src_ip
-`
-Show more lines
-
+```
 Output: Total volume of data exfiltrated from the server.
 
 Attack Chain Summary
