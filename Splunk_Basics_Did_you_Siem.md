@@ -245,8 +245,8 @@ Data Exfiltration
 _time	path	status
 2025-10-08 00:29:28.198	/search.php?q=test'%20AND%20SLEEP(5)--	200
 2025-10-08 00:26:30.198	/search.php?q=test'%20AND%20SLEEP(5)--	200
-2025-10-07 23:34:12.198	/item.php?id=1 AND SLEEP(5)--	          504
-2025-10-07 23:14:05.198	/item.php?id=1 AND SLEEP(5)--	          500
+2025-10-07 23:34:12.198	/item.php?id=1 AND SLEEP(5)--	         504
+2025-10-07 23:14:05.198	/item.php?id=1 AND SLEEP(5)--	         500
 2025-10-07 21:31:24.198	/item.php?id=1	                        504
 
 ```
@@ -265,6 +265,17 @@ Output:
 Downloads via curl, zgrab, etc.
 Evidence of data theft
 Webshell & Ransomware
+
+```
+_time	path	user_agent
+2025-10-20 21:41:04.198	/logs.tar.gz	zgrab/0.x
+2025-10-20 14:53:46.198	/logs.tar.gz	Wget/1.21.4
+2025-10-20 09:32:28.198	/logs.tar.gz	curl/7.88.1
+2025-10-20 03:20:55.198	/logs.tar.gz	zgrab/0.x
+2025-10-20 01:30:46.198	/logs.tar.gz	Go-http-client/1.1
+...
+```
+
 
 Search for webshell execution:
 
