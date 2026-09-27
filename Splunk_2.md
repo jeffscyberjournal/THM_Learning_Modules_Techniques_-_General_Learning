@@ -238,8 +238,7 @@ search using
 ```
 index="botsv2"  amber  sourcetype="pan:traffic"
 ```
-there is only  1 ip for src_ip or client_ip likely related to amber
-10.0.2.101
+There is only 1 IP for src_ip or client_ip likely related to amber: 10.0.2.101
 
 Using that with further search:
 
@@ -249,6 +248,20 @@ leads to just one site: www.berkbeer.com
 
 **Q2 Amber found the executive contact information and sent him an email. What image file displayed the executive's contact information? Answer example: /path/image.ext**
 
+Using the website found:
+
+index="botsv2" 10.0.2.101 sourcetype="stream:HTTP" www.berkbeer.com
+Then selecting the uri_path field in interesting fields there are 12 files. One most likely labelled ceoberk.png is likely the image with the email address.
+/images/ceoberk.png
+
+```
+Top 10 Values             Count 	% 	 
+/                         1       8.333% 	
+/favicon.ico              1       8.333% 	
+/images/bgimg01.jpg       1       8.333% 	
+/images/ceoberk.png       1       8.333% 	
+...
+```
 
 **Q3 What is the CEO's name? Provide the first and last name.**
 
