@@ -108,26 +108,33 @@ In this context, the metadata section is mainly included to demonstrate a Splunk
 
 Scenario: Investigate Amber Turing's communications with a potential competitor and identify the website visited, emails exchanged, contacts involved, and files sent.
 
-Q1: Identify the Competitor Website
+### Q1: Identify the Competitor Website
+
 1. Find Amber's IP Address
 
 Search for references to Amber:
-
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+```
 index="botsv2" amber
-Show more lines
+```
 
 Focus on PAN traffic logs:
-
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+```
 index="botsv2" sourcetype="pan:traffic"
-Show more lines
-
+```
 Output: Amber's IP address.
 
-2. Review Amber's HTTP Activity
+**NOTE: pan:traffic is the Palo Alto Networks firewall traffic log sourcetype.**
+
+Remember from the BOTSv2 description: - A Palo Alto Networks Next-Generation Firewall (NGFW) was deployed to capture network traffic and provide web proxy services.
+
+Those logs are ingested into Splunk as:
+```
+sourcetype=pan:traffic
+```
+
+
+
+### 2. Review Amber's HTTP Activity
 
 Replace IPADDR with Amber's IP address:
 
@@ -222,3 +229,39 @@ CEO's email address
 Second employee's email address
 File attachment sent by Amber
 Amber's personal email address
+
+### Lab Question Answers
+
+**Q1 Amber Turing was hoping for Frothly to be acquired by a potential competitor which fell through, but visited their website to find contact information for their executive team. What is the website domain that she visited?**
+
+search using 
+```
+index="botsv2"  amber  sourcetype="pan:traffic"
+```
+there is only  1 ip for src_ip or client_ip likely related to amber
+10.0.2.101
+
+Using that with further search:
+
+index="botsv2" 10.0.2.101 sourcetype="stream:HTTP" *beer*
+
+leads to just one site: www.berkbeer.com
+
+**Q2 Amber found the executive contact information and sent him an email. What image file displayed the executive's contact information? Answer example: /path/image.ext**
+
+
+**Q3 What is the CEO's name? Provide the first and last name.**
+
+
+**Q4 What is the CEO's email address?**
+
+
+**Q5 After the initial contact with the CEO, Amber contacted another employee at this competitor. What is that employee's email address?**
+
+
+
+**Q6 What is the name of the file attachment that Amber sent to a contact at the competitor?**
+
+
+
+**Q7 What is Amber's personal email address?**
