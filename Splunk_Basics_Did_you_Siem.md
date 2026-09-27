@@ -2,7 +2,7 @@
 
 ## Task 1 Is just start machine and 
 
-No VM required, states "you can connect to the Splunk SIEM by visiting https://**-**-**-**.reverse-proxy.cell-prod-????.vm.tryhackme.com in your browser." 
+No VM required, states "you can connect to the Splunk SIEM by visiting (given when thm target is started, https://lab_web_url.p.thmlabs.com/) in your browser." 
 
 ## Task 2 Log Analysis with Splunk
 
