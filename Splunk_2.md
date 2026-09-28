@@ -165,8 +165,47 @@ Top 10 Values             Count 	%
 
 **Q3 What is the CEO's name? Provide the first and last name.**
 
+```
+index="botsv2" sourcetype="stream:smtp" amber
+```
+Filters down 26 smtp related events linked to word amber.
 
+For what ever reason regex does not seem to work well with filtering, the image in previous question however is called ceoberk which is a clue worth trying. Using berk instead of amber leads to just one event with smtp making sense its from sender 
+
+```
+index="botsv2" sourcetype="stream:smtp" berk
+```
+
+from the the line "Give me a call this afternoon if you= are free.=C2=A0=0A=0AMartin Berk"
+```
+
+     Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+
+     Hello Amber,=C2=A0=0A=0AGreat to hear from you, yes it is unfortunate th=
+e way things turned=0Aout. It would be great to speak with you directly,=
+ I would also like=0Ato have Bernhard on the call as I think he might ha=
+ve some questions=0Afor you. =C2=A0Give me a call this afternoon if you=
+ are free.=C2=A0=0A=0AMartin Berk=0ACEO=0A777.222.8765=0Amberk@berkbeer.=
+com=0A=0A----- Original Message -----=0AFrom: "Amber Turing" <aturing@fr=
+oth.ly>=0ATo:"mberk@berkbeer.com" <mberk@berkbeer.com>=0ACc:=0ASent:Fri,=
+ 11 Aug 2017 15:49:01 +0000=0ASubject:Amber from Froth.ly=0A=0A=09Mr. Be=
+rnhard,=0A=0A=09=C2=A0=C2=A0 I was very sorry to hear about the acquisit=
+ion falling through.=0AI was very excited to work with you in the future=
+.. I have to admit, I=0Aam a little worried about my future here. I=E2=80=
+=99d love to talk to you=0Aabout some information I have regarding my wo=
+rk.=0A=0A Amber Turing=0A Principal Scientist=0A 867.322.1123=0A Froth.l=
+y=0A=0A=09
+
+--=_8177b74425496b166cbde61bd37bbf96
+
+     Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+```
 **Q4 What is the CEO's email address?**
+
+
 
 
 **Q5 After the initial contact with the CEO, Amber contacted another employee at this competitor. What is that employee's email address?**
