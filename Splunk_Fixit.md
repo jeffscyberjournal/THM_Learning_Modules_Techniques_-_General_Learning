@@ -3,7 +3,6 @@
 The Fixit TryHackMe module introduces basic network and system troubleshooting techniques. It teaches you how to investigate and resolve common issues by analyzing logs, checking configurations, validating services, and using troubleshooting tools. The room focuses on developing a structured approach to identifying the root cause of problems, helping learners build practical diagnostic skills that are useful in both IT support and cybersecurity environments.
 
 Skip Task 1 it's just connection information to target.
-Here the THM attach box is fine with no reason for log in to person VM here
 
 ## Task 2 The Fixit Challenge
 
@@ -23,7 +22,7 @@ using a simple index = main in example we get the following example of events bo
 ```  
 The text in the second event actually belongs to the end of a previous log message. Because Splunk does not know where the log entries officially start and stop, it treated that trailing sentence fragment as a brand-new, standalone log entry.
 
-Once you properly apply BREAK_ONLY_BEFORE = \[Network-log\]:, Splunk will stop creating these broken, fragmented events and cleanly merge those lines together.
+Once you properly apply **BREAK_ONLY_BEFORE = \[Network-log\]:**, Splunk will stop creating these broken, fragmented events and cleanly merge those lines together.
 
 **Phase 2: Extracting Custom Fields**
 
@@ -42,14 +41,16 @@ The core objective of Phase 2 is to extract specific, meaningful fields from the
 ```
 [Network-log]: User named Emily Clark from Finance department accessed the resource Cybertees.THM/contact.html from the source IP 192.168.1.4 and country 
 Japan at: Mon Dec  1 10:13:38 2025
+
 [Network-log]: User named Robert Wilson from HR department accessed the resource Cybertees.THM/signup.html from the source IP 10.0.0.2 and country 
 Germany at: Mon Dec  1 10:13:42 2025
+
 [Network-log]: User named Patricia Allen from Finance department accessed the resource Cybertees.THM/checkout.html from the source IP 172.16.0.1 and country 
 Mexico at: Mon Dec  1 10:13:48 2025
 ```
 **Phase 3: Analyzing Event Data**
 
-Use Splunk search queries (SPL) on your freshly parsed and structured logs to investigate network activity and answer the final challenge questions.
+Use Splunk search queries (SPL) on your restructured logs to investigate network activity and answer the final challenge questions.
 
 ### Lab Question Answers
 
@@ -57,8 +58,8 @@ Use Splunk search queries (SPL) on your freshly parsed and structured logs to in
 
 /opt/splunk/etc/apps/fixit
 
-**Q2 Investigate the inputs.conf configuration file of the Fixit app.**
-What is the full path of the network-logs script?
+**Q2 Investigate the inputs.conf configuration file of the Fixit app.
+What is the full path of the network-logs script?**
 
 /opt/splunk/etc/apps/fixit/bin/network-logs
 
