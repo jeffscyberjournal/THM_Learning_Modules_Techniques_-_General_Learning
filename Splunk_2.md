@@ -13,96 +13,19 @@ This one run from attack box or VM.
 
 In this scenario, you take the role of Alice Bluebird, a security analyst assisting Frothly with investigating security incidents using Splunk.
 
-### What Kinds of Events Do We Have?
-
-Use the metadata command to quickly discover the data available in an index. It provides information similar to Splunk's Data Summary, including:
-
-- Available sourcetypes
-- Event counts
-- First and last observed events
-
-**Note:** Timestamps are returned in **epoch format**, so eval and strftime() are used to convert them into a readable date/time format.
-
-```
+### What Data Is Available?
+ 
+The `metadata` command provides a high-level summary of the data available within an index, similar to Splunk's Data Summary view. In this example, it is used to list the available sourcetypes in the `botsv2` index, along with their event counts and the first and last times data was observed.
+ 
+The timestamp fields returned by `metadata` are stored as Unix epoch values. The `eval` command with `strftime()` is used to convert these timestamps into a human-readable date and time format.
+ 
+```spl
 | metadata type=sourcetypes index=botsv2
 | eval firstTime=strftime(firstTime,"%Y-%m-%d %H:%M:%S")
 | eval lastTime=strftime(lastTime,"%Y-%m-%d %H:%M:%S")
 | eval recentTime=strftime(recentTime,"%Y-%m-%d %H:%M:%S")
 | sort - totalCount
 ```
-**Purpose**
-
-This query inventories the **BOTSv2** dataset by listing all available sourcetypes, their event counts, and the first/last times data was seen, helping analysts understand available data before beginning a hunt.
-
-**Why does THM start with metadata in the search command here?**
-
-The room is teaching a standard investigation workflow:
-
-1. What data do I have? ← metadata
-2. Which sourcetypes matter? ← metadata type=sourcetypes
-3. Search those sourcetypes ← index=botsv2 ...
-4. Investigate
-
-This just raises confusion as index is a sub category of one or more of the sub categories, and basically requires digging to find which ones are available. 
-
-But in a real unknown environment, there's a missing step:
-
-Real Workflow
--------------
-1. What indexes exist?
-2. What data do I have in those indexes?
-3. Which sourcetypes matter?
-4. Search events
-5. Investigate
-
-**Running | metadata on its own will raise error it must have a type,** there are only three valid type= values:
-**Note: metadata must also start with pipe also!**
-```
-| metadata type=hosts
-| metadata type=sources
-| metadata type=sourcetypes
-```
-
-### Why metadata Exists
-
-Imagine being dropped into an unfamiliar Splunk environment. You may not know whether HTTP, DNS, Sysmon, email, firewall, or IDS logs are available.
-
-So you first run:
-```
-| metadata type=sourcetypes
-```
-to get a high-level inventory of available log categories (sourcetypes). From the results, you might discover:
-```
-stream:http
-stream:smtp
-pan:traffic
-suricata
-XmlWinEventLog:Microsoft-Windows-Sysmon/Operational
-```
-
-You can then investigate specific data sources:
-```
-index=botsv2 sourcetype="stream:http"
-```
-or
-```
-index=botsv2 sourcetype="stream:smtp"
-```
-
-**Limitation**
-
-metadata only inventories hosts, sources, and sourcetypes. It does not discover indexes, show events, expose fields, or tell you which index a sourcetype belongs to. In a truly unknown environment, index discovery must usually happen separately.
-
-**For this THM room**
-
-You can realistically skip metadata and start with:
-```
-index=botsv2
-...
-```
-because the exercise already tells you the relevant sourcetypes (pan:traffic, stream:HTTP, stream:smtp).
-
-In this context, the metadata section is mainly included to demonstrate a Splunk data-discovery technique rather than to help solve the challenge.
 
 ## Task 3 100 Series Questions (BOTSv2) - Summary
 
