@@ -34,7 +34,7 @@ Use the metadata command to quickly discover the data available in an index. It 
 
 This query inventories the **BOTSv2** dataset by listing all available sourcetypes, their event counts, and the first/last times data was seen, helping analysts understand available data before beginning a hunt.
 
-**Why does THM start with metadata in the search command here?*
+**Why does THM start with metadata in the search command here?**
 
 The room is teaching a standard investigation workflow:
 
