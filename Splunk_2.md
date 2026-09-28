@@ -133,16 +133,24 @@ index="botsv2"  amber  sourcetype="pan:traffic"
 There is only 1 IP for src_ip or client_ip likely related to amber: 10.0.2.101
 
 Using that with further search:
-
+```
 index="botsv2" 10.0.2.101 sourcetype="stream:HTTP" *beer*
-
+```
+Add dedup site to filter further
+```
+index="botsv2" 10.0.2.101 sourcetype="stream:HTTP" *beer* 
+| table site 
+| dedup site
+```
 leads to just one site: www.berkbeer.com
 
 **Q2 Amber found the executive contact information and sent him an email. What image file displayed the executive's contact information? Answer example: /path/image.ext**
 
 Using the website found:
-
+```
 index="botsv2" 10.0.2.101 sourcetype="stream:HTTP" www.berkbeer.com
+| table uri_path
+```
 Then selecting the uri_path field in interesting fields there are 12 files. One most likely labelled ceoberk.png is likely the image with the email address.
 /images/ceoberk.png
 
