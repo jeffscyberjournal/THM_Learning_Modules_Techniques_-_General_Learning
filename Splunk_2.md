@@ -89,9 +89,8 @@ index="botsv2" IPADDR sourcetype="stream:HTTP" *INDUSTRY*
 ```
 Output: Typically narrows results to the competitor website.
 
-### Q2-Q7: Investigate Competitor Communications
-
 ### 4. Focus on Traffic to the Competitor Website
+
 ```
 index="botsv2" IPADDR sourcetype="stream:HTTP" COMPETITOR_WEBSITE
 ```
@@ -105,11 +104,10 @@ index="botsv2" IPADDR sourcetype="stream:HTTP" COMPETITOR_WEBSITE
 ```
 Output: URLs visited, including pages containing executive contact information.
 
-### 5. Find Amber's Email Address
+### 5. Investigate Email Communications
 
 Identify Amber's email from previous results and use it for SMTP searches.
 
-### 6. Investigate Email Communications
 ```
 index="botsv2" sourcetype="stream:smtp" AMBERS_EMAIL COMPETITOR_WEBSITE
 ```
