@@ -316,7 +316,7 @@ index=main sourcetype=network_logs
 
 **Q12 Which user accessed the secret-document.pdf on your client's server?**
 
-Selecting the URI will list the files but (top 10   2 others in rarest listsince 12 requires selecting rarest URI for other 2 listed. But can filter Username connected to the URI using the following: 
+Selecting the URI will list the files but (top 10,   2 others in rarest). But can filter Username connected to the URI using the following: 
 ```
 index=main sourcetype=network_logs "secret-document.pdf"
 | table Username
