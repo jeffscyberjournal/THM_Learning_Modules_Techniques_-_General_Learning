@@ -91,9 +91,9 @@ Start of each event starts with [Network-logs]: this is pattern of interest here
 
 Breaking down the required pattern:
 
-- \[ escapes the opening square bracket so the regex treats it as a literal character.
+- **\[** escapes the opening square bracket so the regex treats it as a literal character.
 Network-log matches the event identifier.
-- \] escapes the closing square bracket.
+- **\]** escapes the closing square bracket.
 
 Answer required is ^\[Network-log\]:
 
