@@ -58,25 +58,18 @@ sourcetype=pan:traffic
 ### 2. Review Amber's HTTP Activity
 
 Replace IPADDR with Amber's IP address:
-
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+```
 index="botsv2" IPADDR sourcetype="stream:HTTP"
-Show more lines
-
+```
 Output: HTTP requests made by Amber.
 
-3. List Unique Websites Visited
+### 3. List Unique Websites Visited
 
 Remove duplicates and display sites:
-
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
-index="botsv2" IPADDR sourcetype="stream:HTTP"
+```index="botsv2" IPADDR sourcetype="stream:HTTP"
 | dedup site
 | table site
-Show more lines
-
+```
 Output:
 
 sitewebsite1
