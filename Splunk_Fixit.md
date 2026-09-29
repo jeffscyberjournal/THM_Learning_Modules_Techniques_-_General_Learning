@@ -296,16 +296,12 @@ SourceIP
 ...
 Events with this field
 Top 10 Values 	Count 	% 	 
-192.168.1.4 	3 	6.977% 	
+192.168.1.4 	3 	6.977% 
+...	
 10.0.0.2 		2 	4.651% 	
-10.0.0.3 		2 	4.651% 	
+...
 172.16.0.2 		2 	4.651% 	
-172.16.0.3 		2 	4.651% 	
-172.16.0.7 		2 	4.651% 	
-172.16.0.8 		2 	4.651% 	
-172.16.0.9 		2 	4.651% 	
-192.168.0.1 	2 	4.651% 	
-192.168.0.11 	2 	4.651% 	
+... 		
 ```
 This still shows 3 ip ranges but only TOP 10 listed. To show full range use statistics view, result will be same. Class A, B and C Ip ranges.
 ```
