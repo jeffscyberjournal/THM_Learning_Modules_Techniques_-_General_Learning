@@ -1,13 +1,10 @@
 # Splunk 2
 
-
-## Task 1 
-
 **BOTSv2 Dataset:**
 
 BOTSv2 is a realistic Splunk security dataset containing Windows endpoint logs, Sysmon events, firewall data, network traffic, and IDS alerts. It is used to practice SOC investigations, threat hunting, incident response, and SPL query analysis within Splunk.
 
-This one run from attack box or VM.
+Task 1: Run from attack box or VM.
 
 ## Task 2 Dive into the Data
 
@@ -19,7 +16,7 @@ The `metadata` command provides a high-level summary of the data available withi
  
 The timestamp fields returned by `metadata` are stored as Unix epoch values. The `eval` command with `strftime()` is used to convert these timestamps into a human-readable date and time format.
  
-```spl
+```
 | metadata type=sourcetypes index=botsv2
 | eval firstTime=strftime(firstTime,"%Y-%m-%d %H:%M:%S")
 | eval lastTime=strftime(lastTime,"%Y-%m-%d %H:%M:%S")
@@ -27,7 +24,7 @@ The timestamp fields returned by `metadata` are stored as Unix epoch values. The
 | sort - totalCount
 ```
 
-## Task 3 100 Series Questions (BOTSv2) - Summary
+## Task 3 100 Series Questions (BOTSv2) 
 
 Scenario: Investigate Amber Turing's communications with a potential competitor and identify the website visited, emails exchanged, contacts involved, and files sent.
 
