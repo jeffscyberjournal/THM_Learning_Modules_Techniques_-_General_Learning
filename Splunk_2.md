@@ -24,7 +24,7 @@ The timestamp fields returned by `metadata` are stored as Unix epoch values. The
 | sort - totalCount
 ```
 
-## Task 3 100 Series Questions (BOTSv2) 
+## Task 3 100 Series Questions
 
 Scenario: Investigate Amber Turing's communications with a potential competitor and identify the website visited, emails exchanged, contacts involved, and files sent.
 
