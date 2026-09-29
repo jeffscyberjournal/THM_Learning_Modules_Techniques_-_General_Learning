@@ -172,13 +172,9 @@ For what ever reason regex does not seem to work well with filtering, the image 
 ```
 index="botsv2" sourcetype="stream:smtp" berk
 ```
-
-from the the line "Give me a call this afternoon if you= are free.=C2=A0=0A=0AMartin Berk"
+- From content_body section in the line "Give me a call this afternoon if you= are free.=C2=A0=0A=0AMartin Berk..."
 ```
-
-     Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
+     --=_8177b74425496b166cbde61bd37bbf96
 
      Hello Amber,=C2=A0=0A=0AGreat to hear from you, yes it is unfortunate th=
 e way things turned=0Aout. It would be great to speak with you directly,=
@@ -195,22 +191,69 @@ ion falling through.=0AI was very excited to work with you in the future=
 rk.=0A=0A Amber Turing=0A Principal Scientist=0A 867.322.1123=0A Froth.l=
 y=0A=0A=09
 
---=_8177b74425496b166cbde61bd37bbf96
+     <html><body style=3D"font-family: Helvetica,Arial,sans-serif; font-size:=
+ 12px;">Hello Amber,=C2=A0<div><br></div><div>Great to hear from you, ye=
+s it is unfortunate the way things turned out. It would be great to spea=
+k with you directly, I would also like to have Bernhard on the call as I=
+ think he might have some questions for you. =C2=A0Give me a call this a=
+fternoon if you are free.=C2=A0</div><div><br></div><div>Martin Berk</di=
+v><div>CEO</div><div>777.222.8765</div><div>mberk@berkbeer.com<br><br><b=
+lockquote class=3D"atmailquote"><br>----- Original Message -----<br><div=
+ id=3D"origionalMessageFromField" style=3D"width:100%;display:inline;bac=
+kground:rgb(228,228,228);"><div style=3D"display:inline;font-weight:bold=
+;">From:</div> "Amber Turing" &lt;aturing@froth.ly&gt;</div><br><div id=
+=3D"origionalMessageToField" style=3D"display:inline;font-weight:bold;">=
+To:</div>"mberk@berkbeer.com" &lt;mberk@berkbeer.com&gt;<br><div id=3D"o=
+rigionalMessageSentField" style=3D"display:inline;font-weight:bold;">Cc:=
+</div><br><div style=3D"display:inline;font-weight:bold;">Sent:</div>Fri=
+, 11 Aug 2017 15:49:01 +0000<br><div id=3D"origionalMessageSubjectField"=
+ style=3D"display:inline;font-weight:bold;">Subject:</div>Amber from Fro=
+th.ly<br><br><br><div class=3D"WordSection1">=0A<p class=3D"MsoNormal">M=
+r. Bernhard,</p><p></p>=0A<p class=3D"MsoNormal">=C2=A0=C2=A0 I was very=
+ sorry to hear about the acquisition falling through. I was very excited=
+ to work with you in the future. I have to admit, I am a little worried=
+ about my future here. I=E2=80=99d love to talk to you about some inform=
+ation I have regarding=0A my work.<br><br>=0AAmber Turing<br>=0APrincipa=
+l Scientist<br>=0A867.322.1123<br>=0AFroth.ly</p><p></p>=0A</div>=0A=0A=
+=09</blockquote></div></body></html>
 
-     Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 ```
 **Q4 What is the CEO's email address?**
+This is in the same content_body or sender, sender_email section of event.
 
+"mberk@berkbeer.com"
 
 
 
 **Q5 After the initial contact with the CEO, Amber contacted another employee at this competitor. What is that employee's email address?**
 
+Another employee email address assuming same domain @berkbeer in place of berk in previous search, 6 results found:
+```
+index="botsv2" sourcetype="stream:smtp" @berkbeer.com
+```
+Out of the 6 after the last one from CEO, there is a 3 events, 
 
+- At 8/29/17 11:03:08.879 AM CEO sends email to amber
+- At 8/29/17 11:08:20.763 AM a relay packet from 
+      - receiver_rcpt_to: [ [-]
+     ubuntu@ec2-34-212-75-178.us-west-2.compute.amazonaws.com
+      - sender_mail_from: hbernhard@berkbeer.com 
+- At 8/29/17 11:08:20.962 AM Only 0.2 seconds later email from sender: hbernhard@berkbeer.com, sent to Amber appears
+- At 8/30/17 3:08:00.075 PM Amber replies to this email from hbernhard@berkbeer.com
 
 **Q6 What is the name of the file attachment that Amber sent to a contact at the competitor?**
 
-
+Email sent at 8/30/17 3:08:00.075 PM From Amber contains the attackment:
+```
+ attach_filename: [ [-]
+     Saccharomyces_cerevisiae_patent.docx 
+```
 
 **Q7 What is Amber's personal email address?**
+The last email sent from Amber in the content body contains base64 code, in it is a section:
+
+```
+Thanks for taking the time today, As discussed here is the document I was referring to.&nbsp; Probably better to take this offline. Email me from now on at
+<a href="mailto:ambersthebest@yeastiebeastie.com">ambersthebest@yeastiebeastie.com</a>
+```
+```
