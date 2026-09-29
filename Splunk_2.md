@@ -114,9 +114,8 @@ Useful fields may include:
 ```
 | table sender recipient subject attachment
 ```
-Output:
 
-sender	recipient	subject	attachment
+This assumes the fields are available for selection within the events. Splunk does not allow you to select these fields directly. Instead, you must use "Extract New" from the Interesting Fields panel and choose a sample event that contains the desired field. You can then create the extraction using either a regular expression (regex) or delimiter-based extraction. In this case, comma-delimited extraction works correctly.
 
 
 ### Lab Question Answers
@@ -141,6 +140,9 @@ index="botsv2" 10.0.2.101 sourcetype="stream:HTTP" *beer*
 ```
 leads to just one site: www.berkbeer.com
 
+
+
+
 **Q2 Amber found the executive contact information and sent him an email. What image file displayed the executive's contact information? Answer example: /path/image.ext**
 
 Using the website found:
@@ -159,6 +161,8 @@ Top 10 Values             Count 	%
 /images/ceoberk.png       1       8.333% 	
 ...
 ```
+
+
 
 **Q3 What is the CEO's name? Provide the first and last name.**
 
@@ -216,8 +220,9 @@ r. Bernhard,</p><p></p>=0A<p class=3D"MsoNormal">=C2=A0=C2=A0 I was very=
 ation I have regarding=0A my work.<br><br>=0AAmber Turing<br>=0APrincipa=
 l Scientist<br>=0A867.322.1123<br>=0AFroth.ly</p><p></p>=0A</div>=0A=0A=
 =09</blockquote></div></body></html>
-
 ```
+
+
 **Q4 What is the CEO's email address?**
 
 This is in the same content_body or sender, sender_email section of event.
@@ -242,9 +247,11 @@ Out of the 6 after the last one from CEO, there is a 3 events,
 - At 8/29/17 11:08:20.962 AM Only 0.2 seconds later email from sender: hbernhard@berkbeer.com, sent to Amber appears
 - At 8/30/17 3:08:00.075 PM Amber replies to this email from hbernhard@berkbeer.com
 
+
+
 **Q6 What is the name of the file attachment that Amber sent to a contact at the competitor?**
 
-Email sent at 8/30/17 3:08:00.075 PM From Amber contains the attackment:
+Email sent at 8/30/17 3:08:00.075 PM from Amber contains the attackment:
 ```
  attach_filename: [ [-]
      Saccharomyces_cerevisiae_patent.docx 
