@@ -250,10 +250,13 @@ Email sent at 8/30/17 3:08:00.075 PM From Amber contains the attackment:
 ```
 
 **Q7 What is Amber's personal email address?**
-The last email sent from Amber in the content body contains base64 code, in it is a section:
+
+The last email sent from Amber in the contain_body section there is base64 code, in it is a section:
 
 ```
-Thanks for taking the time today, As discussed here is the document I was referring to.&nbsp; Probably better to take this offline. Email me from now on at
+...
+<p class="MsoNormal">Thanks for taking the time today, As discussed here is the document I was referring to.&nbsp; Probably better to take this offline. Email me from now on at
 <a href="mailto:ambersthebest@yeastiebeastie.com">ambersthebest@yeastiebeastie.com</a>
+...
 ```
 
