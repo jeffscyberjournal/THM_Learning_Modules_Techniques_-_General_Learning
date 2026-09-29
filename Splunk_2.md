@@ -43,7 +43,7 @@ index="botsv2" sourcetype="pan:traffic"
 ```
 Output: Amber's IP address.
 
-**NOTE:** `pan:traffic` is the Palo Alto Networks firewall traffic log sourcetype. It contains network connection information recorded by a Palo Alto Networks firewall, including source and destination IP addresses, ports, applications, actions, and web traffic details.
+**NOTE:** `pan:traffic` is the Palo Alto Networks firewall traffic log sourcetype. It contains network connection information recorded by a Palo Alto Networks firewall, including the usual source and destination IP addresses, ports, applications, actions, and web traffic details.
 
 Those logs are ingested into Splunk as:
 ```
