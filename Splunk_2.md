@@ -340,6 +340,21 @@ Leads to IP for www.brewertalk.com, src_ip: 52.40.10.231:
    src_port: 57245
    status: 200 
 ```
+The Scr_IP most likely performing a vulnerability assessment on www.brewertalk.com
+```
+index="botsv2" "www.brewertalk.com"
+```
+The most likely IP scanning this site is 45.77.65.211
+```
+Top 10 Values 	Count 	% 	 
+45.77.65.211  8,965 	83.395% 	
+172.31.10.10    909 	8.456% 	
+52.40.10.231    322 	2.995% 	
+10.0.2.109      233 	2.167% 	
+71.39.18.125    133 	1.237% 	
+52.42.208.228    82 	0.763% 	
+174.209.13.154   77 	0.716%
+```
 ### Questions 4 & 5: Attack URI and SQL Function
 
 Using the attacker IP from Question 3:
