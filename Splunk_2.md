@@ -342,45 +342,94 @@ Leads to IP for www.brewertalk.com, src_ip: 52.40.10.231:
 ```
 The Scr_IP most likely performing a vulnerability assessment on www.brewertalk.com
 ```
-index="botsv2" "www.brewertalk.com"
+index="botsv2" "www.brewertalk.com" sourcetype="stream:http"
 ```
 Selecting the src_ip field lists source IP connecting to this site. The most likely IP scanning this site is 45.77.65.211.
 ```
-Top 10 Values 	Count 	% 	 
-45.77.65.211  8,965 	83.395% 	
-172.31.10.10    909 	8.456% 	
-52.40.10.231    322 	2.995% 	
-10.0.2.109      233 	2.167% 	
-71.39.18.125    133 	1.237% 	
-52.42.208.228    82 	0.763% 	
-174.209.13.154   77 	0.716%
+Top 10 Values    Count 	% 	 
+45.77.65.211     4,853   85.29% 	
+52.40.10.231     317     5.571% 	
+172.31.10.10     303     5.325% 	
+10.0.2.109       90      1.582% 	
+71.39.18.125     89      1.564% 	
+174.209.13.154   23      0.404% 	
+136.0.2.138      12      0.211% 	
+136.0.0.125      3       0.053%
+...
 ```
+Alternatively search by count with src_ip:
+```
+index="botsv2" source="stream:http" "www.brewertalk.com"
+| stats count by src_ip 
+| sort -count
+```
+
 ### Questions 4 & 5: Attack URI and SQL Function
 
 Using the attacker IP from Question 3:
-
-Command
-
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+```
 index="botsv2" src_ip="ATTACKER_IP"
 Show more lines
 
 Tip: Set Sampling to 1:100 to avoid query cancellation.
 
-This returns over 18,000 events. Use Interesting Fields to identify the targeted URI path.
+This returns over 140,000 events. Use Interesting Fields to identify the targeted URI path. 
 
 Then refine the search:
-
-Command
-
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+```
 index="botsv2" src_ip="ATTACKER_IP" uri_path="URI_PATH"
- 
-Show more lines
+```
+Or try view stats of uri_path and reduce total events by filtering with source="stream:http" 
+```
+index="botsv2" source="stream:http" src_ip="45.77.65.211" 
+| stats count by uri_path 
+| sort -count
+```
+members.php is most likely with out sampling its close to 662.
+```
+uri_path       count
+/member.php	662
+/search.php	164
+/	          47
+/admin/	     6
+```
+
 
 Review the results to determine the SQL function being abused.
+
+```
+8/16/17
+3:25:19.017 PM	
+{ [-]
+   bytes: 3992
+   bytes_in: 884
+   bytes_out: 3108
+   dest_ip: 172.31.4.249
+   dest_mac: 0A:42:7E:25:21:B4
+   dest_port: 80
+   endtime: 2017-08-16T15:25:19.017145Z
+   flow_id: 52283054-ec82-43ad-a2b5-359c626e2743
+   form_data: regcheck1=&regcheck2=true&username=makman&password=mukarram&password2=mukarram&email=mak@live.com&email2=mak@live.com&referrername=&imagestring=F7yR4&imagehash=1c1d0e6eae9c113f4ff65339e4b3079c&answer=4&allownotices=1&receivepms=1&pmnotice=1&subscriptionmethod=0&timezoneoffset=0&dstcorrection=2&regtime=1416039333&step=registration&action=do_register&regsubmit=Submit Registration!&question_id=makman' and updatexml(NULL,concat (0x3a,(SUBSTRING((SELECT password FROM mybb_users ORDER BY UID LIMIT 5,1), 32, 31))),NULL) and '1
+   http_comment: HTTP/1.1 503 Service Temporarily Unavailable
+   http_content_length: 2194
+   http_content_type: text/html; charset=UTF-8
+   http_method: POST
+   http_user_agent: Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.17 Safari/537.36
+   protocol_stack: ip:tcp:http
+   server: Apache/2.2.15 (CentOS)
+   set_cookie: [ [+]
+   ]
+   site: www.brewertalk.com
+   src_ip: 45.77.65.211
+   src_mac: 0A:96:DA:8D:C8:A1
+   src_port: 48128
+   status: 503
+   time_taken: 253608
+   timestamp: 2017-08-16T15:25:18.927246Z
+   transport: tcp
+   uri_path: /member.php
+} 
+```
 
 Questions 6 & 7: XSS Cookie and Spear-Phishing User
 
