@@ -344,7 +344,7 @@ The Scr_IP most likely performing a vulnerability assessment on www.brewertalk.c
 ```
 index="botsv2" "www.brewertalk.com"
 ```
-The most likely IP scanning this site is 45.77.65.211
+Selecting the src_ip field lists source IP connecting to this site. The most likely IP scanning this site is 45.77.65.211.
 ```
 Top 10 Values 	Count 	% 	 
 45.77.65.211  8,965 	83.395% 	
