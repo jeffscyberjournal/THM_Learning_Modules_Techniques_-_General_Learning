@@ -268,3 +268,99 @@ The last email sent from Amber in the contain_body section there is base64 code,
 ...
 ```
 
+
+## 200 Series Questions
+
+### Question 1: TOR Version Installed by Amber
+
+Start with a keyword search:
+```
+index="botsv2" amber tor
+```
+This returns 325 events. Reverse the event order and add another keyword to narrow the results.
+
+Command
+```
+index="botsv2" amber tor KEYWORD
+```
+
+Replace KEYWORD with a term that helps identify the TOR installation version.
+
+Trying KEYWORD 'install' shows "C:\Users\amber.turing\Downloads\torbrowser-install-7.0.4_en-US.exe" in 125 events. Less successful keywords were browser (325), exe (325)
+
+### Questions 2 & 3: BrewerTalk IPs
+
+Determine:
+
+- The public IP address of brewertalk.com
+- The IP address performing a web vulnerability scan against it
+
+Use the techniques from previous searches.
+
+### Questions 4 & 5: Attack URI and SQL Function
+
+Using the attacker IP from Question 3:
+
+Command
+
+Plain Text
+spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+index="botsv2" src_ip="ATTACKER_IP"
+Show more lines
+
+Tip: Set Sampling to 1:100 to avoid query cancellation.
+
+This returns over 18,000 events. Use Interesting Fields to identify the targeted URI path.
+
+Then refine the search:
+
+Command
+
+Plain Text
+spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+index="botsv2" src_ip="ATTACKER_IP" uri_path="URI_PATH"
+ 
+Show more lines
+
+Review the results to determine the SQL function being abused.
+
+Questions 6 & 7: XSS Cookie and Spear-Phishing User
+
+Start by gathering information about Kevin.
+
+Command
+
+Plain Text
+spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+index="botsv2" kevin
+Show more lines
+
+Identify Kevin's full name, then investigate the XSS attack.
+
+Focus on:
+
+Kevin's HTTP traffic
+XSS payloads
+Cookie values sent to a malicious URL
+
+Once you find the relevant events, determine the username created through a spear-phishing attack.
+
+A keyword search should help:
+
+Command
+
+Plain Text
+spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+index="botsv2" KEYWORD
+Show more lines
+
+Replace KEYWORD with an appropriate search term.
+
+Questions to Answer
+What version of TOR Browser did Amber install to obfuscate her web browsing?
+What is the public IPv4 address of the server running www.brewertalk.com?
+What IP address performed a web vulnerability scan against www.brewertalk.com?
+What URI path was attacked from the IP address in Question 3? (Include the leading /.)
+What SQL function was abused on that URI path?
+What cookie value did Kevin's browser transmit during the XSS attack? (Digits only.)
+What brewertalk.com username was maliciously created through a spear-phishing attack?
