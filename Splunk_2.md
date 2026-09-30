@@ -233,7 +233,7 @@ This is in the same content_body or sender, sender_email section of event.
 
 **Q5 After the initial contact with the CEO, Amber contacted another employee at this competitor. What is that employee's email address?**
 
-Another employee email address assuming same domain @berkbeer in place of berk in previous search, 6 results found:
+Another employee email address assuming same domain **@berkbeer.com** in place of berk in previous search, 6 results found:
 ```
 index="botsv2" sourcetype="stream:smtp" @berkbeer.com
 ```
