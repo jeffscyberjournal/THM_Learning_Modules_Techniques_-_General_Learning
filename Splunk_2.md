@@ -297,6 +297,49 @@ Determine:
 
 Use the techniques from previous searches.
 
+Try
+```
+index="botsv2" "brewertalk.com"
+```
+Then try field site leading to 4 DNS url and closer look leads to 4 sites
+
+Then use field dest_ip and search external (2 out of the 10), leading to:
+```
+index="botsv2" "brewertalk.com" dest_ip="52.40.10.231"
+```
+Shows 
+```
+Values 	                                             Count 	%
+www.brewertalk.com 	                                   9,860 	99.026% 	
+brewertalk.com                                         86        0.864% 	
+ec2-52-40-10-231.us-west-2.compute.amazonaws.com:8088 	10        0.1% 	
+45.77.65.211:9999                                      1         0.01%
+```
+Searching with first option using:
+```
+index="botsv2" "brewertalk.com" site="www.brewertalk.com"
+```
+Leads to IP for www.brewertalk.com, src_ip: 52.40.10.231:
+```
+   dest_ip: 172.31.4.249
+   dest_mac: 0A:42:7E:25:21:B4
+   dest_port: 80
+   endtime: 2017-08-29T11:11:24.567153Z
+   flow_id: b3e25a45-6a1c-452a-a55a-13e231b776dd
+   http_comment: HTTP/1.1 200 OK
+   http_content_type: text/html; charset=UTF-8
+   http_method: GET
+   http_user_agent: Splunk Website Monitoring (+https://splunkbase.splunk.com/app/1493/)
+   protocol_stack: ip:tcp:http
+   server: Apache/2.2.15 (CentOS)
+   set_cookie: [ [+]
+   ]
+   site: www.brewertalk.com
+   src_ip: 52.40.10.231
+   src_mac: 0A:96:DA:8D:C8:A1
+   src_port: 57245
+   status: 200 
+```
 ### Questions 4 & 5: Attack URI and SQL Function
 
 Using the attacker IP from Question 3:
