@@ -24,7 +24,7 @@ The timestamp fields returned by `metadata` are stored as Unix epoch values. The
 | sort - totalCount
 ```
 
-## Task 3 100 Series Questions
+## Task 3: 100 Series Questions
 
 Scenario: Investigate Amber Turing's communications with a potential competitor and identify the website visited, emails exchanged, contacts involved, and files sent.
 
@@ -122,13 +122,15 @@ This assumes the fields are available for selection within the events. Splunk do
 
 **Q1 Amber Turing was hoping for Frothly to be acquired by a potential competitor which fell through, but visited their website to find contact information for their executive team. What is the website domain that she visited?**
 
-search using 
+General search for traffic related to Amber using.
+
+First we IP related to Amber:
 ```
 index="botsv2"  amber  sourcetype="pan:traffic"
 ```
 There is only 1 IP for src_ip or client_ip likely related to amber: 10.0.2.101
 
-Using that with further search:
+Using that with further search since competitor is also beer related company try 'beer':
 ```
 index="botsv2" 10.0.2.101 sourcetype="stream:HTTP" *beer*
 ```
@@ -139,8 +141,6 @@ index="botsv2" 10.0.2.101 sourcetype="stream:HTTP" *beer*
 | dedup site
 ```
 leads to just one site: www.berkbeer.com
-
-
 
 
 **Q2 Amber found the executive contact information and sent him an email. What image file displayed the executive's contact information? Answer example: /path/image.ext**
