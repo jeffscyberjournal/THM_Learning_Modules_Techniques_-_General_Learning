@@ -115,7 +115,7 @@ Useful fields may include:
 | table sender recipient subject attachment
 ```
 
-This assumes the fields are available for selection within the events. Splunk does not allow you to select these fields directly. Instead, you must use "Extract New" from the Interesting Fields panel and choose a sample event that contains the desired field. You can then create the extraction using either a regular expression (regex) or delimiter-based extraction. In this case, comma-delimited extraction works correctly.
+This assumes the fields are available for selection within the events. Here it was necessary to add fields through "Extract New" at bottom of events tab section to make that work. You can then create the extraction using either a regular expression (regex) or delimiter-based extraction. In this case, comma-delimited extraction works correctly.
 
 
 ### Lab Question Answers
@@ -134,13 +134,13 @@ Using that with further search since competitor is also beer related company try
 ```
 index="botsv2" 10.0.2.101 sourcetype="stream:HTTP" *beer*
 ```
-Add dedup site to filter further
+Add `dedup site` to filter further:
 ```
 index="botsv2" 10.0.2.101 sourcetype="stream:HTTP" *beer* 
 | table site 
 | dedup site
 ```
-leads to just one site: www.berkbeer.com
+Leads to just one site: www.berkbeer.com
 
 
 **Q2 Amber found the executive contact information and sent him an email. What image file displayed the executive's contact information? Answer example: /path/image.ext**
@@ -171,7 +171,7 @@ index="botsv2" sourcetype="stream:smtp" amber
 ```
 Filters down 26 smtp related events linked to word amber.
 
-For what ever reason regex does not seem to work well with filtering, the image in previous question however is called ceoberk which is a clue worth trying. Using berk instead of amber leads to just one event with smtp making sense its from sender 
+The image in previous question however is called ceoberk which is a clue worth trying. Using berk instead of amber leads to just one event with streamsmtp making sense its from sender 
 
 ```
 index="botsv2" sourcetype="stream:smtp" berk
