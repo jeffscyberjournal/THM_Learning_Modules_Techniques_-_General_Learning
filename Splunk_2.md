@@ -130,7 +130,7 @@ index="botsv2"  amber  sourcetype="pan:traffic"
 ```
 There is only 1 IP for src_ip or client_ip likely related to amber: 10.0.2.101
 
-Using that with further search since competitor is also beer related company try 'beer':
+Using that with further search since competitor is also beer related company try `beer`:
 ```
 index="botsv2" 10.0.2.101 sourcetype="stream:HTTP" *beer*
 ```
