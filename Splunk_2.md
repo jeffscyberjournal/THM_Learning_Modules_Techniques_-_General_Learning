@@ -597,28 +597,39 @@ Second file path = original file being archived
 Use the event details to determine the encrypted filename.
 Find the encrypted Game of Thrones movie
 
-Use the same sourcetype that revealed the PowerPoint event.
+Use the same sourcetype that revealed the PowerPoint event. 
+In the previous case the extension crypt was present so that was tried.
+```
+index="botsv2" host="MACLORY-AIR13" *.crypt
+```
+From more "All fields" select columns.target_path:
+```
+columns.target_path
 
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
-index="botsv2" host="NAME_MACBOOK" sourcetype="SOURCETYPE" *.EXT
-Show more lines
+14 Values, 6.8% of events
 
-Replace:
-
-SOURCETYPE = sourcetype from PowerPoint results
-EXT = ransomware extension
+Top 10 Values                                                               Count    % 	 
+...
+/Users/mallorykraeusen/Downloads/GoT.S07E02.BOTS.BOTS.BOTS.mkv.crypt        7        9.333% 	
+/Users/mallorykraeusen/Downloads/GoT.S7E2.BOTS.BOTS.BOTS.mkv.torrent.crypt  6        8% 	
+...
+/Users/mallorykraeusen/Documents/Frothly_marketing_campaign_Q317.pptx.crypt 5        6.667% 	
+...
+```
 
 Output:
 
-~1000+ events.
-Movie file should appear on first results page.
-Determine season and episode from filename.
-Questions 3-7: USB Malware Investigation
+File /Users/mallorykraeusen/Downloads/GoT.S07E02.BOTS.BOTS.BOTS.mkv.crypt. Season 7 episode 2.
+
+
+
+
+### Questions 3-7: USB Malware Investigation
+
 Begin with Mallory's personal MacBook
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+```
 index="botsv2" kutekitten
+```
 Show more lines
 
 Output:
