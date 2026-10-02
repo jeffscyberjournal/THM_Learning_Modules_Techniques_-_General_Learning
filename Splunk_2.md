@@ -510,7 +510,7 @@ Answer is found in 6 events, repeatedly in several fields percentage encoded and
 - src_headers:
 - uri_query:
 
-Easiest way was found in the 3 events found in Q6, These 3 packets also include Username kIagerfield. Here is the encoded section at end without the percentage encoding:
+Easiest way was found in the 3 events found in Q6. These 3 packets also include Username kIagerfield. Here is the encoded section at end without the percentage encoding:
 ```
 http://www.brewertalk.com/admin/index.php?module=user-titles&action=edit&utid=2">
 <script>
