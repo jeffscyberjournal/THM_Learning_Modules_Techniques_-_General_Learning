@@ -628,9 +628,9 @@ File /Users/mallorykraeusen/Downloads/GoT.S07E02.BOTS.BOTS.BOTS.mkv.crypt. Seaso
 
 Begin with Mallory's personal MacBook
 ```
-index="botsv2" kutekitten
+index="botsv2" kutekitten 
 ```
-Show more lines
+
 
 Output:
 
