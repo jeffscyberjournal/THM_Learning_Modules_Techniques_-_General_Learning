@@ -394,7 +394,6 @@ uri_path       count
 /	          47
 /admin/	     6
 ```
-################
 
 **Q5 What SQL function was abused on that URI path?**
 
