@@ -290,8 +290,6 @@ Trying KEYWORD 'install' shows "C:\Users\amber.turing\Downloads\torbrowser-insta
 
 ### Questions 2 & 3: BrewerTalk IPs
 
-Determine:
-
 **Q2 The public IP address of brewertalk.com**
 
 Use the techniques from previous searches.
