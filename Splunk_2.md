@@ -328,8 +328,7 @@ Leads to IP for www.brewertalk.com, src_ip: 52.40.10.231:
    http_user_agent: Splunk Website Monitoring (+https://splunkbase.splunk.com/app/1493/)
    protocol_stack: ip:tcp:http
    server: Apache/2.2.15 (CentOS)
-   set_cookie: [ [+]
-   ]
+   set_cookie: [ [+]]
    site: www.brewertalk.com
    src_ip: 52.40.10.231
    src_mac: 0A:96:DA:8D:C8:A1
