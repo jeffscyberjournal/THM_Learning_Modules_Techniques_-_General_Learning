@@ -531,3 +531,270 @@ console.log(my_post_key);
 }
 </script>
 ```
+## Task 5: 300 Series
+
+### Questions 1 & 2: Encrypted PowerPoint and Movie File
+
+Find Mallory's MacBook
+```
+index="botsv2" mallory
+```
+
+Output:
+
+- Over 11,000 events.
+- Example:
+```
+Time               Event
+8/29/17   
+10:34:18.000 AM	
+                   _mbsetupuser        /var/setup          Setup User
+                   host = MACLORY-AIR13
+                   source = usersWithLoginPrivs
+                   sourcetype = usersWithLoginPrivs
+```
+Identify the hostname of Mallory's MacBook (MACLORY-AIR13)
+
+Next search the MacBook:
+```
+index="botsv2" host="NAME_MACBOOK"
+```
+Output:
+- Over 9 million events.
+- Too broad to be useful.
+
+Find the PowerPoint file
+```
+index="botsv2" host="NAME_MACBOOK" (*.ppt OR *.pptx)
+```
+Output:
+
+Greatly reduced result set to 7 events.
+Reveals the critical PowerPoint filename.
+Led to command showing original and file basically copied with new name:
+```
+zip -0 -P UH9PUnpePPK0vYybBKRdMukR \
+/Volumes/FROTHLY/Home/mallory.kraeusen/Frothly_marketing_campaign_Q317.pptx.crypt \
+/Volumes/FROTHLY/Home/mallory.kraeusen/Frothly_marketing_campaign_Q317.pptx
+```
+except with with spaces replaced with underscores.
+```
+...
+app
+	zip -0_-P_UH9PUnpePPK0vYybBKRdMukR_/Volumes//FROTHLY/Home/mallory.kraeusen/Frothly_marketing_campaign_Q317.pptx.crypt_/Volumes//FROTHLY/Home/mallory.kraeusen/Frothly_marketing_campaign_Q317.pptx
+...
+```
+Meaning:
+
+zip = creates a ZIP archive
+-0 = no compression
+-P = password protect archive
+UH9PUnpePPK0vYybBKRdMukR = ZIP password
+First file path = output archive
+Second file path = original file being archived
+
+
+Use the event details to determine the encrypted filename.
+Find the encrypted Game of Thrones movie
+
+Use the same sourcetype that revealed the PowerPoint event.
+
+Plain Text
+spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+index="botsv2" host="NAME_MACBOOK" sourcetype="SOURCETYPE" *.EXT
+Show more lines
+
+Replace:
+
+SOURCETYPE = sourcetype from PowerPoint results
+EXT = ransomware extension
+
+Output:
+
+~1000+ events.
+Movie file should appear on first results page.
+Determine season and episode from filename.
+Questions 3-7: USB Malware Investigation
+Begin with Mallory's personal MacBook
+Plain Text
+spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+index="botsv2" kutekitten
+Show more lines
+
+Output:
+
+~6,000 events.
+Primarily Osquery data.
+What is Osquery?
+
+Osquery exposes operating system data as SQL-accessible tables including:
+
+processes
+network connections
+file hashes
+hardware devices
+USB events
+Search Mallory's folders
+
+Start locating events related to files within Mallory's account.
+
+Plain Text
+spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+index="botsv2" kutekitten "\\/PATH\\/MALLORY\\/FOLDER"
+ 
+Show more lines
+
+Replace:
+
+Plain Text
+/PATH/MALLORY/FOLDER
+Show more lines
+
+with Mallory's actual directory structure.
+
+Examples to investigate:
+
+Plain Text
+/Desktop
+/Downloads
+/Documents
+Show more lines
+
+Remember:
+
+Path must be double escaped.
+Find the malware
+
+Look at available fields:
+
+path
+target_path
+filename
+file_path
+md5
+sha1
+sha256
+
+Goal:
+
+Find a suspicious file showing a field count of 1.
+Use the hash in VirusTotal for confirmation.
+Pivot to surrounding events
+
+Once the suspicious file is found:
+
+Open the event.
+Click its timestamp.
+View events approximately one minute earlier.
+Narrow the search
+
+Run focused searches around installation activity.
+
+Plain Text
+spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+index="botsv2" kutekitten KEYWORD KEYWORD
+Show more lines
+
+Possible useful keywords:
+
+Plain Text
+usb
+mount
+disk
+volume
+process
+curl
+python
+perl
+ruby
+Show more lines
+USB Vendor Question
+
+Goal: Identify the USB device connected shortly before the malware executed.
+
+Look for Osquery tables involving:
+
+Plain Text
+usb_devices
+hardware_events
+disk_events
+Show more lines
+
+Output:
+
+Vendor ID
+Product ID
+
+Research Vendor ID externally to obtain:
+
+Plain Text
+USB manufacturer/vendor name
+Show more lines
+Malware Questions
+
+Once hash is identified:
+
+VirusTotal
+
+Determine:
+
+Programming language
+First-seen date
+
+Outputs Needed:
+
+Plain Text
+Programming language
+YYYY-MM-DD first-seen date
+``
+Show more lines
+C2 Domain Questions
+
+After identifying malware:
+
+Search for network activity immediately after execution.
+
+Useful searches:
+
+Plain Text
+spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+index="botsv2" kutekitten sourcetype=osquery
+Show more lines
+
+Add keywords such as:
+
+Plain Text
+spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+index="botsv2" kutekitten dns
+Show more lines
+Plain Text
+spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+index="botsv2" kutekitten socket
+Show more lines
+Plain Text
+spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+index="botsv2" kutekitten process
+Show more lines
+Plain Text
+spl isn’t fully supported. Syntax highlighting is based on Plain Text.
+index="botsv2" kutekitten query_name
+Show more lines
+
+Output:
+
+Two Dynamic DNS domains
+Sort alphabetically
+Submit:
+First FQDN
+Second FQDN
+Expected Answers
+
+You are looking for:
+
+Encrypted PowerPoint filename
+Encrypted Game of Thrones season/episode
+USB vendor/manufacturer
+Malware programming language
+First seen date
+First C2 FQDN (alphabetically)
+Second C2 FQDN (alphabetically)
