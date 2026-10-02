@@ -305,10 +305,10 @@ index="botsv2" "brewertalk.com" dest_ip="52.40.10.231"
 ```
 Shows 
 ```
-Values 	                                             Count 	%
-www.brewertalk.com 	                                   9,860 	99.026% 	
-brewertalk.com                                         86        0.864% 	
-ec2-52-40-10-231.us-west-2.compute.amazonaws.com:8088 	10        0.1% 	
+Values                                                 Count     %
+www.brewertalk.com                                     9,860     99.026%
+brewertalk.com                                         86        0.864%
+ec2-52-40-10-231.us-west-2.compute.amazonaws.com:8088 	10        0.1%
 45.77.65.211:9999                                      1         0.01%
 ```
 Searching with first option using:
