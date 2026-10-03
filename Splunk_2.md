@@ -557,7 +557,7 @@ Identify the hostname of Mallory's MacBook (MACLORY-AIR13)
 
 Next search the MacBook:
 ```
-index="botsv2" host="NAME_MACBOOK"
+index="botsv2" host="MACLORY-AIR13"
 ```
 Output:
 - Over 9 million events.
@@ -565,19 +565,13 @@ Output:
 
 Find the PowerPoint file
 ```
-index="botsv2" host="NAME_MACBOOK" (*.ppt OR *.pptx)
+index="botsv2" host="MACLORY-AIR13" (*.ppt OR *.pptx)
 ```
 Output:
 
 Greatly reduced result set to 7 events.
 Reveals the critical PowerPoint filename.
 Led to command showing original and file basically copied with new name:
-```
-zip -0 -P UH9PUnpePPK0vYybBKRdMukR \
-/Volumes/FROTHLY/Home/mallory.kraeusen/Frothly_marketing_campaign_Q317.pptx.crypt \
-/Volumes/FROTHLY/Home/mallory.kraeusen/Frothly_marketing_campaign_Q317.pptx
-```
-except with with spaces replaced with underscores.
 ```
 ...
 app
@@ -593,12 +587,12 @@ UH9PUnpePPK0vYybBKRdMukR = ZIP password
 First file path = output archive
 Second file path = original file being archived
 
+### Use the event details to determine the encrypted filename.
 
-Use the event details to determine the encrypted filename.
-Find the encrypted Game of Thrones movie
+**Find the encrypted Game of Thrones movie**
 
-Use the same sourcetype that revealed the PowerPoint event. 
-In the previous case the extension crypt was present so that was tried.
+- Use the same sourcetype that revealed the PowerPoint event. 
+- In the previous case the extension crypt was present so that was tried.
 ```
 index="botsv2" host="MACLORY-AIR13" *.crypt
 ```
@@ -619,24 +613,104 @@ Top 10 Values                                                               Coun
 
 Output:
 
-File /Users/mallorykraeusen/Downloads/GoT.S07E02.BOTS.BOTS.BOTS.mkv.crypt. Season 7 episode 2.
+File /Users/mallorykraeusen/Downloads/GoT.S07E02.BOTS.BOTS.BOTS.mkv.crypt. S07E02.
 
 
 
 
 ### Questions 3-7: USB Malware Investigation
 
-Begin with Mallory's personal MacBook
+Begin with Mallory's personal MacBook, given Mallory's personal MacBook (kutekitten).
 ```
-index="botsv2" kutekitten 
+index="botsv2"  kutekitten usb
 ```
-
-
+Led to about 40 events, further narrowed when events field "column.removeable=1" selected limiting output to just 4 events.
+```
+index="botsv2"  kutekitten usb "columns.removable"=1
+```
 Output:
+```
+8/3/17
+6:18:10.000 PM	
+{ [-]
+   action: added
+   calendarTime: Thu Aug 03 18:18:10 2017 UTC
+   columns: { [-]
+     model: Mass Storage
+     model_id: 6387
+     removable: 1
+     serial: 849083BA
+     usb_address: 1
+     usb_port: 1
+     vendor: Generic
+     vendor_id: 058f
+   }
+   decorations: { [-]
+     host_uuid: 00000000-0000-1000-8000-000C296A4C57
+     username: mkraeusen
+   }
+   hostIdentifier: kutekitten.local
+   name: pack_hardware-monitoring_usb_devices
+   unixTime: 1501784290
+}
+```
+From this looking into the following values:
+"vendor":"Generic",
+"vendor_id":"058f",
+"model":"Mass Storage",
+"model_id":"6387",
+"serial":"849083BA"
 
-~6,000 events.
-Primarily Osquery data.
-What is Osquery?
+The important identifiers are:
+
+Vendor ID (VID): 058F → assigned to Alcor Micro Corp.
+Product ID (PID): 6387 → commonly identified as an Alcor Micro flash drive / mass storage device.
+
+**What programming language is at least part of the malware from the question above written in?**
+From the above username "mkraeusen" obtained, combining with additional field "name" and within that is file_events.
+```
+index="botsv2"  kutekitten "decorations.username"=mkraeusen name=file_events
+```
+Narrows to 4 events, here there is an interesting file with file hashes related worth checking in virustotal.
+```
+8/3/17 6:19:07.000 PM	
+{ ...
+Type 	
+		Field 					Value
+Selected	
+		columns.category 		Downloads	
+		columns.md5				72d4d364ed91dd9418d144a2db837a6d
+		columns.sha1			794bcba867307bdbd5f947f6c939eb4df1d2c9b8
+		columns.sha256	befa9bfe488244c64db096522b4fad73fc01ea8c4cd0323f1cbdee81ba008271
+		columns.target_path		/Users/mkraeusen/Downloads/Important_HR_INFO_for_mkraeusen	
+		decorations.username	mkraeusen	
+		host					kutekitten	
+		hostIdentifier			kutekitten.local	
+		source					/var/log/osquery/osqueryd.results.log	
+		sourcetype				osquery_results	
+Event	
+		action					added	
+		calendarTime			Thu Aug 03 18:19:07 2017 UTC
+```
+Using the MD5, SHA1, and SHA256 hashes associated with the file Important_HR_INFO_for_mkraeusen, a search on VirusTotal using the file hash reveals the following findings, however all that is required is that its perl script language:
+```
+Code insights - malicious
+The provided Perl script functions as a cross-platform Remote Access Trojan (RAT) designed to operate on Unix-like operating systems (macOS and Linux).
+
+Key observed behaviors include:
+
+- Process Masquerading: Renames its execution process title ($0) to java to evade basic process monitoring.
+- Embedded Payload Execution: Extracts, decodes (using XOR and decompressing byte patterns), and executes a secondary binary embedded within the __DATA__ section using inter-process communication (IPC::Open2).
+- Command and Control (C2) Communication: Connects outbound via TCP sockets to hardcoded, obfuscated network addresses. It implements a custom binary protocol to exchange command bytes and serialized data.
+- System Reconnaissance: Automatically collects and transmits initial host metadata including hostname, current username, and uptime.
+- Remote Administration Capabilities: Implements handlers for various C2 commands, allowing an operator to:
+       - Execute arbitrary shell commands and Perl code (eval).
+       - Perform file system operations (read, write, copy, move, delete, list directories, and check file existence).
+       - List and terminate running system processes.
+       - Capture desktop screenshots using native utilities (screencapture on macOS or xwd/convert on Linux).
+       - Resolve domain names and test outbound network connections (basic port scanning).
+```
+
 
 Osquery exposes operating system data as SQL-accessible tables including:
 
@@ -648,12 +722,6 @@ USB events
 Search Mallory's folders
 
 Start locating events related to files within Mallory's account.
-
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
-index="botsv2" kutekitten "\\/PATH\\/MALLORY\\/FOLDER"
- 
-Show more lines
 
 Replace:
 
