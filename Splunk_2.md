@@ -709,7 +709,21 @@ Key observed behaviors include:
        - List and terminate running system processes.
        - Capture desktop screenshots using native utilities (screencapture on macOS or xwd/convert on Linux).
        - Resolve domain names and test outbound network connections (basic port scanning).
+
+Basic properties
+MD5		72d4d364ed91dd9418d144a2db837a6d
+SHA-1	794bcba867307bdbd5f947f6c939eb4df1d2c9b8
+SHA-256	befa9bfe488244c64db096522b4fad73fc01ea8c4cd0323f1cbdee81ba008271
+...
+File type Perl
+Magic	Perl script text executable
+...
+History
+First Seen In The Wild		2017-01-17 19:09:06 UTC
+First Submission			2017-01-31 16:54:15 UTC
+...
 ```
+
 
 
 Osquery exposes operating system data as SQL-accessible tables including:
