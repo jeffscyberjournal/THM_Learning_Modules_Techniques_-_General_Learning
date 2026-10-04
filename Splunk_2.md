@@ -276,14 +276,12 @@ index="botsv2" amber tor
 ```
 This returns 325 events. Reverse the event order and add another keyword to narrow the results.
 
-Command
+Nexy add a term that helps identify the TOR installation version. Trying KEYWORD 'install' shows the following in 125 events.
 ```
-index="botsv2" amber tor KEYWORD
+"C:\Users\amber.turing\Downloads\torbrowser-install-7.0.4_en-US.exe"
+
 ```
-
-Replace KEYWORD with a term that helps identify the TOR installation version.
-
-Trying KEYWORD 'install' shows "C:\Users\amber.turing\Downloads\torbrowser-install-7.0.4_en-US.exe" in 125 events. Less successful keywords were browser (325), exe (325)
+Less successful keywords were: browser (325), exe (325)
 
 ### Questions 2 & 3: BrewerTalk IPs
 
