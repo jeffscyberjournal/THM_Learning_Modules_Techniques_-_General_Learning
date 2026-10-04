@@ -265,8 +265,8 @@ The last email sent from Amber in the contain_body section there is base64 code,
 ...
 ```
 
-
-## 200 Series Questions
+---
+## Task 4: 200 Series Questions
 
 ### Question 1: TOR Version Installed by Amber
 
@@ -281,7 +281,6 @@ Nexy add a term that helps identify the TOR installation version. Trying KEYWORD
 "C:\Users\amber.turing\Downloads\torbrowser-install-7.0.4_en-US.exe"
 
 ```
-Less successful keywords were: browser (325), exe (325)
 
 ### Questions 2 & 3: BrewerTalk IPs
 
@@ -382,11 +381,11 @@ index="botsv2" source="stream:http" src_ip="45.77.65.211"
 ```
 members.php is most likely with out sampling its close to 662.
 ```
-uri_path       count
+uri_path    count
 /member.php	662
 /search.php	164
-/	          47
-/admin/	     6
+/	        47
+/admin/	    6
 ```
 
 **Q5 What SQL function was abused on that URI path?**
@@ -462,7 +461,7 @@ index="botsv2" source="stream:http" kevin
 ```
 Only 3 events are found , the value of the cookie found was:
 ```
-   cookie: mybb[lastvisit]=1502408189; mybb[lastactive]=1502408191; sid=4a06e3f4a6eb6ba1501c4eb7f9b25228
+cookie: mybb[lastvisit]=1502408189; mybb[lastactive]=1502408191; sid=4a06e3f4a6eb6ba1501c4eb7f9b25228
 ```
 
 ```
@@ -526,6 +525,7 @@ console.log(my_post_key);
 }
 </script>
 ```
+---
 ## Task 5: 300 Series
 
 ### Questions 1 & 2: Encrypted PowerPoint and Movie File
@@ -661,7 +661,7 @@ The important identifiers are:
 Vendor ID (VID): 058F → assigned to Alcor Micro Corp.
 Product ID (PID): 6387 → commonly identified as an Alcor Micro flash drive / mass storage device.
 
-**What programming language is at least part of the malware from the question above written in?**
+**Q4 What programming language is at least part of the malware from the question above written in?**
 From the above username "mkraeusen" obtained, combining with additional field "name" and within that is file_events.
 ```
 index="botsv2"  kutekitten "decorations.username"=mkraeusen name=file_events
@@ -718,7 +718,9 @@ First Seen In The Wild		2017-01-17 19:09:06 UTC
 First Submission			2017-01-31 16:54:15 UTC
 ...
 ```
+**Q5 When was this malware first seen in the wild? Answer Guidance: YYYY-MM-DD**
 
+From basic properties on virustotal results: 2017-01-17 
 
 
 Osquery exposes operating system data as SQL-accessible tables including:
