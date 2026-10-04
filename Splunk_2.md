@@ -268,7 +268,7 @@ The last email sent from Amber in the contain_body section there is base64 code,
 ---
 ## Task 4: 200 Series Questions
 
-### Question 1: TOR Version Installed by Amber
+**Q1: TOR Version Installed by Amber**
 
 Start with a keyword search:
 ```
@@ -279,7 +279,6 @@ This returns 325 events. Reverse the event order and add another keyword to narr
 Nexy add a term that helps identify the TOR installation version. Trying KEYWORD 'install' shows the following in 125 events.
 ```
 "C:\Users\amber.turing\Downloads\torbrowser-install-7.0.4_en-US.exe"
-
 ```
 
 ### Questions 2 & 3: BrewerTalk IPs
@@ -297,7 +296,7 @@ Then use field dest_ip and search external (2 out of the 10), leading to:
 ```
 index="botsv2" "brewertalk.com" dest_ip="52.40.10.231"
 ```
-Shows 
+Shows: 
 ```
 Values                                                 Count     %
 www.brewertalk.com                                     9,860     99.026%
@@ -615,6 +614,8 @@ File /Users/mallorykraeusen/Downloads/GoT.S07E02.BOTS.BOTS.BOTS.mkv.crypt. S07E0
 
 ### Questions 3-7: USB Malware Investigation
 
+**Q3 Kevin Lagerfield used a USB drive to move malware onto kutekitten, Mallory's personal MacBook. She ran the malware, which obfuscates itself during execution. Provide the vendor name of the USB drive Kevin likely used. Answer Guidance: Use time correlation to identify the USB drive.**
+
 Begin with Mallory's personal MacBook, given Mallory's personal MacBook (kutekitten).
 ```
 index="botsv2"  kutekitten usb
@@ -722,169 +723,6 @@ First Submission			2017-01-31 16:54:15 UTC
 
 From basic properties on virustotal results: 2017-01-17 
 
+**Q6 The malware infecting kutekitten uses dynamic DNS destinations to communicate with two C&C servers shortly after installation. What is the fully-qualified domain name (FQDN) of the first (alphabetically) of these destinations?**
 
-Osquery exposes operating system data as SQL-accessible tables including:
 
-processes
-network connections
-file hashes
-hardware devices
-USB events
-Search Mallory's folders
-
-Start locating events related to files within Mallory's account.
-
-Replace:
-
-Plain Text
-/PATH/MALLORY/FOLDER
-Show more lines
-
-with Mallory's actual directory structure.
-
-Examples to investigate:
-
-Plain Text
-/Desktop
-/Downloads
-/Documents
-Show more lines
-
-Remember:
-
-Path must be double escaped.
-Find the malware
-
-Look at available fields:
-
-path
-target_path
-filename
-file_path
-md5
-sha1
-sha256
-
-Goal:
-
-Find a suspicious file showing a field count of 1.
-Use the hash in VirusTotal for confirmation.
-Pivot to surrounding events
-
-Once the suspicious file is found:
-
-Open the event.
-Click its timestamp.
-View events approximately one minute earlier.
-Narrow the search
-
-Run focused searches around installation activity.
-
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
-index="botsv2" kutekitten KEYWORD KEYWORD
-Show more lines
-
-Possible useful keywords:
-
-Plain Text
-usb
-mount
-disk
-volume
-process
-curl
-python
-perl
-ruby
-Show more lines
-USB Vendor Question
-
-Goal: Identify the USB device connected shortly before the malware executed.
-
-Look for Osquery tables involving:
-
-Plain Text
-usb_devices
-hardware_events
-disk_events
-Show more lines
-
-Output:
-
-Vendor ID
-Product ID
-
-Research Vendor ID externally to obtain:
-
-Plain Text
-USB manufacturer/vendor name
-Show more lines
-Malware Questions
-
-Once hash is identified:
-
-VirusTotal
-
-Determine:
-
-Programming language
-First-seen date
-
-Outputs Needed:
-
-Plain Text
-Programming language
-YYYY-MM-DD first-seen date
-``
-Show more lines
-C2 Domain Questions
-
-After identifying malware:
-
-Search for network activity immediately after execution.
-
-Useful searches:
-
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
-index="botsv2" kutekitten sourcetype=osquery
-Show more lines
-
-Add keywords such as:
-
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
-index="botsv2" kutekitten dns
-Show more lines
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
-index="botsv2" kutekitten socket
-Show more lines
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
-index="botsv2" kutekitten process
-Show more lines
-Plain Text
-spl isn’t fully supported. Syntax highlighting is based on Plain Text.
-index="botsv2" kutekitten query_name
-Show more lines
-
-Output:
-
-Two Dynamic DNS domains
-Sort alphabetically
-Submit:
-First FQDN
-Second FQDN
-Expected Answers
-
-You are looking for:
-
-Encrypted PowerPoint filename
-Encrypted Game of Thrones season/episode
-USB vendor/manufacturer
-Malware programming language
-First seen date
-First C2 FQDN (alphabetically)
-Second C2 FQDN (alphabetically)
