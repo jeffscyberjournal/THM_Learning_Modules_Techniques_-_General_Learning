@@ -738,3 +738,7 @@ hh4de2.hopto.org 			| 3/91 		| 2000-02-17 	| No-IP Technologies, LLC
 ```
 **Q6** eidk.duckdns.org
 **Q7** eidk.hopto.org 	
+
+
+---
+## Task 6: 400 Series
