@@ -725,4 +725,16 @@ From basic properties on virustotal results: 2017-01-17
 
 **Q6 The malware infecting kutekitten uses dynamic DNS destinations to communicate with two C&C servers shortly after installation. What is the fully-qualified domain name (FQDN) of the first (alphabetically) of these destinations?**
 
-
+This is obtained from virustotal while still using the same hash file, look for relations tab:
+```
+Domain 						Detections		Created	          Registrar
+apis.apple.map.fastly.net 	| 0/91 		| - 			| -
+apps.mzstatic.com 			| 0/91 		| 2010-07-12 	| NOM-IQ Ltd dba Com Laude
+cdn.fwupd.org 				| 0/91 		| 2015-07-20 	| 1API GmbH
+eidk.duckdns.org 			| 4/91 		| 2013-04-12 	| Gandi SAS
+eidk.hopto.org 				| 10/91 	| 2000-02-17 	| No-IP Technologies, LLC
+hh4de2.hopto.org 			| 3/91 		| 2000-02-17 	| No-IP Technologies, LLC
+...
+```
+**Q6** eidk.duckdns.org
+**Q7** eidk.hopto.org 	
