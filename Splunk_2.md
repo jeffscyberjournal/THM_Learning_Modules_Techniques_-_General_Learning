@@ -4,8 +4,6 @@
 
 BOTSv2 is a realistic Splunk security dataset containing Windows endpoint logs, Sysmon events, firewall data, network traffic, and IDS alerts. It is used to practice SOC investigations, threat hunting, incident response, and SPL query analysis within Splunk.
 
-Task 1: Run from attack box or VM.
-
 ## Task 2 Dive into the Data
 
 In this scenario, you take the role of Alice Bluebird, a security analyst assisting Frothly with investigating security incidents using Splunk.
@@ -23,14 +21,14 @@ The timestamp fields returned by `metadata` are stored as Unix epoch values. The
 | eval recentTime=strftime(recentTime,"%Y-%m-%d %H:%M:%S")
 | sort - totalCount
 ```
-
+---
 ## Task 3: 100 Series Questions
 
 Scenario: Investigate Amber Turing's communications with a potential competitor and identify the website visited, emails exchanged, contacts involved, and files sent.
 
-### Q1: Identify the Competitor Website
+### 1. Find Amber's IP Address
 
-1. Find Amber's IP Address
+**Q1: Identify the Competitor Website**
 
 Search for references to Amber:
 ```
@@ -49,7 +47,6 @@ Those logs are ingested into Splunk as:
 ```
 sourcetype=pan:traffic
 ```
-
 
 
 ### 2. Review Amber's HTTP Activity
