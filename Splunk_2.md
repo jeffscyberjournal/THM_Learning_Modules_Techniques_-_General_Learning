@@ -743,3 +743,51 @@ hh4de2.hopto.org 			| 3/91 		| 2000-02-17 	| No-IP Technologies, LLC
 
 ---
 ## Task 6: 400 Series
+
+ **malicious Taedonggang actor**
+ 
+ -  Taedonggang is the brand of south korean beer
+ -  Taedongang is this scenarios APT, attacking	Frothly Brewing Company network what is likely espionage or intellectual property theft
+We know its a phishing campaign so filtering for 'attach_filename' by adding custom fields, using comma delimited filtering.
+```
+attach_filename{}
+Selected Yes No
+
+6 Values, 100% of events
+Reports
+Top values 	Top values by time 	Rare values
+Events with this field
+Values 	Count 	% 	 
+Malware Alert Text.txt 					4 			36.364% 	
+invoice.zip 							4 			36.364% 	
+image.png 								2 			18.182% 	
+GoT.S7E2.BOTS.BOTS.BOTS.mkv.torrent 	1 			9.091% 	
+Office2016_Patcher_For_OSX.torrent 		1 			9.091% 	
+Saccharomyces_cerevisiae_patent.docx 	1 			9.091% 	
+
+```
+Alternatively select one email, just click filename and hover until "Add To Search" appears and select. You should get something like, change file name to *.* to select those:
+```
+index=_* OR index=* sourcetype=stream:smtp | spath "attach_filename{}"| spath "attach_filename{}" | search "attach_filename{}"="*.*"
+```
+Password 912345678 is in the header bod of the content section below that is an interesting large section of base64, near end is AAKSBAAAAAGludm which converts to invoice.doc likely that is the zip file encoded in base64.
+```
+ <html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DUTF-8">
+</head>
+<body>
+<div>
+<div data-node-type=3D"line" id=3D"magicdomid2">
+<div data-node-type=3D"line" id=3D"magicdomid2">
+<div data-node-type=3D"line" id=3D"magicdomid2">As we have not received a =
+service cessation letter, I am assuming that you might have accidentally =
+overlooked this invoice &lsquo;02/160000506500 (Unpaid)&rsquo; for 10,000 =
+GBP. Should you wish to bring an end to the agreement please let us know. =
+Otherwise early withdrawal penalties will apply next month.&nbsp;</div>
+<div data-node-type=3D"line" id=3D"magicdomid3">&nbsp;</div>
+<div data-node-type=3D"line" id=3D"magicdomid4">Pleaser refer to the =
+attached document for payment details. Due to the personal nature of the =
+account we have added a password to the document. Please enter the =
+password (912345678).</div>
+````
