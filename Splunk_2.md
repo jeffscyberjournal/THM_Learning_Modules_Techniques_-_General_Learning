@@ -784,3 +784,11 @@ password (912345678).</div>
 
 **Q3 The Taedonggang APT group encrypts most of their traffic with SSL. What is the "SSL Issuer" that they use for the majority of their traffic? Answer guidance: Copy the field exactly, including spaces.**
 
+We already know from earlier the source of this traffic was most likely from earlier question 'Task 4, Q3 The IP address performing a web vulnerability scan against it', dest_ip="45.77.65.211 using a simple search again dest_ip and SSL, there are two listed ssl_issuers listed but only one value.
+
+```
+ssl_issuer
+Values 	Count 	% 	 
+C = US 	14,189 	58.981% 	
+
+```
