@@ -789,6 +789,9 @@ We already know from earlier the source of this traffic was most likely from ear
 ```
 ssl_issuer
 Values 	Count 	% 	 
-C = US 	14,189 	58.981% 	
-
+C = US 	14,189 	58.981%
+ 	 	9,868 	41.019%
 ```
+
+**Q4 What is the first and last name of the poor innocent sap who was implicated in the metadata of the file that executed PowerShell Empire on the first victim's workstation? Answer example: John Smith**
+- Since Empire is related to powershell I started with index=botsv2 powershell, then looked into
