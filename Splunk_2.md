@@ -66,7 +66,8 @@ Remove duplicates and display sites:
 ```
 Output:
 ```
-sitewebsite1
+website
+website1
 website2
 ...
 ```
