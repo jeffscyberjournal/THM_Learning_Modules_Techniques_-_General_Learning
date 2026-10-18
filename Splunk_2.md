@@ -838,14 +838,14 @@ The other FTP command was related but don't directly to this stager.
 - This relates not to what was just covered but the invoice.zip file from earlier its a little out of place.
 - From the file that contained the interesting code in base64 that was clearly the invoice.zip file.
 - Convert to single line dropping returnlines and end space this worked for me in linux:
-  		```
+```
 		grep -o '[A-Za-z0-9+/=]\+' invoiceb64.txt | tr -d '\n' > b64.txt
-		```
+```
 - Decode
-  		```
+```
 		base64 -d cleaned.txt > invoice_decodedb64.zip
-  		```
+```
 - unzip using password from earlier and you get invoice.doc produced
-  		```
+```
 		unzip invoice_decodedb64.zip
-  		```
+```
