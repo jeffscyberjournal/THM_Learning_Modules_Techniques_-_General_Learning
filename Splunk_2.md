@@ -797,7 +797,11 @@ C = US 	14,189 	58.981%
 
 - Since Empire is related to powershell I started with: 
 ```
-index=botsv2 powershell, then looked into index="botsv2" powershell sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+index=botsv2 powershell
+
+Then looked into:
+
+index="botsv2" powershell sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
 ```
 This still results in over 50,000 events looking at interesting fields selecting 'commandline' in top 10 is oa few interesting commands, ftp.exe and powershell related. The powershell command that stands out is as follows:
 ```
