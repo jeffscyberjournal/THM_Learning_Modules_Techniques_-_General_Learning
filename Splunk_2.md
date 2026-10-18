@@ -122,7 +122,7 @@ This assumes the fields are available for selection within the events. Here it w
 
 General search for traffic related to Amber using.
 
-First we IP related to Amber:
+First we search IP traffic related to Amber on firewall traffic:
 ```
 index="botsv2"  amber  sourcetype="pan:traffic"
 ```
