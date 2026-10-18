@@ -795,6 +795,8 @@ C = US 	14,189 	58.981%
 
 **Q4 What is the first and last name of the poor innocent sap who was implicated in the metadata of the file that executed PowerShell Empire on the first victim's workstation? Answer example: John Smith**
 
+(might be a trick question the names Ryan and Kovar don't appear together in any of the packets linked with empire) 
+
 - Since Empire is related to powershell I started with: 
 ```
 index=botsv2 powershell
@@ -849,3 +851,4 @@ The other FTP command was related but don't directly to this stager.
 ```
 		unzip invoice_decodedb64.zip
 ```
+Answer is found int invoice.doc: Congrats! It looks like you have a virustotal account and chose to live on the edge. If you find this… turn it in for some CyberEastEgg points!!! 
