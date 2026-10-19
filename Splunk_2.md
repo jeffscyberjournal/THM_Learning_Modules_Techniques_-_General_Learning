@@ -176,8 +176,7 @@ index="botsv2" sourcetype="stream:smtp" berk
 ```
 - From content_body section in the line "Give me a call this afternoon if you= are free.=C2=A0=0A=0AMartin Berk..."
 ```
-     --=_8177b74425496b166cbde61bd37bbf96
-
+....
      Hello Amber,=C2=A0=0A=0AGreat to hear from you, yes it is unfortunate th=
 e way things turned=0Aout. It would be great to speak with you directly,=
  I would also like=0Ato have Bernhard on the call as I think he might ha=
