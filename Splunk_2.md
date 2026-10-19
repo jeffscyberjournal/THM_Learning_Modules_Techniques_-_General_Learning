@@ -106,7 +106,6 @@ Identify Amber's email from previous results and use it for SMTP searches.
 ```
 index="botsv2" sourcetype="stream:smtp" AMBERS_EMAIL COMPETITOR_WEBSITE
 ```
-Output: Email exchanges between Amber and competitor personnel.
 
 Useful fields may include:
 ```
