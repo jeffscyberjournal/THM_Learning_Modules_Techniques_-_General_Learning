@@ -119,8 +119,6 @@ This assumes the fields are available for selection within the events. Here it w
 
 **Q1 Amber Turing was hoping for Frothly to be acquired by a potential competitor which fell through, but visited their website to find contact information for their executive team. What is the website domain that she visited?**
 
-General search for traffic related to Amber using.
-
 First we search IP traffic related to Amber on firewall traffic:
 ```
 index="botsv2"  amber  sourcetype="pan:traffic"
