@@ -135,21 +135,23 @@ Similarly, can be applied to smtp stream:
 ```
 index="botsv2" sourcetype="stream:smtp" amber
 ```
-Filters down 26 smtp related events linked to word amber.
+Filters down 26 smtp related events linked to word amber. 
 
-The image in previous question however is called ceoberk which is a clue worth trying. Using berk instead of amber leads to just one event with streamsmtp making sense its from sender 
+The image in previous question however is called ceoberk which is a clue worth trying. Using berk instead of amber leads to just one event with streamsmtp making sense its from sender. Adding keyword 'berk' filters list to just event (same result if berk use without amber).
 
 ```
-index="botsv2" sourcetype="stream:smtp" berk
+index="botsv2" sourcetype="stream:smtp" amber berk
 ```
 - From content_body section in the line "Give me a call this afternoon if you= are free.=C2=A0=0A=0AMartin Berk..."
 ```
 ....
-     Hello Amber,Great to hear from you, yes it is unfortunate the way things
-turned out. It would be great to speak with you directly, I would also like
-to have Bernhard on the call as I think he might have some questions
-for you. 
-Give me a call this afternoon if you are free. Martin Berk mberk@berkbeer.
+  Hello Amber, Great to hear from you, yes it is unfortunate 
+the way things turned out. It would be great to speak with you directly,
+I would also like to have Bernhard on the call as I think he might have some questions for you. 
+Give me a call this afternoon if you are free.
+Martin Berk
+777.222.8765
+mberk@berkbeer.com
 
 ----- Original Message -----
 From: "Amber Turing" <aturing@froth.ly
@@ -162,10 +164,8 @@ worried about my future here. Id love to talk to you about some information I ha
 regarding my work. Amber Turing Principal Scientist Froth.ly
 
      
-Great to hear from you, yes it is unfortunate the way things turned out. It would be great
-to speak with you directly, I would also like to have Bernhard on the call as I
+     <html><body ...Hello Amber,Great to hear from you, yes it is unfortunate the way things turned out. It would be great to speak with you directly, I would also like to have Bernhard on the call as I 
 think he might have some questions for you. Give me a call this afternoon if you are free.
-
 Martin Berk
 CEO
 777.222.8765
