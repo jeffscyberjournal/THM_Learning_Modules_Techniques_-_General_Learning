@@ -145,37 +145,43 @@ index="botsv2" sourcetype="stream:smtp" berk
 - From content_body section in the line "Give me a call this afternoon if you= are free.=C2=A0=0A=0AMartin Berk..."
 ```
 ....
-     Hello Amber,=C2=A0=0A=0AGreat to hear from you, yes it is unfortunate th=
-e way things turned=0Aout. It would be great to speak with you directly,=
- I would also like=0Ato have Bernhard on the call as I think he might ha=
-ve some questions=0Afor you. =C2=A0Give me a call this afternoon if you=
- are free.=C2=A0=0A=0AMartin Berk=0ACEO=0A777.222.8765=0Amberk@berkbeer.=
-com=0A=0A----- Original Message -----=0AFrom: "Amber Turing" <aturing@fr=
-oth.ly>=0ATo:"mberk@berkbeer.com" <mberk@berkbeer.com>=0ACc:=0ASent:Fri,=
- 11 Aug 2017 15:49:01 +0000=0ASubject:Amber from Froth.ly=0A=0A=09Mr. Be=
-rnhard,=0A=0A=09=C2=A0=C2=A0 I was very sorry to hear about the acquisit=
-ion falling through.=0AI was very excited to work with you in the future=
-.. I have to admit, I=0Aam a little worried about my future here. I=E2=80=
-=99d love to talk to you=0Aabout some information I have regarding my wo=
-rk.=0A=0A Amber Turing=0A Principal Scientist=0A 867.322.1123=0A Froth.l=
-y=0A=0A=09
+     Hello Amber,Great to hear from you, yes it is unfortunate the way things
+turned out. It would be great to speak with you directly, I would also like
+to have Bernhard on the call as I think he might have some questions
+for you. 
+Give me a call this afternoon if you are free. Martin Berk mberk@berkbeer.
 
-     <html><body ... Great to hear from you, ye=
-s it is unfortunate the way things turned out. It would be great to spea=
-k with you directly, I would also like to have Bernhard on the call as I=
- think he might have some questions for you. =C2=A0Give me a call this a=
-fternoon if you are free.=C2=A0</div><div><br></div><div>Martin Berk</di=
-v><div>CEO</div><div>777.222.8765</div><div>mberk@berkbeer.com<br><br><b=
-lockquote class=3D"atmailquote">
-
-<br>----- Original Message -----<br><....From:</div> "Amber Turing" &lt;aturing@froth.ly&gt;</div><br><div id=
-=3D"origionalMessageToField" ... To:</div>"mberk@berkbeer.com" &lt;mberk@berkbeer.com&gt;... Sent:</div>Fri=
-, 11 Aug 2017 15:49:01 +0000...Subject:</div>Amber from Fro=...
+----- Original Message -----
+From: "Amber Turing" <aturing@froth.ly
+To:"mberk@berkbeer.com" <mberk@berkbeer.com>
+Sent:Fri, 11 Aug 2017 15:49:01 
+Subject:Amber from Froth.ly
 Mr. Bernhard, I was very sorry to hear about the acquisition falling through.
+I was very excited to work with you in the future I have to admit, I am a little
+worried about my future here. Id love to talk to you about some information I have
+regarding my work. Amber Turing Principal Scientist Froth.ly
+
+     
+Great to hear from you, yes it is unfortunate the way things turned out. It would be great
+to speak with you directly, I would also like to have Bernhard on the call as I
+think he might have some questions for you. Give me a call this afternoon if you are free.
+
+Martin Berk
+CEO
+777.222.8765
+mberk@berkbeer.com
+
+----- Original Message -----
+From:"Amber Turing" 
+origionalMessageToField" ...
+To:"mberk@berkbeer.com" mberk@berkbeer.com
+Sent:Fri, 11 Aug 2017 15:49:01 
+Subject:Amber from From ...Mr. Bernhard, I was very sorry to hear about the acquisition falling through.
  was very excited to work with you in the future. I have to admit, I am a little worried=
  about my future here. Id love to talk to you about some inform=
 ation I have regarding=0A my work.<br><br>=0AAmber Turing<br>=0APrincipa=
-l Scientist<br>=0A867.322.1123<br>=0AFroth.ly...</body></html>
+l Scientist<br>=0A867.322.112
+Froth.ly...</body></html>
 ```
 
 **Q4 What is the CEO's email address?**
@@ -236,10 +242,21 @@ Email sent at 8/30/17 3:08:00.075 PM from Amber contains the attackment:
 
 The last email sent from Amber in the content_body section there is base64 code, in it is a section:
 
+Using splunk search parameters:
+```
+index="botsv2" sourcetype="stream:smtp" @berkbeer.com amber
+```
 ```
 ...
-<p class="MsoNormal">Thanks for taking the time today, As discussed here is the document I was referring to.&nbsp; Probably better to take this offline. Email me from now on at
-<a href="mailto:ambersthebest@yeastiebeastie.com">ambersthebest@yeastiebeastie.com</a>
+VGhhbmtzIGZvciB0YWtpbmcgdGhlIHRpbWUgdG9kYXksIEFzIGRpc2N1c3NlZCBoZXJlIGlzIHRo
+ZSBkb2N1bWVudCBJIHdhcyByZWZlcnJpbmcgdG8uICBQcm9iYWJseSBiZXR0ZXIgdG8gdGFrZSB0
+aGlzIG9mZmxpbmUuIEVtYWlsIG1lIGZyb20gbm93IG9uIGF0IGFtYmVyc3RoZWJlc3RAeWVhc3Rp
+ZWJlYXN0aWUuY29tPG1haWx0bzphbWJlcnN0aGViZXN0QHllYXN0aWViZWFzdGllLmNvb
+...
+
+converted from base64
+...
+Thanks for taking the time today, As discussed here is the document I was referring to.  Probably better to take this offline. Email me from now on at ambersthebest@yeastiebeastie.com<mailto:ambersthebest@yeastiebeastie.com>
 ...
 ```
 
