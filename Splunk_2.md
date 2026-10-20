@@ -4,6 +4,7 @@
 
 BOTSv2 is a realistic Splunk security dataset containing Windows endpoint logs, Sysmon events, firewall data, network traffic, and IDS alerts. It is used to practice SOC investigations, threat hunting, incident response, and SPL query analysis within Splunk.
 
+---
 ## Task 2 Dive into the Data
 
 ### What Data Is Available?
@@ -24,14 +25,12 @@ The timestamp fields returned by `metadata` are stored as Unix epoch values. The
 
 Scenario: Investigate Amber Turing's communications with a potential competitor and identify the website visited, emails exchanged, contacts involved, and files sent.
 
+---
 ### 1. Find Amber's IP Address
 
 **Q1: Identify the Competitor Website**
 
-Search for references to Amber:
-```
-index="botsv2" amber
-```
+
 
 Focus on PAN traffic logs, add this sourcetype to search:
 ```
@@ -40,18 +39,19 @@ index="botsv2" sourcetype="pan:traffic" amber
 
 **NOTE:** `pan:traffic` is the Palo Alto Networks firewall traffic log sourcetype. It contains network connection information recorded by a Palo Alto Networks firewall, including the usual source and destination IP addresses, ports, applications, actions, and web traffic details.
 
-
+---
 ### 2. Review Amber's HTTP Activity
 
-Replace IPADDR with Amber's IP address to show events that are linked:
+Search against Amber's IP address to show events that include this IP:
 ```
-index="botsv2" IPADDR sourcetype="stream:HTTP"
+index="botsv2" "Ambers_IP_ADDR" sourcetype="stream:HTTP"
 ```
 
+---
 ### 3. List Unique Websites Visited
 
-Remove duplicates and display sites:
-```index="botsv2" IPADDR sourcetype="stream:HTTP"
+Remove duplicates and display sites by appending dedup with variable (urkindex to filter by:
+```index="botsv2" "Ambers_IP_ADDR" sourcetype="stream:HTTP"
 | dedup site
 | table site
 ```
@@ -71,54 +71,24 @@ index="botsv2" IPADDR sourcetype="stream:HTTP" *INDUSTRY*
 ```
 Output: Typically narrows results to the competitor website.
 
-### 4. Focus on Traffic to the Competitor Website
-
-```
-index="botsv2" IPADDR sourcetype="stream:HTTP" COMPETITOR_WEBSITE
-```
-Output: HTTP activity between Amber and the competitor's website.
-
-Use table to extract useful fields:
-
-```
-index="botsv2" IPADDR sourcetype="stream:HTTP" COMPETITOR_WEBSITE
-| table uri uri_path site
-```
-Output: URLs visited, including pages containing executive contact information.
-
-### 5. Investigate Email Communications
-
-Identify Amber's email from previous results and use it for SMTP searches.
-
-```
-index="botsv2" sourcetype="stream:smtp" AMBERS_EMAIL COMPETITOR_WEBSITE
-```
-
-Useful fields may include:
-```
-| table sender recipient subject attachment
-```
-
-This assumes the fields are available for selection within the events. Here it was necessary to add fields through "Extract New" at bottom of events tab section to make that work. You can then create the extraction using either a regular expression (regex) or delimiter-based extraction. In this case, comma-delimited extraction works correctly.
-
 
 ### Lab Question Answers
 
 **Q1 Amber Turing was hoping for Frothly to be acquired by a potential competitor which fell through, but visited their website to find contact information for their executive team. What is the website domain that she visited?**
 
-First we search IP traffic related to Amber on firewall traffic:
+Search for references to Amber:
 ```
-index="botsv2"  amber  sourcetype="pan:traffic"
+index="botsv2" amber
+```
+Expand on this to search IP traffic related to Amber on firewall traffic:
+```
+index="botsv2" amber sourcetype="pan:traffic"
 ```
 There is only 1 IP for src_ip or client_ip likely related to amber: 10.0.2.101
 
-Using that with further search since competitor is also beer related company try `beer`:
+Using that amber IP to further search since competitor is also beer related company try `beer`:
 ```
 index="botsv2" 10.0.2.101 sourcetype="stream:HTTP" *beer*
-```
-Add `dedup site` to filter further:
-```
-index="botsv2" 10.0.2.101 sourcetype="stream:HTTP" *beer* 
 | table site 
 | dedup site
 ```
@@ -144,10 +114,24 @@ Top 10 Values             Count 	%
 ...
 ```
 
+---
+### 4. Focus on Traffic to the Competitor Website
 
+```
+index="botsv2" (ambers_IP_ADDR) sourcetype="stream:HTTP" COMPETITOR_WEBSITE
+```
+Output: HTTP activity between Amber and the competitor's website.
+
+Use table to extract useful fields:
+
+```
+index="botsv2" IPADDR sourcetype="stream:HTTP" COMPETITOR_WEBSITE
+| table uri uri_path site
+```
 
 **Q3 What is the CEO's name? Provide the first and last name.**
 
+Similarly, can be applied to smtp stream:
 ```
 index="botsv2" sourcetype="stream:smtp" amber
 ```
@@ -176,33 +160,23 @@ ion falling through.=0AI was very excited to work with you in the future=
 rk.=0A=0A Amber Turing=0A Principal Scientist=0A 867.322.1123=0A Froth.l=
 y=0A=0A=09
 
-     <html><body style=3D"font-family: Helvetica,Arial,sans-serif; font-size:=
- 12px;">Hello Amber,=C2=A0<div><br></div><div>Great to hear from you, ye=
+     <html><body ... Great to hear from you, ye=
 s it is unfortunate the way things turned out. It would be great to spea=
 k with you directly, I would also like to have Bernhard on the call as I=
  think he might have some questions for you. =C2=A0Give me a call this a=
 fternoon if you are free.=C2=A0</div><div><br></div><div>Martin Berk</di=
 v><div>CEO</div><div>777.222.8765</div><div>mberk@berkbeer.com<br><br><b=
-lockquote class=3D"atmailquote"><br>----- Original Message -----<br><div=
- id=3D"origionalMessageFromField" style=3D"width:100%;display:inline;bac=
-kground:rgb(228,228,228);"><div style=3D"display:inline;font-weight:bold=
-;">From:</div> "Amber Turing" &lt;aturing@froth.ly&gt;</div><br><div id=
-=3D"origionalMessageToField" style=3D"display:inline;font-weight:bold;">=
-To:</div>"mberk@berkbeer.com" &lt;mberk@berkbeer.com&gt;<br><div id=3D"o=
-rigionalMessageSentField" style=3D"display:inline;font-weight:bold;">Cc:=
-</div><br><div style=3D"display:inline;font-weight:bold;">Sent:</div>Fri=
-, 11 Aug 2017 15:49:01 +0000<br><div id=3D"origionalMessageSubjectField"=
- style=3D"display:inline;font-weight:bold;">Subject:</div>Amber from Fro=
-th.ly<br><br><br><div class=3D"WordSection1">=0A<p class=3D"MsoNormal">M=
-r. Bernhard,</p><p></p>=0A<p class=3D"MsoNormal">=C2=A0=C2=A0 I was very=
- sorry to hear about the acquisition falling through. I was very excited=
- to work with you in the future. I have to admit, I am a little worried=
- about my future here. I=E2=80=99d love to talk to you about some inform=
-ation I have regarding=0A my work.<br><br>=0AAmber Turing<br>=0APrincipa=
-l Scientist<br>=0A867.322.1123<br>=0AFroth.ly</p><p></p>=0A</div>=0A=0A=
-=09</blockquote></div></body></html>
-```
+lockquote class=3D"atmailquote">
 
+<br>----- Original Message -----<br><....From:</div> "Amber Turing" &lt;aturing@froth.ly&gt;</div><br><div id=
+=3D"origionalMessageToField" ... To:</div>"mberk@berkbeer.com" &lt;mberk@berkbeer.com&gt;... Sent:</div>Fri=
+, 11 Aug 2017 15:49:01 +0000...Subject:</div>Amber from Fro=...
+Mr. Bernhard, I was very sorry to hear about the acquisition falling through.
+ was very excited to work with you in the future. I have to admit, I am a little worried=
+ about my future here. Id love to talk to you about some inform=
+ation I have regarding=0A my work.<br><br>=0AAmber Turing<br>=0APrincipa=
+l Scientist<br>=0A867.322.1123<br>=0AFroth.ly...</body></html>
+```
 
 **Q4 What is the CEO's email address?**
 
@@ -210,7 +184,21 @@ This is in the same content_body or sender, sender_email section of event.
 
 "mberk@berkbeer.com"
 
+---
+### 5. Investigate Email Communications
 
+Identify Amber's email from previous results and use it for SMTP searches.
+
+```
+index="botsv2" sourcetype="stream:smtp" AMBERS_EMAIL COMPETITOR_WEBSITE
+```
+
+Useful fields may include:
+```
+| table sender recipient subject attachment
+```
+
+This assumes the fields are available for selection within the events. Here it was necessary to add fields through "Extract New" at bottom of events tab section to make that work. You can then create the extraction using either a regular expression (regex) or delimiter-based extraction. In this case, comma-delimited extraction works correctly.
 
 **Q5 After the initial contact with the CEO, Amber contacted another employee at this competitor. What is that employee's email address?**
 
@@ -229,18 +217,24 @@ Out of the 6 after the last one from CEO, there is a 3 events,
 - At 8/30/17 3:08:00.075 PM Amber replies to this email from hbernhard@berkbeer.com
 
 
-
 **Q6 What is the name of the file attachment that Amber sent to a contact at the competitor?**
 
+Starting with:
+```
+index="botsv2" sourcetype="stream:smtp" @berkbeer.com
+``` 
+Then filtering further by adding attach_filename[] from 'All fields' section of events menu we find one docx file.
 Email sent at 8/30/17 3:08:00.075 PM from Amber contains the attackment:
 ```
  attach_filename: [ [-]
      Saccharomyces_cerevisiae_patent.docx 
 ```
 
+
+
 **Q7 What is Amber's personal email address?**
 
-The last email sent from Amber in the contain_body section there is base64 code, in it is a section:
+The last email sent from Amber in the content_body section there is base64 code, in it is a section:
 
 ```
 ...
