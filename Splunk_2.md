@@ -6,8 +6,6 @@ BOTSv2 is a realistic Splunk security dataset containing Windows endpoint logs, 
 
 ## Task 2 Dive into the Data
 
-In this scenario, you take the role of Alice Bluebird, a security analyst assisting Frothly with investigating security incidents using Splunk.
-
 ### What Data Is Available?
 
 The `metadata` command provides a high-level summary of the data available within an index, similar to Splunk's Data Summary view. In this example, it is used to list the available sourcetypes in the `botsv2` index, along with their event counts and the first and last times data was observed.
@@ -35,18 +33,12 @@ Search for references to Amber:
 index="botsv2" amber
 ```
 
-Focus on PAN traffic logs:
+Focus on PAN traffic logs, add this sourcetype to search:
 ```
-index="botsv2" sourcetype="pan:traffic"
+index="botsv2" sourcetype="pan:traffic" amber 
 ```
-Output: Amber's IP address.
 
-**NOTE:** `pan:traffic` is the Palo Alto Networks firewall traffic log sourcetype. It contains network connection information recorded by a Palo Alto Networks firewall, including the usual source and destination IP addresses, ports, applications, actions, and web traffic details.
-
-Those logs are ingested into Splunk as:
-```
-sourcetype=pan:traffic
-```
+**NOTE:** `pan:traffic` is the Palo Alto Networks firewall traffic log sourcetype. It contains network connection information recorded by a Palo Alto Networks firewall, including the usual source and destination IP addresses, ports, applications, actions, and web traffic detailsq
 
 
 ### 2. Review Amber's HTTP Activity
