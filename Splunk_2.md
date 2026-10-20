@@ -246,6 +246,8 @@ Using splunk search parameters:
 ```
 index="botsv2" sourcetype="stream:smtp" @berkbeer.com amber
 ```
+4 events show, top last one 8/30/17 3:08:00.075 PM
+Top of the email contains: To hbernhard@berkbeer.com from  Amber Turing <aturing@froth.ly>
 ```
 ...
 VGhhbmtzIGZvciB0YWtpbmcgdGhlIHRpbWUgdG9kYXksIEFzIGRpc2N1c3NlZCBoZXJlIGlzIHRo
