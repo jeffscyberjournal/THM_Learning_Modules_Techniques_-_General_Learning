@@ -246,8 +246,12 @@ Using splunk search parameters:
 ```
 index="botsv2" sourcetype="stream:smtp" @berkbeer.com amber
 ```
-4 events show, top last one 8/30/17 3:08:00.075 PM
-Top of the email contains: To hbernhard@berkbeer.com from  Amber Turing <aturing@froth.ly>
+4 events shown with, last one 8/30/17 3:08:00.075 PM.
+
+Top of the email contains: 
+
+- To hbernhard@berkbeer.com 
+- From  Amber Turing <aturing@froth.ly>
 ```
 ...
 VGhhbmtzIGZvciB0YWtpbmcgdGhlIHRpbWUgdG9kYXksIEFzIGRpc2N1c3NlZCBoZXJlIGlzIHRo
@@ -256,7 +260,7 @@ aGlzIG9mZmxpbmUuIEVtYWlsIG1lIGZyb20gbm93IG9uIGF0IGFtYmVyc3RoZWJlc3RAeWVhc3Rp
 ZWJlYXN0aWUuY29tPG1haWx0bzphbWJlcnN0aGViZXN0QHllYXN0aWViZWFzdGllLmNvb
 ...
 
-converted from base64
+Converted from base64
 ...
 Thanks for taking the time today, As discussed here is the document I was referring to.  Probably better to take this offline. Email me from now on at ambersthebest@yeastiebeastie.com<mailto:ambersthebest@yeastiebeastie.com>
 ...
