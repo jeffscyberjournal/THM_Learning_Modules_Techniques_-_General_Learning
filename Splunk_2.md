@@ -38,16 +38,15 @@ Focus on PAN traffic logs, add this sourcetype to search:
 index="botsv2" sourcetype="pan:traffic" amber 
 ```
 
-**NOTE:** `pan:traffic` is the Palo Alto Networks firewall traffic log sourcetype. It contains network connection information recorded by a Palo Alto Networks firewall, including the usual source and destination IP addresses, ports, applications, actions, and web traffic detailsq
+**NOTE:** `pan:traffic` is the Palo Alto Networks firewall traffic log sourcetype. It contains network connection information recorded by a Palo Alto Networks firewall, including the usual source and destination IP addresses, ports, applications, actions, and web traffic details.
 
 
 ### 2. Review Amber's HTTP Activity
 
-Replace IPADDR with Amber's IP address:
+Replace IPADDR with Amber's IP address to show events that are linked:
 ```
 index="botsv2" IPADDR sourcetype="stream:HTTP"
 ```
-Output: HTTP requests made by Amber.
 
 ### 3. List Unique Websites Visited
 
@@ -63,11 +62,7 @@ website1
 website2
 ...
 ```
-The competitor's domain should stand out based on Frothly's industry.
-
-Alternative: Filter by Industry
-
-Use an industry-related keyword:
+The competitor's domain should stand out based on Frothly's industry. Or use industry-related keywords:
 
 ```
 index="botsv2" IPADDR sourcetype="stream:HTTP" *INDUSTRY*
