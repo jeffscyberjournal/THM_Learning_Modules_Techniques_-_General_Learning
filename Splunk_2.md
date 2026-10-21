@@ -177,10 +177,10 @@ origionalMessageToField" ...
 To:"mberk@berkbeer.com" mberk@berkbeer.com
 Sent:Fri, 11 Aug 2017 15:49:01 
 Subject:Amber from From ...Mr. Bernhard, I was very sorry to hear about the acquisition falling through.
- was very excited to work with you in the future. I have to admit, I am a little worried=
- about my future here. Id love to talk to you about some inform=
-ation I have regarding=0A my work.<br><br>=0AAmber Turing<br>=0APrincipa=
-l Scientist<br>=0A867.322.112
+ was very excited to work with you in the future. I have to admit, I am a little worried
+ about my future here. Id love to talk to you about some information I have regarding my work. Amber Turing 
+Principal Scientist
+867.322.112
 Froth.ly...</body></html>
 ```
 
