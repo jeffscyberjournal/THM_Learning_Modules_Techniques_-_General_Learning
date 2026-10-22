@@ -312,22 +312,12 @@ index="botsv2" "brewertalk.com" site="www.brewertalk.com"
 Leads to IP for www.brewertalk.com, src_ip: 52.40.10.231:
 ```
    dest_ip: 172.31.4.249
-   dest_mac: 0A:42:7E:25:21:B4
-   dest_port: 80
-   endtime: 2017-08-29T11:11:24.567153Z
-   flow_id: b3e25a45-6a1c-452a-a55a-13e231b776dd
-   http_comment: HTTP/1.1 200 OK
-   http_content_type: text/html; charset=UTF-8
-   http_method: GET
-   http_user_agent: Splunk Website Monitoring (+https://splunkbase.splunk.com/app/1493/)
-   protocol_stack: ip:tcp:http
-   server: Apache/2.2.15 (CentOS)
-   set_cookie: [ [+]]
+   ...
    site: www.brewertalk.com
    src_ip: 52.40.10.231
-   src_mac: 0A:96:DA:8D:C8:A1
+   ...
    src_port: 57245
-   status: 200 
+   ...
 ```
 
 **Q3 The IP address performing a web vulnerability scan against it**
