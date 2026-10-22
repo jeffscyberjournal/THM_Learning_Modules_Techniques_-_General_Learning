@@ -385,24 +385,13 @@ Review the results to determine the SQL function being abused.
 8/16/17
 3:25:19.017 PM	
 { [-]
-   bytes: 3992
-   bytes_in: 884
-   bytes_out: 3108
+   ...
    dest_ip: 172.31.4.249
-   dest_mac: 0A:42:7E:25:21:B4
+   ...
    dest_port: 80
-   endtime: 2017-08-16T15:25:19.017145Z
-   flow_id: 52283054-ec82-43ad-a2b5-359c626e2743
+   ...
    form_data: regcheck1=&regcheck2=true&username=makman&password=mukarram&password2=mukarram&email=mak@live.com&email2=mak@live.com&referrername=&imagestring=F7yR4&imagehash=1c1d0e6eae9c113f4ff65339e4b3079c&answer=4&allownotices=1&receivepms=1&pmnotice=1&subscriptionmethod=0&timezoneoffset=0&dstcorrection=2&regtime=1416039333&step=registration&action=do_register&regsubmit=Submit Registration!&question_id=makman' and updatexml(NULL,concat (0x3a,(SUBSTRING((SELECT password FROM mybb_users ORDER BY UID LIMIT 5,1), 32, 31))),NULL) and '1
-   http_comment: HTTP/1.1 503 Service Temporarily Unavailable
-   http_content_length: 2194
-   http_content_type: text/html; charset=UTF-8
-   http_method: POST
-   http_user_agent: Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.17 Safari/537.36
-   protocol_stack: ip:tcp:http
-   server: Apache/2.2.15 (CentOS)
-   set_cookie: [ [+]
-   ]
+   ...
    site: www.brewertalk.com
    src_ip: 45.77.65.211
    src_mac: 0A:96:DA:8D:C8:A1
