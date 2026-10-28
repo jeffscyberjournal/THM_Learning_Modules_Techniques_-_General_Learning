@@ -34,6 +34,7 @@ Parsing Time	      Search-time (on the Search Head)     Index-time (partial or c
 Data Flexibility	  High (can reinterpret data 	         Lower (bound by pre-indexed      
                     without reindexing)                   structures)
 Performance Impact	Increases CPU load during queries	   Reduces query times; increases                                                              ingestion processing
+
 **Q1 Which part of the Splunk deployment architecture is responsible for processing incoming data from forwarders?** Indexer
 
 **Q2 Part of your client's infrastructure includes hundreds of employee workstations.
