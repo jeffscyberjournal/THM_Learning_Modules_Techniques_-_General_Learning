@@ -31,10 +31,10 @@
 
 **Feature	          Splunk	                             Elastic**
 ```
-Parsing Time:	      Search-time (on the Search Head)     Index-time (partial or complete)
-Data Flexibility:	  High (can reinterpret data 	         Lower (bound by pre-indexed      
-                    without reindexing)                   structures)
-Performance Impact:	Increases CPU load during queries	   Reduces query times; increases                                                              ingestion processing
+Parsing Time:       Search-time (on the Search Head)     Index-time (partial or complete)
+Data Flexibility:   High (can reinterpret data           Lower (bound by pre-indexed      
+                    without reindexing)                  structures)
+Performance Impact: Increases CPU load during queries    Reduces query times; increases                                                              ingestion processing
 ```
 **Q1 Which part of the Splunk deployment architecture is responsible for processing incoming data from forwarders?** Indexer
 
