@@ -1,6 +1,7 @@
 # Splunk: Setting Up SOC lab
 
 ## Task1: Objectives overview
+
 - Learn how to install Splunk and the Universal Forwarder on a Linux host
 - Explore Splunk configuration via the command line
 - Understand how to ingest Linux and Web logs into Splunk
@@ -22,10 +23,10 @@
  └────────────────────────────────────────────┘
 ```
 
-• **Forwarders:** Lightweight agents installed on endpoints to collect and send data. Universal Forwarders send raw data, while Heavy Forwarders can parse or filter data before sending it.
-• **Indexers:** Transform, parse, and store incoming data into a structured format called an "index" to make it searchable and available for analysis.
-• **Search Heads:** The user interface where analysts run queries, view dashboards, and investigate logs. They perform search-time parsing (extracting fields dynamically during a query), which saves storage flexibility but increases CPU load.
-• **Deployment Servers:** A centralized management hub used to remotely configure, update, and manage hundreds or thousands of scattered forwarders simultaneously.
+- **Forwarders:** Lightweight agents installed on endpoints to collect and send data. Universal Forwarders send raw data, while Heavy Forwarders can parse or filter data before sending it.
+- **Indexers:** Transform, parse, and store incoming data into a structured format called an "index" to make it searchable and available for analysis.
+- **Search Heads:** The user interface where analysts run queries, view dashboards, and investigate logs. They perform search-time parsing (extracting fields dynamically during a query), which saves storage flexibility but increases CPU load.
+- **Deployment Servers:** A centralized management hub used to remotely configure, update, and manage hundreds or thousands of scattered forwarders simultaneously.
 
 **Splunk vs. Elastic Parsing Comparison**
 
