@@ -8,18 +8,18 @@
 
 ## Task2: Core Splunk architecture components
 ```
-        [ Server ]
-            │
-            ▼
-   [ Deployment Server ]
-     /      │        \
-    /       │         \
-   ▼        ▼          ▼
-[Forwarders] [Indexer] [Search Head]
- │   │   │       ▲          ▲
- ▼   ▼   ▼       │          │
-[🌐] [🐧] [🪟] ───┘          │
- └──────────────────────────┘
+                        [ Server ]
+                            │
+                            ▼
+                  [     Deployment Server     ]
+                /                  │        \
+               /                   │         \
+              ▼                    ▼          ▼
+[       Forwarders     ]         [Indexer]  [Search Head]
+ │            │       │            ▲          ▲
+ ▼            ▼       ▼            │          │
+[Internet] [Linux] [Windows]    ───┘          │
+ └────────────────────────────────────────────┘
 ```
 
 • **Forwarders:** Lightweight agents installed on endpoints to collect and send data. Universal Forwarders send raw data, while Heavy Forwarders can parse or filter data before sending it.
