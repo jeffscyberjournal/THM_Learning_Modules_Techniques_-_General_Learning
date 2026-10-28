@@ -7,6 +7,7 @@
 - Understand how to ingest Linux and Web logs into Splunk
 - By the end, you'll have a working setup for centralized log monitoring using Splunk.
 
+---
 ## Task2: Core Splunk architecture components
 ```
                         [ Server ]
@@ -43,4 +44,5 @@ Performance Impact: Increases CPU load during queries    Reduces query times; in
 **Q2 Part of your client's infrastructure includes hundreds of employee workstations.
 Which Splunk feature would enable you to remotely manage forwarders on each system?** Deployment Server
 
+---
 ## Task3: Linux Deployment
