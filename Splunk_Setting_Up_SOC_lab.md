@@ -104,4 +104,80 @@ root@coffely:/opt/splunk/bin#
 
 **Q2 Which port does the Splunk web interface run on by default?** 8000
 
+---
+## Task 4: Managing Splunk From CLI
+
+- Run from the /opt/splunk/bin directory.
+
+- **splunk start** command is used to start the Splunk server. Th
+- Splunk can be stopped with **splunk stop**.
+- **splunk restart** is useful when changes have been made to Splunk's configuration. 
+```
+root@coffely:/opt/splunk/bin# ./splunk start
+Splunk> Finding your faults, just like mom.
+…
+Checking prerequisites...
+    Checking http port [8000]: open
+    Checking mgmt port [8089]: open
+    Checking appserver port [127.0.0.1:8065]: open
+    Checking kvstore port [8191]: open
+    Checking configuration... Done.
+...
+...
+The Splunk web interface is at http://coffely:8000
+```
+
+### Further Useful Commands
+
+- **splunk enable** boot-start command to configure Splunk to automatically start as a service whenever the system boots.
+- **splunk status** command is used to check the status of the Splunk server. Including whether it is running or not, and any errors that may be occurring.
+
+```
+**Splunk Status**
+root@coffely:/opt/splunk/bin# ./splunk status
+splunkd is running (PID: 45852).
+splunk helpers are running (PIDs: 45853 46296 46305 46414 46511 46786).
+```
+
+The **splunk add oneshot** command is used to add a single event to the Splunk index. This is useful for testing purposes or for adding individual events that may not be part of a larger data stream.
+
+**Splunk One Shot**
+```
+root@coffely:/opt/splunk/bin# ./splunk add oneshot /path/to/logfile -index yourindex
+...
+```
+
+The **splunk search** command is used to search for data in the Splunk index. This command can be used to search for specific events, as well as to perform more complex searches using Splunk's search processing language.
+
+**Splunk Search**
+```
+root@coffely:/opt/splunk/bin# ./splunk search coffely 
+WARNING: Server Certificate Hostname Validation is disabled. Please see server.conf/[sslConfig]/cliVerifyServerName for details.
+Feb 18 21:09:04 coffley ubuntu: coffely-has-the-best-coffee-in-town
+Feb 18 13:48:17 coffely ubuntu: COFFELY
+Feb 18 13:48:17 coffely ubuntu: COFFELY
+...
+```
+
+Try out **splunk help** to view all available Splunk CLI commands, their descriptions, and usage syntax.
+
+
+**Splunk Help**
+```
+root@coffely:/opt/splunk/bin# ./splunk help
+Welcome to Splunk's Command Line Interface (CLI).
+
+   Type these commands for more help:
+
+       help [command]             type a command name to access its help page
+       help [object]              type an object name to access its help page
+       help [topic]               type a topic keyword to get help on a topic
+       help commands              display a full list of CLI commands
+       help clustering            commands that can be used to configure the clustering setup
+       help shclustering          commands that can be used to configure the Search Head Cluster setup
+       help control, controls     tools to start, stop, manage Splunk processes
+       help datastore             manage Splunk's local filesystem use
+    ...
+```
+These are just a few of the many CLI commands available in Splunk. Administrators can leverage the command-line interface to efficiently manage, configure, and troubleshoot their Splunk environments.
 
