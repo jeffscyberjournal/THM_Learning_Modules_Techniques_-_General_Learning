@@ -10,17 +10,17 @@
 ---
 ## Task2: Core Splunk architecture components
 ```
-                        [ Server ]
+                        [─Server─]
                             │
                             ▼
-                  [     Deployment Server     ]
+                [─────Deployment Server────]
                 /                  │        \
                /                   │         \
               ▼                    ▼          ▼
-[       Forwarders     ]         [Indexer]  [Search Head]
+[─────Forwarders──────]       [Indexer]  [Search Head]
  │            │       │            ▲          ▲
  ▼            ▼       ▼            │          │
-[Internet] [Linux] [Windows]    ───┘          │
+[Internet] [Linux] [Windows]──────┘           │
  └────────────────────────────────────────────┘
 ```
 
