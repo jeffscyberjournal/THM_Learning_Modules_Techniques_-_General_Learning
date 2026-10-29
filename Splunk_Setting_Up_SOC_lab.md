@@ -181,3 +181,9 @@ Welcome to Splunk's Command Line Interface (CLI).
 ```
 These are just a few of the many CLI commands available in Splunk. Administrators can leverage the command-line interface to efficiently manage, configure, and troubleshoot their Splunk environments.
 
+**Q1 Using the CLI, what command would you run to search Splunk for the term coffely?** ./splunk search coffely
+
+**Q2 Which Splunk command would you run to get help with Splunk searches?** ./splunk help search
+
+---
+## Task 5: 
