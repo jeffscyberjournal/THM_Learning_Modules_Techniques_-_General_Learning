@@ -129,14 +129,17 @@ The Splunk web interface is at http://coffely:8000
 
 ### Further Useful Commands
 
-- **splunk enable** boot-start command to configure Splunk to automatically start as a service whenever the system boots.
+- **splunk enable boot-start** command to configure Splunk to automatically start as a service whenever the system boots.
 - **splunk status** command is used to check the status of the Splunk server. Including whether it is running or not, and any errors that may be occurring.
 
 ```
-**Splunk Status**
+root@coffely:/opt/splunk/bin# ./splunk enable boot-start
+Init script installed at /etc/init.d/splunk.
+Init script is not configured to run at boot.
+
 root@coffely:/opt/splunk/bin# ./splunk status
-splunkd is running (PID: 45852).
-splunk helpers are running (PIDs: 45853 46296 46305 46414 46511 46786).
+splunkd is running (PID: 9045).
+splunk helpers are running (PIDs: 9046 9224 9229 9332 9378 9576).
 ```
 
 The **splunk add oneshot** command is used to add a single event to the Splunk index. This is useful for testing purposes or for adding individual events that may not be part of a larger data stream.
@@ -186,4 +189,152 @@ These are just a few of the many CLI commands available in Splunk. Administrator
 **Q2 Which Splunk command would you run to get help with Splunk searches?** ./splunk help search
 
 ---
-## Task 5: 
+## Task 5: Splunk Universal Forwarder
+
+- Configuring data ingestion, indexed searchable incoming data
+- Wide range of log sources from operating systems, web applications, intrusion detection systems, and more.
+- Forwarders similar for forwarding syslog data on wazuh siem.
+- Forwarders are installed on remote machines, such as endpoints, servers, or network devices, and send their data to a central Splunk server for indexing and analysis. 
+
+
+**Installing the Universal Forwarder**
+
+- Check out the Splunk site to download the universal forwarder, which is available for all major OS versions.
+- For this exercise, the 64-bit version for Linux has been placed in the ~/Downloads/splunk directory.
+- The Linux Splunk forwarder options available on the Splunk website.
+
+Go ahead and navigate back to the /home/ubuntu/Downloads/splunk directory. Ensure you're running as root, and run the tar command to install the forwarder and move it into the /opt directory.
+
+
+**Forwarder Install**
+```
+ubuntu@coffely:~/Downloads/splunk/$ ls
+splunk_installer.tgz splunkforwarder.tgz
+ubuntu@coffely:~/Downloads/splunk/$ sudo su
+root@coffely:~/Downloads/splunk/#
+root@coffely:~/Downloads/splunk/# tar xvzf splunkforwarder.tgz -C /opt
+splunkforwarder/
+splunkforwarder/swidtag/
+...
+```
+**Starting the Forwarder**
+
+- Navigate to **/opt/splunkforwarder/bin** and use **./splunk start --accept-license** to start the forwarder and enter your new credentials.
+- By default, both Splunk Enterprise and the Splunk Universal Forwarder use port 8089 for management traffic (splunkd).
+- Since both are running on the same machine, this creates a port conflict. When prompted, change the forwarder management port to 8090 so both services can run simultaneously.
+
+
+**Forwarder Start**
+```
+root@coffely:~/Downloads/splunk/# cd /opt/splunkforwarder/bin
+root@coffey:/opt/splunkforwarder/bin# ./splunk start --accept-license
+This appears to be your first time running this version of Splunk.
+...
+...
+Please enter an administrator username: admin
+Password must contain at least:
+  * 8 total printable ASCII character(s).
+Please enter a new password: 
+Please confirm new password: 
+...
+...
+Checking prerequisites...
+    Checking mgmt port [8089]: not available
+ERROR: mgmt port [8089] - port is already bound.  Splunk needs to use this port.
+Would you like to change ports? [y/n]: y
+Enter a new mgmt port: 8090
+Setting mgmt to port: 8090
+The server's splunkd port has been changed.
+    Checking mgmt port [8090]: open        
+Starting splunk server daemon (splunkd)...  
+Done
+```
+
+---
+## Task 6: Configuring the Forwarder
+
+Now that we have installed the forwarder, it needs to know where to send the data. So we will configure it on the host end to send the data and configure Splunk so that it knows from where it is receiving the data from.
+
+**Splunk Configuration** 
+
+- Log in to Splunk main management interface (localhost:8000), head to Settings, and click Forwarding and receiving.
+- You will see multiple options to configure both forwarding and receiving. We want to receive data from the Linux endpoint, so click + Add new in the Receive data section.
+- By default, the Splunk instance receives data from the forwarder on port 9997. It's up to us whether we want to use this port or change it. For now, we will configure our Splunk to start listening on port 9997 and Save.
+- At any time, you can return to this page and disable or delete this configuration.
+
+**Creating an Index**
+
+- Settings again and click on the Indexes option. We will create a new index to store the data we want to receive. If no index is created and specified, Splunk will store received data in the default index main.
+- The indexes tab contains all the indexes created by the user or by default. By default, Splunk contains internal logs used to monitor its own operations and performance.  It shows important metadata about the indexes, like size, event count, and home path. Go ahead and click the New Index button.
+- The Splunk Indexes menu with the Splunk default internal indexes and New Index button highlighted.
+- Fill index name with linux_host and keep the default settings for the rest. Save your new index.
+
+**Configuring the Forwarder**
+
+It's time to configure the forwarder to ensure it sends the data to the right destination. On the Linux host terminal, add the forward server using the command below.
+
+
+Add Forward Server
+root@coffely:/opt/splunkforwarder/bin# ./splunk add forward-server 10.67.187.209:9997
+Splunk username: admin
+Password: 
+Added forwarding to: 10.67.187.209:9997.
+Linux Log Sources
+Linux stores all of its important logs into the /var/log directory, as shown below. In our case, we will ingest the syslog file into Splunk. All other logs can be ingested using the same method.
+
+
+Linux Log Sources
+root@coffely:/opt/splunkforwarder/bin# ls /var/log
+README              btmp.1                  gpu-manager.log      speech-dispatcher
+Xorg.0.log          cloud-init-output.log   hp                   sssd
+Xorg.0.log.old      cloud-init.log          journal              syslog
+alternatives.log    cloud-init.log.1        kern.log             syslog.1
+alternatives.log.1  cups                    kern.log.1           sysstat
+amazon              cups-browsed            landscape            ubuntu-advantage.log
+apache2             dist-upgrade            lastlog              ubuntu-advantage.log.1
+apport.log          dmesg                   lightdm              unattended-upgrades
+apport.log.1        dmesg.0                 openvpn              upgrade
+apt                 dpkg.log                prime-offload.log    wtmp
+auth.log            dpkg.log.1              prime-supported.log
+auth.log.1          fontconfig.log          private
+btmp                gpu-manager-switch.log  samba
+Next, use the ./splunk add monitor command below to add the syslog file to our newly created index.
+
+
+Add Monitor
+root@coffely:/opt/splunkforwarder/bin# ./splunk add monitor /var/log/syslog -index linux_host
+Added monitor of '/var/log/syslog'.
+Inputs
+We can now look at the inputs.conf file to check our configuration. Splunk inputs define what data Splunk should collect. You can manually edit inputs.conf to specify new data sources or modify existing input settings.
+
+
+Inputs
+root@coffely:/opt/splunkforwarder/bin# cat /opt/splunkforwarder/etc/apps/search/local/inputs.conf
+[monitor:///var/log/syslog]
+disabled = false
+index = linux_host
+Using the Logger Utility
+Logger is a built-in command-line tool to add test logs to the syslog file. We are already monitoring the syslog file and sending all logs to Splunk, so the log generated with the command below will be searchable in our Splunk instance.
+
+
+Logger Utility
+root@coffely:/opt/splunkforwarder/bin# logger "coffely-has-the-best-coffee-in-town"
+root@coffely:/opt/splunkforwarder/bin# tail -1 /var/log/syslog
+2025-11-06T05:37:11.415531+00:00 coffely root: coffely-has-the-best-coffee-in-town
+To confirm that Splunk is indeed receiving your logs, head to the Search & Reporting app in your Splunk instance and search for your test log with the following query:
+
+index = linux_host "coffely-has-the-best-coffee-in-town"
+The Splunk Search & Reporting app showing the query index = linux_host with the query and first log highlighted.
+
+Answer the questions below
+Follow the steps from above, but this time to ingest the /var/log/auth.log file into the linux_host index.
+What is the value in the sourcetype field?
+
+____
+
+Check
+Create a new user named analyst using the command adduser analyst. 
+Once created, look at the syslog events generated in Splunk related to the user creation activity.
+What is the value of the process field when the new user is added?
+
+_______
