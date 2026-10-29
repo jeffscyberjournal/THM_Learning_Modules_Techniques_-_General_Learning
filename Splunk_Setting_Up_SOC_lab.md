@@ -48,3 +48,60 @@ Which Splunk feature would enable you to remotely manage forwarders on each syst
 
 ---
 ## Task3: Linux Deployment
+
+- Create a Splunk account and download the latest installation package.
+- Trial enterprise version basically after intro period affectively becomes the community addition.
+- https://www.splunk.com/en_us/download/splunk-enterprise.html?locale=en_us
+
+### Linux Splunk Install: 
+
+- Assuming its already downloaded in the Downloads directory
+- Installation requires root privilege for installation
+
+```
+ubuntu@coffely:~$ cd ~/Downloads/splunk 
+ubuntu@coffely:~/Downloads/splunk$ ls
+splunk_installer.tgz  splunkforwarder.tgz
+ubuntu@coffely:~/Downloads/splunk$ sudo su
+root@coffely:/home/ubuntu/Downloads/splunk#  tar xvzf splunk_installer.tgz -C /opt
+...
+```
+### Starting Splunk
+
+- Start splunk as follows
+- Create admin password
+  
+```
+root@coffely:/home/ubuntu/Downloads/splunk# cd /opt/splunk/bin
+root@coffely:/opt/splunk/bin# ./splunk start --accept-license
+
+This appears to be your first time running this version of Splunk.
+
+Splunk software must create an administrator account during startup. Otherwise, you cannot log in.
+Create credentials for the administrator account.
+Characters do not appear on the screen when you type in credentials.
+
+Please enter an administrator username: admin
+Password must contain at least:
+   * 8 total printable ASCII character(s).
+Please enter a new password: 
+Please confirm new password: 
+Copying '/opt/splunk/etc/openldap/ldap.conf.default' to '/opt/splunk/etc/openldap/ldap.conf'.
+writing RSA key
+...
+Starting splunk server daemon (splunkd)...  
+...
+Waiting for web server at http://127.0.0.1:8000 to be available.................................. Done
+
+If you get stuck, we're here to help.  
+Look for answers here: http://docs.splunk.com
+
+The Splunk web interface is at http://coffely:8000
+
+root@coffely:/opt/splunk/bin# 
+```
+**Q1 In which Linux directory, typically used for add-on or third-party software, should Splunk be installed?** /opt
+
+**Q2 Which port does the Splunk web interface run on by default?** 8000
+
+
