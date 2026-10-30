@@ -271,19 +271,23 @@ Now that we have installed the forwarder, it needs to know where to send the dat
 
 **Configuring the Forwarder**
 
-It's time to configure the forwarder to ensure it sends the data to the right destination. On the Linux host terminal, add the forward server using the command below.
+- It's time to configure the forwarder to ensure it sends the data to the right destination. On the Linux host terminal, add the forward server using the command below.
 
 
-Add Forward Server
+```
 root@coffely:/opt/splunkforwarder/bin# ./splunk add forward-server 10.67.187.209:9997
 Splunk username: admin
 Password: 
 Added forwarding to: 10.67.187.209:9997.
-Linux Log Sources
-Linux stores all of its important logs into the /var/log directory, as shown below. In our case, we will ingest the syslog file into Splunk. All other logs can be ingested using the same method.
+```
 
+**Linux Log Sources**
 
-Linux Log Sources
+- Linux stores all of its important logs into the /var/log directory.
+- In our case, we will ingest the syslog file into Splunk.
+- All other logs can be ingested using the same method.
+
+```
 root@coffely:/opt/splunkforwarder/bin# ls /var/log
 README              btmp.1                  gpu-manager.log      speech-dispatcher
 Xorg.0.log          cloud-init-output.log   hp                   sssd
@@ -298,42 +302,49 @@ apt                 dpkg.log                prime-offload.log    wtmp
 auth.log            dpkg.log.1              prime-supported.log
 auth.log.1          fontconfig.log          private
 btmp                gpu-manager-switch.log  samba
+```
+
 Next, use the ./splunk add monitor command below to add the syslog file to our newly created index.
-
-
-Add Monitor
+```
 root@coffely:/opt/splunkforwarder/bin# ./splunk add monitor /var/log/syslog -index linux_host
 Added monitor of '/var/log/syslog'.
-Inputs
-We can now look at the inputs.conf file to check our configuration. Splunk inputs define what data Splunk should collect. You can manually edit inputs.conf to specify new data sources or modify existing input settings.
-
-
-Inputs
+```
+**Inputs**
+- Splunk inputs define what data Splunk should collect.
+- Can be manually edited inputs.conf to specify new data sources or modify existing input settings.
+```
 root@coffely:/opt/splunkforwarder/bin# cat /opt/splunkforwarder/etc/apps/search/local/inputs.conf
 [monitor:///var/log/syslog]
 disabled = false
 index = linux_host
 Using the Logger Utility
+```
+
+**Logger Utility For Testing**
 Logger is a built-in command-line tool to add test logs to the syslog file. We are already monitoring the syslog file and sending all logs to Splunk, so the log generated with the command below will be searchable in our Splunk instance.
 
-
-Logger Utility
+```
 root@coffely:/opt/splunkforwarder/bin# logger "coffely-has-the-best-coffee-in-town"
 root@coffely:/opt/splunkforwarder/bin# tail -1 /var/log/syslog
 2025-11-06T05:37:11.415531+00:00 coffely root: coffely-has-the-best-coffee-in-town
-To confirm that Splunk is indeed receiving your logs, head to the Search & Reporting app in your Splunk instance and search for your test log with the following query:
+```
 
+Search & Reporting app in your Splunk: test log with the following query:
+```
 index = linux_host "coffely-has-the-best-coffee-in-town"
-The Splunk Search & Reporting app showing the query index = linux_host with the query and first log highlighted.
+```
 
-Answer the questions below
-Follow the steps from above, but this time to ingest the /var/log/auth.log file into the linux_host index.
-What is the value in the sourcetype field?
+### Lab Questions and Answer:
 
+**Q1 Follow the steps from above, but this time to ingest the /var/log/auth.log file into the linux_host index. What is the value in the sourcetype field?**
+
+**Start by adding /var/log/auth.log similar to what was done for syslog above:**
 ```
 root@coffely:/opt/splunkforwarder/bin# ./splunk add monitor /var/log/auth.log -index linux_host
 Added monitor of '/var/log/auth.log'.
-
+```
+**Verify its been added to the searchable inputs.conf:**
+```
 root@coffely:/opt/splunkforwarder/bin# cat /opt/splunkforwarder/etc/apps/search/local/inputs.conf
 [monitor:///var/log/syslog]
 disabled = false
@@ -353,17 +364,16 @@ Values 	Count
 syslog  3,327 	
 auth    60
 ```
-Answer is auth
+**Answer is auth**
 
-Create a new user named analyst using the command adduser analyst. 
-Once created, look at the syslog events generated in Splunk related to the user creation activity.
-What is the value of the process field when the new user is added?
+**Q2 Create a new user named analyst using the command adduser analyst. 
+Once created, look at the syslog events generated in Splunk related to the user creation activity. What is the value of the process field when the new user is added?**
 
-Using a simple search index=linux_host "new user"
-or index = linux_host analyst
+- Using a simple search index=linux_host "new user"
+- Or index = linux_host analyst
 Then search All fields and add process field
 
-From index=linux_host "new user" search of 3 events.
+**From index=linux_host "new user" search of 3 events.**
 ```
 10/30/26 1:21:26.278 PM	
 2026-10-30T13:21:26.278390+00:00 coffely adduser[10579]: Adding new user `analyst' to supplemental / extra groups `users' ...
@@ -380,7 +390,7 @@ Default          index             linux_host
                  punct             --::.+:__[]:____'___/___'_...	
                  splunk_server     coffely	​‌
 ```
-From adding field:
+**From adding field:**
 ```
 process
 1 Value, 12.5% of events
@@ -388,5 +398,3 @@ Events with this field
 Values 	Count 	 	 
 adduser  1
 ```
-
-_______
