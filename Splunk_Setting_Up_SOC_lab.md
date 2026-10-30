@@ -330,11 +330,63 @@ Answer the questions below
 Follow the steps from above, but this time to ingest the /var/log/auth.log file into the linux_host index.
 What is the value in the sourcetype field?
 
-____
+```
+root@coffely:/opt/splunkforwarder/bin# ./splunk add monitor /var/log/auth.log -index linux_host
+Added monitor of '/var/log/auth.log'.
 
-Check
+root@coffely:/opt/splunkforwarder/bin# cat /opt/splunkforwarder/etc/apps/search/local/inputs.conf
+[monitor:///var/log/syslog]
+disabled = false
+index = linux_host
+
+[monitor:///var/log/auth.log]
+disabled = false
+index = linux_host
+root@coffely:/opt/splunkforwarder/bin# 
+```
+- Revisit splunk search and reporting and just start with index=linux_host
+- View sourcetypes
+```
+sourcetype
+
+Values 	Count	 
+syslog  3,327 	
+auth    60
+```
+Answer is auth
+
 Create a new user named analyst using the command adduser analyst. 
 Once created, look at the syslog events generated in Splunk related to the user creation activity.
 What is the value of the process field when the new user is added?
+
+Using a simple search index=linux_host "new user"
+or index = linux_host analyst
+Then search All fields and add process field
+
+From index=linux_host "new user" search of 3 events.
+```
+10/30/26 1:21:26.278 PM	
+2026-10-30T13:21:26.278390+00:00 coffely adduser[10579]: Adding new user `analyst' to supplemental / extra groups `users' ...
+Event Actions
+Type             Field             Value
+Selected	       host              coffely	
+                 source            /var/log/syslog	
+                 sourcetype        syslog	
+Event            pid               10579	
+                 process           adduser	
+Time             _time             2026-10-30T13:21:26.278+00:00
+Default          index             linux_host	
+                 linecount         1	
+                 punct             --::.+:__[]:____'___/___'_...	
+                 splunk_server     coffely	​‌
+```
+From adding field:
+```
+process
+1 Value, 12.5% of events
+Events with this field
+Values 	Count 	 	 
+adduser  1
+```
 
 _______
