@@ -1,5 +1,6 @@
 # Splunk: Setting Up SOC lab
 
+---
 ## Task1: Objectives overview
 
 - Learn how to install Splunk and the Universal Forwarder on a Linux host
@@ -398,7 +399,7 @@ Events with this field
 Values 	Count 	 	 
 adduser  1
 ```
-
+---
 ## Task 7: Windows forwarding
 
 - Splunk supports a range of log forwarding, including Windows, email servers, or firewalls.
@@ -433,3 +434,30 @@ Added monitor of 'C:\Windows\System32\winevt\Logs\Security.evtx'.
 **Q1 What command would you use on Linux to enable your Splunk instance as a deployment server?**
 
 Answer: ./splunk enable deploy-server 
+
+
+---
+## Task 8: Ingesting Web Logs
+
+Ingesting logs from the website already on the VM where Splunk deployment server in installed. Accessed via http://coffely.thm:8000 from the VM. This task configures to receive web logs to trace and improve coffee sales.
+- Site will enable logging or coffee orders online, track request and responses and orders placed.
+
+### Getting Started
+
+- Running on Apache, access logs we need '/var/log/apache2/access.log'. This can be done via the command line method used like for syslog logs, or via Splunk interface.
+
+### Adding Data
+
+- In Splunk, navigate to 'Settings' → 'Add Data'.
+- Scroll down and select 'Monitor'.
+- Choose 'Files & Directories', then enter the path of the file to 'monitor':
+```
+/var/log/apache2/access.log
+```
+- The reference guide recommends configuring the file for continuous monitoring rather than a one-time import. This ensures new log entries are automatically ingested into Splunk as they are written to the file.
+- Next select SourceType dropdown, select Web, and then choose 'access_combined'.
+- Next assign a name to the host field value. Let's change it to 'coffelyweb', then create a new index named 'web', just like we did for the previous logs.
+- Finally, review then submit, start searching through newly monitored file. Logs won't be added automatically. You need to interact with the website 'http://coffely.thm:8000' after all its continuous monitoring. Then start with:
+```
+index=web sourcetype=access_combined host=coffelyweb source="/var/log/apache2/access.log"
+```
