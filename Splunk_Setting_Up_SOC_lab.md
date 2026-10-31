@@ -431,5 +431,4 @@ Added monitor of 'C:\Windows\System32\winevt\Logs\Security.evtx'.
 
 **Q1 What command would you use on Linux to enable your Splunk instance as a deployment server?**
 
-
-- 
+Answer: ./splunk enable deploy-server 
