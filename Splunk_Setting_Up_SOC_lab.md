@@ -461,3 +461,18 @@ Ingesting logs from the website already on the VM where Splunk deployment server
 ```
 index=web sourcetype=access_combined host=coffelyweb source="/var/log/apache2/access.log"
 ```
+### Lab Questions
+
+**Q1 Which sourcetype should be used to parse and categorize Apache access logs correctly?**
+
+
+**Q2 After browsing the Coffely site, which root field value has the highest count?**
+
+
+**Q3 What is the full uri_path field value for cappuchino.png?**
+
+/______/_____________/__________.___
+
+
+**Q4 Navigate to http://coffely.thm:8080/secret-flag.html Check out the list of recent orders and find the flag!**
+
