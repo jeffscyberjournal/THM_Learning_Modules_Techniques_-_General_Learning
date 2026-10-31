@@ -398,3 +398,38 @@ Events with this field
 Values 	Count 	 	 
 adduser  1
 ```
+
+## Task 7: Windows forwarding
+
+- Splunk supports a range of log forwarding, including Windows, email servers, or firewalls.
+- Log aggregation at central location, normalization and indexing of logs.
+- Allows control of correlation and clearer view of incidents.
+- This section is read along only but covers the configuration for forwarding from a Windows system.
+- This will require atleast 2 VM for Windows and Linux architecture. You can install the universal forwarder on the Windows machine and specify the IP address of your Linux instance to act as the indexer during the installation process.
+- Using PowerShell, we can head to the forwarder directory and add a new monitor. Not dissimilar to adding syslog in linux.
+```
+PS C:\> cd "Program Files\SplunkUniversalForwarder\bin"
+PS C:\Program Files\SplunkUniversalForwarder\bin> .\splunk.exe add monitor C:\Windows\System32\winevt\Logs\Security.evtx
+Added monitor of 'C:\Windows\System32\winevt\Logs\Security.evtx'.
+```
+Test same way with search and reporting in splunk.
+
+### Deployment Server
+
+- An alternative you can turn your Splunk instance into a deployment server, allowing you to manage other Splunk instances and forwarders remotely.
+```
+PS C:\> cd "Program Files\SplunkUniversalForwarder\bin"
+PS C:\Program Files\SplunkUniversalForwarder\bin> .\splunk.exe add monitor C:\Windows\System32\winevt\Logs\Security.evtx
+Added monitor of 'C:\Windows\System32\winevt\Logs\Security.evtx'.
+```
+- Login to deployment server used earlier in linux, go to Settings, select Data Inputs, scroll down to Forwarder inputs, and choose **+ Add new** that is on right next to Windows Event Logs.
+- We now see Windows machines available in the 'available hosts' column, select it and give it a 'New Server Class name'. Server classes are used to define a single instance or group of Splunk deployment clients (Splunk instance, forwarder, indexer, or search head).
+- Finally, we can create a new index named Windows, review our data input, and submit just as we did in the previous steps.
+- Test in splunk with index=windows.
+
+### Lab Question Answer
+
+**Q1 What command would you use on Linux to enable your Splunk instance as a deployment server?**
+
+
+- 
