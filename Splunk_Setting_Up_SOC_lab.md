@@ -426,6 +426,7 @@ Added monitor of 'C:\Windows\System32\winevt\Logs\Security.evtx'.
 - We now see Windows machines available in the 'available hosts' column, select it and give it a 'New Server Class name'. Server classes are used to define a single instance or group of Splunk deployment clients (Splunk instance, forwarder, indexer, or search head).
 - Finally, we can create a new index named Windows, review our data input, and submit just as we did in the previous steps.
 - Test in splunk with index=windows.
+- Check sources should show 4 WinEventlog Security, System, Application and Setup logs.
 
 ### Lab Question Answer
 
